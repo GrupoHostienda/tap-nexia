@@ -15,8 +15,9 @@ class UserItem extends Model
      * @var string
      */
     protected $table = 'user_items';
-    
+
     protected $fillable = [
+        'title',
         'text_color',
         'bg_color',
         'bg_image',
