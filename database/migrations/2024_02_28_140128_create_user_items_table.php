@@ -14,13 +14,13 @@ return new class extends Migration
     {
         Schema::create('user_items', function (Blueprint $table) {
             $table->id();
-            $table->string('text_color');
-            $table->string('bg_color');
-            $table->string('bg_image');
-            $table->string('url');
-            $table->string('icon');
+            $table->string('text_color')->nullable();
+            $table->string('bg_color')->nullable();
+            $table->string('bg_image')->nullable();
+            $table->string('url')->nullable();
+            $table->string('icon')->nullable();
             $table->foreignIdFor(User::class)->constrained()
-            ->cascadeOnDelete();
+            ->cascadeOnDelete()->nullable();
             $table->timestamps();
         });
     }
