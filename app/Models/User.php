@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Model
 {
-    use HasFactory;
+    use HasFactory, HasRoles;
 
     protected $fillable = [
         'name',
@@ -17,8 +18,8 @@ class User extends Model
         'profile_image',
     ];
 
-
     public function items() { 
         return $this->hasMany(UserItem::class);
     }
+
 }

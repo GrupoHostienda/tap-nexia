@@ -15,8 +15,7 @@ class UserItem extends Model
      * @var string
      */
     protected $table = 'user_items';
-
-
+    
     protected $fillable = [
         'text_color',
         'bg_color',
@@ -27,5 +26,6 @@ class UserItem extends Model
 
     public function user() {
         return $this->belongsTo(User::class);
-    };
+    }
+
 }
