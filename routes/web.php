@@ -4,6 +4,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\ExampleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ItemController;
 
@@ -49,6 +50,8 @@ Route::prefix('/items')->middleware('auth')->group(function () {
     // Route::get('/{example}/edit', [ItemController::class, 'edit'])->name('items.edit');
 });
 
+Route::get('/usertest', [UserController::class, 'index']);
+   
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
