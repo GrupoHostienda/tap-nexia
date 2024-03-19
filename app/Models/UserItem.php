@@ -17,13 +17,14 @@ class UserItem extends Model
     protected $table = 'user_items';
 
     protected $fillable = [
+        'user_id',
         'title',
         'text_color',
         'bg_color',
         'bg_image',
         'url',
         'icon',
-            ];
+    ];
 
     public function user() {
         return $this->belongsTo(User::class);

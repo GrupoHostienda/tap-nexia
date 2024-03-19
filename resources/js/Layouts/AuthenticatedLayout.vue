@@ -29,6 +29,14 @@ const menu = [
             class: 'pi pi-fw pi-map-marker',
         },
     },
+    {
+        href: "/items",
+        title: "Item",
+        icon: {
+            element: 'span',
+            class: 'pi pi-fw pi-map-marker',
+        },
+    },
 ];
 
 const showingNavigationDropdown = ref(false);
@@ -56,7 +64,7 @@ onMounted(() => {
             :collapsed="collapse"
             :linkComponentName="Link"
             widthCollapsed="100px"
-            class="!bg-pantone"
+            class="!bg-#1e1e21"
         >
             <template #header>
                 <div class="flex justify-center h-16 w-full">
