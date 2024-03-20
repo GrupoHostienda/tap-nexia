@@ -18,7 +18,7 @@ import Editor from 'primevue/editor';
 
 
 defineProps({
-    items: {
+    socialItems: {
         type: Array,
         required: true,
     },
@@ -30,11 +30,8 @@ const itemDialog = ref(false);
 const isEditing = ref(false);
 const deleteItemDialog = ref(false);
 const deleteItemsDialog = ref(false);
-const item = ref({
+const socialItem = ref({
          title:'',
-    text_color:'',
-      bg_color:'',
-      bg_image:'',
            url:'',
           icon:''
 });
@@ -55,23 +52,21 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const showItem = (id) => {
-    router.visit(`/items/${id}`);
+    router.visit(`/socialItems/${id}`);
 }
 const saveItem = () => {
     submitted.value = true;
 
     if (
-        !item.value.title ||
-        !item.value.text_color ||
-        !item.value.bg_color ||
-        !item.value.bg_image ||
-        !item.value.url 
+        !socialItem.value.title ||
+        !socialItem.value.icon ||
+        !socialItem.value.url 
     ) {
       return;
     }
 
     const form  = useForm({
-        ...item.value,
+        ...socialItem.value,
     })
 
     if (isEditing.value) {
@@ -79,9 +74,9 @@ const saveItem = () => {
         return
     }
 
-    form.post(`/items`, {
+    form.post(`/socialItems`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Item Created', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Created', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -92,9 +87,9 @@ const saveItem = () => {
 const updateItem = (form) => {
     submitted.value = true;
 
-    form.post(`/items/update`, {
+    form.post(`/socialItems/update`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Item Updated', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Updated', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -105,10 +100,10 @@ const updateItem = (form) => {
 const editItem = (prod) => {
     itemDialog.value = true;
     isEditing.value = true;
-    item.value = {...prod};
+    socialItem.value = {...prod};
 };
 const confirmDeleteItem = (prod) => {
-    item.value = prod;
+    socialItem.value = prod;
     deleteItemDialog.value = true;
 };
 const deleteItem = () => {
@@ -116,9 +111,9 @@ const deleteItem = () => {
 
     const form = useForm({})
 
-    form.delete(`/items/${item.value.id}`, {
+    form.delete(`/socialItems/${socialItem.value.id}`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Item Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -139,13 +134,13 @@ const deleteSelectedItems = () => {
     deleteItemsDialog.value = false;
 
     const form  = useForm({
-        items: selectedItems.value
+        socialItems: selectedItems.value
     })
 
-    form.delete(`/items/deleteSelected`, {
+    form.delete(`/socialItems/deleteSelected`, {
         onSuccess: () => {
             selectedItems.value = null;
-            toast.add({severity:'success', summary: 'Successful', detail: 'Items Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -154,7 +149,7 @@ const deleteSelectedItems = () => {
 };
 
 const emptyItem = () => {
-    item.value = {
+    socialItem.value = {
          title:'',
     text_color:'',
       bg_color:'',
@@ -188,7 +183,7 @@ const emptyItem = () => {
                 <div
                     class="bg-white p-5 overflow-hidden shadow-sm sm:rounded-lg"
                 >
-                    <h2 class="text-2xl font-bold mb-4">Items</h2>
+                    <h2 class="text-2xl font-bold mb-4">Social</h2>
 
                     <div>
                         <div class="card">
@@ -203,13 +198,13 @@ const emptyItem = () => {
                                 </template>
                             </Toolbar>
 
-                            <DataTable ref="dt" :value="items" v-model:selection="selectedItems" dataKey="id"
+                            <DataTable ref="dt" :value="socialItems" v-model:selection="selectedItems" dataKey="id"
                                 :paginator="true" :rows="10" :filters="filters"
                                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} itemos">
+                                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} social items">
                                 <template #header>
                                     <div class="flex flex-wrap gap-2 align-items-center justify-between">
-                                        <h4 class="m-0">Items</h4>
+                                        <h4 class="m-0">Social items</h4>
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText v-model="filters['global'].value" placeholder="Buscar..." />
@@ -224,12 +219,6 @@ const emptyItem = () => {
                                 <Column field="id" header="ID" sortable />
 
                                 <Column field="title" header="Title" />
-
-                                <Column field="text_color" header="Text color" />
-
-                                <Column field="bg_color" header="Back ground color" />
-
-                                <Column field="bg_image" header="Back ground image" />
 
                                 <Column field="url" header="Url" />
 
@@ -257,62 +246,23 @@ const emptyItem = () => {
 
                             <div class="field mb-3">
                                 <label for="tilte">Title</label>
-                                <InputText id="title" v-model.trim="item.title" required="true" :class="{'p-invalid': submitted && !item.title}" />
-                                <small class="p-error" v-if="submitted && !item.title">Title is required.</small>
+                                <InputText id="title" v-model.trim="socialItem.title" required="true" :class="{'p-invalid': submitted && !socialItem.title}" />
+                                <small class="p-error" v-if="submitted && !socialItem.title">Title is required.</small>
                             </div>
 
-                            <div class="field mb-3">
-                                <label for="text_color">Text color</label>
-                                <div class="flex flex-row justify-start content-center items-center gap-10">
-                                    <InputText 
-                                        id="text_color" 
-                                        v-model.trim="item.text_color" 
-                                        required="true" 
-                                        :class="{'p-invalid': submitted && !item.text_color}" 
-                                        class="basis-1/2"
-                                    />
-                                    <ColorPicker 
-                                        v-model.trim="item.text_color" 
-                                        class="w-10"
-                                    />
-                                </div>
-                                <small class="p-error" v-if="submitted && !item.text_color">Text color is required.</small>
-                            </div>
 
-                            <div class="field mb-3">
-                                <label for="bg_color">Back ground color</label>
-                                <div class="flex flex-row justify-start content-center items-center gap-10">
-                                    <InputText 
-                                        id="bg_color" 
-                                        v-model.trim="item.bg_color" 
-                                        required="true" 
-                                        :class="{'p-invalid': submitted && !item.bg_color}" 
-                                        class="basis-1/2"
-                                    />
-                                    <ColorPicker 
-                                        v-model.trim="item.bg_color" 
-                                        class="w-10"
-                                    />
-                                </div>
-                                <small class="p-error" v-if="submitted && !item.bg_color">Back ground color is required.</small>
-                            </div>
 
-                            <div class="field mb-3">
-                                <label for="bg_image">Back ground image </label>
-                                <InputText id="bg_image" v-model.trim="item.bg_image" required="true" :class="{'p-invalid': submitted && !item.bg_image}" />
-                                <small class="p-error" v-if="submitted && !item.bg_image">Back ground image is required.</small>
-                            </div>
 
                             <div class="field mb-3">
                                 <label for="url">Url</label>
-                                <InputText id="url" v-model.trim="item.url" required="true" :class="{'p-invalid': submitted && !item.url}" />
-                                <small class="p-error" v-if="submitted && !item.url">Url is required.</small>
+                                <InputText id="url" v-model.trim="socialItem.url" required="true" :class="{'p-invalid': submitted && !socialItem.url}" />
+                                <small class="p-error" v-if="submitted && !socialItem.url">Url is required.</small>
                             </div>
 
                             <div class="field mb-3">
                                 <label for="icon">Icon</label>
-                                <InputText id="url" v-model.trim="item.icon" required="true" :class="{'p-invalid': submitted && !item.icon}" />
-                                <small class="p-error" v-if="submitted && !item.icon">Icon is required.</small>
+                                <InputText id="url" v-model.trim="socialItem.icon" required="true" :class="{'p-invalid': submitted && !socialItem.icon}" />
+                                <small class="p-error" v-if="submitted && !socialItem.icon">Icon is required.</small>
                             </div>
 
 
@@ -325,7 +275,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="item">Are you sure you want to delete <b>{{item.name}}</b>?</span>
+                                <span v-if="socialItem">Are you sure you want to delete <b>{{socialItem.name}}</b>?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemDialog = false"/>
@@ -336,7 +286,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="item">Are you sure you want to delete the selected items?</span>
+                                <span v-if="socialItem">Are you sure you want to delete the selected socialItems?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemsDialog = false"/>

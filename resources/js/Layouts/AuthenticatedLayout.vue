@@ -22,16 +22,16 @@ const numberOfAlerts = ref(JSON.parse(localStorage.getItem('alertCount') || '0')
 
 const menu = [
     {
-        href: "/examples",
-        title: "Ejemplo",
+        href: "/items",
+        title: "Item",
         icon: {
             element: 'span',
             class: 'pi pi-fw pi-map-marker',
         },
     },
     {
-        href: "/items",
-        title: "Item",
+        href: "/socialItems",
+        title: "Social",
         icon: {
             element: 'span',
             class: 'pi pi-fw pi-map-marker',

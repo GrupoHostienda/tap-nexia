@@ -24,4 +24,8 @@ class User extends Authenticatable
         return $this->hasMany(UserItem::class);
     }
 
+    public function socials() { 
+        return $this->hasMany(UserSocialItem::class);
+    }
+
 }

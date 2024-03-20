@@ -5,27 +5,28 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\UserItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+// Model
+use App\Models\UserSocialItem;
 
-class ItemController extends Controller
+class UserSocialItemController extends Controller
 {
      /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Item/index', [
-            'items' => $this->currentUser()->items,
+        return Inertia::render('Social/index', [
+            'socialItems' => $this->currentUser()->socials,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
-
+        //
     }
 
     /**
@@ -35,29 +36,29 @@ class ItemController extends Controller
     {
         $user = $this->currentUser();
 
-        $items = UserItem::make($request->all());
+        $items = UserSocialItem::make($request->all());
         
-        $user->items()->save($items);
+        $user->socials()->save($items);
 
         return Redirect::back()->with([
-            'message' => 'UserItem created successfully',
+            'message' => 'Social created successfully',
         ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(UserItem $example)
+    public function show(UserSocialItem $userSocialItem)
     {
-
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(UserSocialItem $userSocialItem)
     {
-
+        //
     }
 
     /**
@@ -67,13 +68,13 @@ class ItemController extends Controller
     {
         $user = $this->currentUser();
 
-        $item = $user->items()->find($request->id);
+        $item = $user->socials()->find($request->id);
         $item->update($request->all());
         $user->items()->save($item);
         
 
         return Redirect::back()->with([
-            'message' => 'Item updated successfully',
+            'message' => 'Social updated successfully',
         ]);
     }
 
@@ -84,26 +85,25 @@ class ItemController extends Controller
     {
         $user = $this->currentUser();
 
-        $item = $user->items()->find($id)->delete();
+        $item = $user->socials()->find($id)->delete();
 
         return Redirect::back()->with([
-            'message' => 'Item deleted successfully',
+            'message' => 'Social deleted successfully',
             'buttons' => UserItem::all(),
         ]);
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function deleteSelected(Request $request)
     {
 
-        $exampleIds = collect($request->items)->pluck('id');
-        UserItem::destroy($exampleIds);
+        $exampleIds = collect($request->socialItems)->pluck('id');
+        UserSocialItem::destroy($exampleIds);
 
         return Redirect::back()->with([
-            'message' => 'Selected items deleted successfully',
-            'buttons' => UserItem::all(),
+            'message' => 'Selected social deleted successfully',
+            'buttons' => UserSocialItem::all(),
         ]);
     }
 }
