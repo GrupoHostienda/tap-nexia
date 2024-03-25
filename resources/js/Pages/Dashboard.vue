@@ -51,7 +51,7 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const showProduct = (id) => {
-    router.visit(`/examples/${id}`);
+    router.visit(`/items/${id}`);
 }
 const saveProduct = () => {
     submitted.value = true;
@@ -65,7 +65,7 @@ const saveProduct = () => {
         return
     }
 
-    form.post(`/examples`, {
+    form.post(`/items`, {
         onSuccess: () => {
             toast.add({severity:'success', summary: 'Successful', detail: 'Product Created', life: 3000});
             productDialog.value = false;
@@ -78,7 +78,7 @@ const saveProduct = () => {
 const updateProduct = (form) => {
     submitted.value = true;
 
-    form.post(`/examples/update`, {
+    form.post(`/items/update`, {
         onSuccess: () => {
             toast.add({severity:'success', summary: 'Successful', detail: 'Product Updated', life: 3000});
             productDialog.value = false;
@@ -102,7 +102,7 @@ const deleteProduct = () => {
 
     const form = useForm({})
 
-    form.delete(`/examples/${product.value.id}`, {
+    form.delete(`/items/${product.value.id}`, {
         onSuccess: () => {
             toast.add({severity:'success', summary: 'Successful', detail: 'Product Deleted', life: 3000});
         },
@@ -128,7 +128,7 @@ const deleteSelectedProducts = () => {
         products: selectedProducts.value
     })
 
-    form.delete(`/examples/deleteSelected`, {
+    form.delete(`/items/deleteSelected`, {
         onSuccess: () => {
             selectedProducts.value = null;
             toast.add({severity:'success', summary: 'Successful', detail: 'Products Deleted', life: 3000});
