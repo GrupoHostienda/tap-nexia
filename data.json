@@ -1,0 +1,37 @@
+{
+  "name": "john doe",
+  "desc": "artist | dreamer | entrepreneur",
+  "avatar": "https://pbs.twimg.com/profile_images/994592419705274369/RLplF55e_400x400.jpg",
+  "links": [
+    {
+      "title": "My Store",
+      "url": "https://www.amazon.com/"
+    },
+    {
+      "title": "Record Request",
+      "url": "https://www.google.com/"
+    },
+    {
+      "title": "Contact Me",
+      "url": "https://www.google.com/"
+    }
+  ],
+  "socials": [
+    {
+      "title": "x",
+      "url": "https://twitter.com/"
+    },
+    {
+      "title": "facebook",
+      "url": "https://www.facebook.com/"
+    },
+    {
+      "title": "instagram",
+      "url": "https://www.instagram.com/"
+    },
+    {
+      "title": "spotify",
+      "url": "https://open.spotify.com/intl-es"
+    }
+  ]
+}
