@@ -4,8 +4,8 @@ import {
   FaInstagram,
   FaSpotify,
 } from "react-icons/fa6";
-import SocialItem from "../components/SocialItem";
-import data from "../../data.json";
+import SocialItem from "./SocialItem";
+import data from "data.json";
 
 const { socials } = data;
 

@@ -1,6 +1,6 @@
-import LinksContainer from "../components/LinksContainer";
-import SocialsContainer from "../components/SocialsContainer";
-import data from "../../data.json";
+import LinksContainer from "@/components/LinksContainer";
+import SocialsContainer from "@/components/SocialsContainer";
+import data from "data.json";
 /* function for meta data, for improving SEO */
 export function meta() {
   return [
@@ -13,11 +13,10 @@ export function meta() {
     },
   ];
 }
-/* component */
+
 export default function Index() {
   return (
     <div className="flex flex-col gap-10 pt-20">
-      {/* general info */}
       <div className=" flex flex-col gap-2">
         <img
           src={data.avatar}
@@ -30,10 +29,8 @@ export default function Index() {
         </div>
       </div>
 
-      {/* links */}
       <LinksContainer />
 
-      {/* socials */}
       <SocialsContainer />
     </div>
   );

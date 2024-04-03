@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import { ReactNode } from "react";
 import {
   Links,
   Meta,
@@ -6,11 +6,13 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-
-
 import "./styles/index.css";
 
-export function Layout({ children }) {
+type LayoutProps = {
+  children?: ReactNode;
+};
+
+export function Layout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <head>
@@ -22,12 +24,10 @@ export function Layout({ children }) {
 
       <body
         style={{
-          fontFamily: "system-ui, sans-serif", //font
+          fontFamily: "system-ui, sans-serif",
         }}
         className={` min-h-screen bg-center bg-no-repeat bg-cover flex flex-col justify-between gap-4 max-w-3xl mx-auto px-4 sm:px-6`}
       >
-
-        {/* content */}
         <div className=" flex-1">{children}</div>
 
         <ScrollRestoration />
