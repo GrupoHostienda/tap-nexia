@@ -39,7 +39,7 @@ function TopDownBar({toggle}) {
         className={`fixed ${isOpen ? 'inset-0':'-right-full'} flex justify-end transition-all`}
         id="sidebar-container"
       >
-        <div className={`bg-white lg:w-72 md:w-60 w-full h-full overflow-y-auto rounded-2xl shadow-lg`}>
+        <div className={`bg-white lg:w-80 w-full h-full overflow-y-auto rounded-2xl shadow-lg`}>
           <h2 className="text-xl font-bold fixed top-3 w-full px-10">
             Share this link
           </h2>
