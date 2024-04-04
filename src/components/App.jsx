@@ -2,6 +2,7 @@ import { useState } from "react";
 import Button from "./Button";
 import TopDownBar from "./TopDownBar";
 import { LuYoutube, LuInstagram } from "react-icons/lu";
+import { PiPaypalLogoLight } from "react-icons/pi";
 function App() {
   const [toggle, setToggle] = useState(false);
 
@@ -31,14 +32,17 @@ function App() {
           </div>
           {/* Redes sociales */}
           <div className="flex z-10 gap-4 items-center justify-center w-full text-xl mt-5">
-            <div className="content-between p-2 absolute mr-9">
+            <div className="content-between p-2 absolute mr-[10%]">
               <LuYoutube title="Youtube" className="hover:text-2xl"></LuYoutube>
             </div>
-            <div className="content-between p-2 absolute ml-9">
+            <div className="content-between p-2 absolute">
               <LuInstagram
                 title="Instagram"
                 className="hover:text-2xl"
               ></LuInstagram>
+            </div>
+            <div className="content-between p-2 absolute ml-[10%]">
+            <PiPaypalLogoLight title="paypal" className="hover:text-2xl"/>
             </div>
           </div>
         </div>
