@@ -15,7 +15,7 @@ function App() {
         <div className="p-7 grid grid-cols-1 gap-5 h-full">
           <div class="bg-transparent p-6">
             <div class="w-24 h-24 rounded-full overflow-hidden mx-auto">
-              <img class="object-cover w-full h-full" src="images.png" alt="" />
+              <img class="object-cover w-full h-full" src="image.webp" alt="" />
             </div>
             <div className="justify-center text-center p-4">
               <h1 className="text-3xl font-bold">Lorem ipsum</h1>
