@@ -1,5 +1,6 @@
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
+import Sidebar from "@/components/SIdeBar";
 import data from "data.json";
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -32,6 +33,12 @@ export default function Index() {
       <LinksContainer />
 
       <SocialsContainer />
+
+      <Sidebar title="Sidebar">
+        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 1</a>
+        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 2</a>
+        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 3</a>
+      </Sidebar>
     </div>
   );
 }
