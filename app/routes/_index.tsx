@@ -1,6 +1,9 @@
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
+import Iframe from "@/components/Iframe";
 import data from "data.json";
+import { motion } from "framer-motion";
+
 /* function for meta data, for improving SEO */
 export function meta() {
   return [
@@ -16,8 +19,12 @@ export function meta() {
 
 export default function Index() {
   return (
-    <div className="flex flex-col gap-10 pt-20">
-      <div className=" flex flex-col gap-2">
+    <div className="flex flex-col gap-10 pt-20 ">
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className=" flex flex-col gap-2"
+      >
         <img
           src={data.avatar}
           alt="avatar"
@@ -27,11 +34,40 @@ export default function Index() {
           <h2 className="  text-3xl font-bold">{data.name}</h2>
           <p className=" text-lg ">{data.desc}</p>
         </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+      >
+        <LinksContainer />
+      </motion.div>
+
+      <motion.div
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className=" text-white  text-2xl text-center capitalize flex //flex-col justify-center gap-2 //mb-14"
+      >
+        <SocialsContainer />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          delay: 1,
+          duration: 0.5,
+        }}
+      >
+        <Iframe />
+      </motion.div>
+
+      {/*   Necesito esto acá para que la animacion de framer motion funcione bien*/}
+      <div className=" select-none rounded-full opacity-[0.001] text-sm flex justify-center items-center">
+        animation fix | looks like I need some content at the end to make it
+        work
       </div>
-
-      <LinksContainer />
-
-      <SocialsContainer />
     </div>
   );
 }
