@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children }) => {
         <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
           <button
             onClick={toggleSidebar}
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-600 lg:hidden"
+            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-600 "
             aria-label="Open sidebar"
           >
             <svg
