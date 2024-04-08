@@ -4,6 +4,7 @@ import Sidebar from "@/components/SIdeBar";
 import data from "data.json";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Link } from "@remix-run/react";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -70,6 +71,9 @@ export default function Index() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
       >
+        <Link to="/login">
+        Login
+      </Link>
         <LinksContainer
           setIframeVisible={setIframeVisible}
           iFrameVisible={iFrameVisible}
@@ -90,7 +94,7 @@ export default function Index() {
         animation fix | looks like I need some content at the end to make it
         work
       </div>
-
+      
       <Sidebar title="Social Media">
         {/* <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 1</a>
         <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 2</a>
