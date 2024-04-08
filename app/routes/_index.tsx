@@ -91,26 +91,11 @@ export default function Index() {
         work
       </div>
 
-      {/*  <SideBar title="Sidebar">
-        <a
-          href="#d"
-          className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Link 1
-        </a>
-        <a
-          href="#d"
-          className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Link 2
-        </a>
-        <a
-          href="#d"
-          className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-        >
-          Link 3
-        </a>
-      </SideBar> */}
+      <Sidebar title="Social Media">
+        {/* <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 1</a>
+        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 2</a>
+        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Link 3</a> */}
+      </Sidebar>
     </div>
   );
 }

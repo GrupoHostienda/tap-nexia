@@ -1,21 +1,33 @@
 import React, { useState } from 'react';
+import { FaMehBlank } from 'react-icons/fa';
+import SidebarContent from "@/components/SideBarContent";
 
 interface SidebarProps {
   title: string;
-  children: React.ReactNode
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ title, children }) => {
+const Sidebar: React.FC<SidebarProps> = ({ title }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [copy, setCopied] = useState("Copy");
+  const [change, setSwitched] = useState(false)
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
+  const changeText = () => {
+    if(change){
+      setCopied("Copy")
+      setSwitched(!change)
+    }else{
+      setCopied("Copied")
+      setSwitched(!change)
+    }
+  }
+
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className={`fixed top-0 h-screen flex overflow-hidden transition-all ${isOpen ? 'left-0' : '-left-full'}`}>
       {/* Sidebar */}
-      <div className={`bg-gray-800 w-64 pt-5 pb-4 ${isOpen ? 'block' : 'hidden'}`}>
+      <div className={`z-20 bg-gray-800 w-64 pt-5 pb-4`}>
         <div className="flex items-center justify-between px-4">
           <h2 className="text-white text-xl font-semibold">{title}</h2>
           <button
@@ -38,17 +50,24 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children }) => {
         </div>
         <nav className="mt-5">
           <div className="space-y-1">
-            {children}
+          <SidebarContent></SidebarContent>
+          </div>
+          <div className="mt-3 mx-4">
+            <button onClick={changeText} className="flex gap-3 items-center border border-gray-600 p-4 rounded-lg w-full text-white bg-gray-600">
+              <FaMehBlank className="text-2xl text-green-700" />
+              <p className="">Lorem ipsum dolor</p>
+              <span id="url-for-copy" className={`${change? "text-green-500": "text-gray-950"} border border-transparent border-l-gray-500 border-dotted p-3`}>{copy}</span>
+            </button>
           </div>
         </nav>
       </div>
 
       {/* Button */}
-      <div className="flex-1 overflow-auto focus:outline-none">
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-200 lg:border-none">
+      
+        <div className="fixed top-4 left-4 z-10 flex-shrink-0 flex h-16">
           <button
             onClick={toggleSidebar}
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-600 "
+            className="px-4 text-white hover:text-gray-600 focus:outline-none rounded-full hover:bg-gray-100 focus:text-gray-600 transition-colors"
             aria-label="Open sidebar"
           >
             <svg
@@ -65,7 +84,6 @@ const Sidebar: React.FC<SidebarProps> = ({ title, children }) => {
           </button>
           
         </div>
-      </div>
     </div>
   );
 };
