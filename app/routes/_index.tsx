@@ -1,6 +1,6 @@
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
-//import SideBar from "@/components/SideBar";
+import Sidebar from "@/components/SIdeBar";
 import data from "data.json";
 import { motion } from "framer-motion";
 import { useState } from "react";
