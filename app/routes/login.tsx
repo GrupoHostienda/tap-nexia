@@ -52,7 +52,7 @@ export default function loginLayout() {
             <input
               type="submit"
               value="Log in"
-              className="bg-blue-600 text-white rounded-full p-3 hover:bg-blue-400 cursor-pointer"
+              className={`bg-blue-600 text-white rounded-full p-3 hover:bg-blue-400 cursor-pointer ${''}`}
             />
             <p className="text-center">Or</p>
             <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100">
@@ -69,7 +69,11 @@ export default function loginLayout() {
           </form>
         </div>
         {/* Imagen lateral */}
-        <div className="absolute bg-gray-800 h-screen w-1/3 right-0"></div>
+        <div className="absolute bg-gray-800 h-screen w-1/3 right-0">
+          <button className="p-5 rounded-full bg-violet-800 text-white text-xl absolute bottom-4 right-4 hover:bg-violet-700">
+            <p className="w-7 h-7">?</p>
+          </button>
+        </div>
       </div>
     </>
   );

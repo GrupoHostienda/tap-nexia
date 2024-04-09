@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
             aria-label="Open sidebar"
           >
             <svg
-              className="h-6 w-6"
+              className="h-8 w-8"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
