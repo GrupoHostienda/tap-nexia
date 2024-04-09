@@ -16,7 +16,7 @@ export function meta() {
 }
 
 export default function loginLayout() {
-const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
+  const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
   return (
     <>
@@ -36,17 +36,17 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
               name=""
               id=""
             />
-<div className="bg-gray-200 rounded-md flex items-center w-full">
-  <input
-              type={`${PasswordInputType}`}
-              placeholder="password"
-              className="bg-transparent p-2 px-4 rounded-md w-[90%]"
-              name=""
-              id=""
-            />
-            {ToggleIcon}
-</div>
-            
+            <div className="bg-gray-200 rounded-md flex items-center w-full">
+              <input
+                type={`${PasswordInputType}`}
+                placeholder="password"
+                className="bg-transparent p-2 px-4 rounded-md w-[90%]"
+                name=""
+                id=""
+              />
+              {ToggleIcon}
+            </div>
+
             <div className="flex gap-3">
               <Link className="text-blue-600 text-sm" to="#">
                 Forgot your password?
@@ -58,7 +58,7 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
             <input
               type="submit"
               value="Log in"
-              className={`bg-blue-600 text-white rounded-full p-3 hover:bg-blue-400 cursor-pointer ${''}`}
+              className={`bg-blue-600 text-white rounded-full p-3 hover:bg-blue-400 cursor-pointer ${""}`}
             />
             <p className="text-center">Or</p>
             <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100">
@@ -70,7 +70,10 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
               <p className="font-semibold">Continue with Apple</p>
             </button>
             <p className="text-center text-sm">
-              Don't have an account? <Link className="text-blue-600 text-sm" to="#">Sign up</Link>
+              Don't have an account?{" "}
+              <Link className="text-blue-600 text-sm" to="#">
+                Sign up
+              </Link>
             </p>
           </form>
         </div>
