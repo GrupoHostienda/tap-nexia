@@ -22,7 +22,7 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
     <>
       <div className="w-screen h-screen bg-gray-50 fixed left-0">
         {/* Formulario */}
-        <div className="absolute top-[8%] left-[10%] lg:w-[48%] sm:w-[80%] h-[70%] rounded-xl p-5">
+        <div className="absolute top-[8%] left-[10%] md:w-[48%] sm:w-[80%] h-[70%] p-5">
           <form action="#" className="grid grid-cols-1 gap-2">
             <h1 className=" text-4xl text-center px-2 pt-2 font-bold">
               Welcome Back
@@ -32,19 +32,21 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
             <input
               type="email"
               placeholder="Email or username"
-              className="borde bg-gray-200 p-2 px-4 rounded-md "
+              className="bg-gray-200 p-2 px-4 rounded-md "
               name=""
               id=""
             />
-
-            <input
+<div className="bg-gray-200 rounded-md flex items-center w-full">
+  <input
               type={`${PasswordInputType}`}
               placeholder="password"
-              className="border bg-gray-200 p-2 px-4 rounded-md"
+              className="bg-transparent p-2 px-4 rounded-md w-[90%]"
               name=""
               id=""
             />
             {ToggleIcon}
+</div>
+            
             <div className="flex gap-3">
               <Link className="text-blue-600 text-sm" to="#">
                 Forgot your password?
@@ -73,7 +75,7 @@ const [PasswordInputType, ToggleIcon] = PasswordTypeToggle()
           </form>
         </div>
         {/* Imagen lateral */}
-        <div className="absolute bg-gray-800 h-screen w-1/3 lg:right-0 sm:-right-full">
+        <div className="absolute md:bg-gray-800 h-screen w-1/3 md:right-0 sm:bg-transparent">
           <button className="p-5 rounded-full bg-violet-800 text-white text-xl fixed bottom-4 right-4 hover:bg-violet-700">
             <p className="w-7 h-7">?</p>
           </button>

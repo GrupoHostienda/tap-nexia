@@ -7,7 +7,7 @@ const PasswordTypeToggle = ()=>{
         setVisible(!visible);
     }
 
-    const icon = <span onClick={setVisibility} className="absolute top-[39%] right-[10%] opacity-60 cursor-pointer">
+    const icon = <span onClick={setVisibility} className="w-[10%] opacity-60 cursor-pointer">
         {visible ? <FaEye/> : <FaEyeSlash/>}
     </span>
         
