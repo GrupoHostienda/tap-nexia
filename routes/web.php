@@ -4,10 +4,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
 // Controllers
-use App\Http\Controllers\ExampleController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LinkTypeController;
+use App\Http\Controllers\LinkSchemaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,14 +40,14 @@ Route::prefix('/link-types')->middleware('auth')->group(function () {
 });
 
 Route::prefix('/link-schemas')->middleware('auth')->group(function () {
-    Route::get('/', [LinkTypeController::class, 'index'])->name('linkType');
-    Route::post('/', [LinkTypeController::class, 'store'])->name('linkType.store');
-    Route::post('update', [LinkTypeController::class, 'update'])->name('linkType.update');
-    Route::delete('/deleteSelected', [LinkTypeController::class, 'deleteSelected'])->name('linkType.deleteSelected');
-    Route::delete('/{type}', [LinkTypeController::class, 'destroy'])->name('linkType.destroy');
-    // Route::get('/create', [LinkTypeController::class, 'create'])->name('items.create');
-    // Route::get('/{example}', [LinkTypeController::class, 'show'])->name('items.show');
-    // Route::get('/{example}/edit', [LinkTypeController::class, 'edit'])->name('items.edit');
+    Route::get('/', [LinkSchemaController::class, 'index'])->name('linkSchema');
+    Route::post('/', [LinkSchemaController::class, 'store'])->name('linkSchema.store');
+    Route::post('update', [LinkSchemaController::class, 'update'])->name('linkSchema.update');
+    Route::delete('/deleteSelected', [LinkSchemaController::class, 'deleteSelected'])->name('linkSchema.deleteSelected');
+    Route::delete('/{type}', [LinkSchemaController::class, 'destroy'])->name('linkSchema.destroy');
+    // Route::get('/create', [LinkSchemaController::class, 'create'])->name('items.create');
+    // Route::get('/{example}', [LinkSchemaController::class, 'show'])->name('items.show');
+    // Route::get('/{example}/edit', [LinkSchemaController::class, 'edit'])->name('items.edit');
 });
 
 

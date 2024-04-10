@@ -16,7 +16,8 @@ class LinkSchemaController extends Controller
     public function index()
     {
         return Inertia::render('LinkSchemas/index', [
-            'linkTypes' => LinkType::all(),
+            'linkTypes' => LinkType::where('hasSchema',false)->get(),
+            'linkSchemas' => LinkSchema::all(),
         ]);
     }
 
@@ -32,7 +33,10 @@ class LinkSchemaController extends Controller
      */
     public function store(Request $request)
     {
-        LinkSchema::create($request->all());
+
+        $schema = LinkSchema::create($request->all());
+        $schema->type->setSchema(true);
+        
 
         return Redirect::back()->with([
             'message' => 'Example created successfully',
@@ -73,7 +77,9 @@ class LinkSchemaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        LinkSchema::destroy($id);
+        $schema = LinkSchema::find($id);
+        $schema->type->setSchema(false);
+        $schema->destroy();
 
         return Redirect::back()->with([
             'message' => 'Example deleted successfully',
