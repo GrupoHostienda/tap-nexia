@@ -20,16 +20,6 @@ class User extends Authenticatable implements JWTSubject
         'role',
     ];
 
-    public function items() { 
-        return $this->hasMany(UserItem::class);
-    }
-
-    public function socials() { 
-        return $this->hasMany(UserSocialItem::class);
-    }
-
-
-    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

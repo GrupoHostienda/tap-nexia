@@ -13,15 +13,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login']]);
-    }
 
     // Login 
     public function login(){
@@ -51,6 +42,7 @@ class AuthController extends Controller
         $user = User::create($data);
 
         $credentials = request(['email', 'password']);
+
         return response()->json([
             'message' => 'User and profile created',
             'token' => JWTAuth::attempt($credentials),
@@ -66,6 +58,13 @@ class AuthController extends Controller
         // Make  new user
         $data['role']='admin';
         $user = User::create($data);
+
+        $credentials = request(['email', 'password']);
+        return response()->json([
+            'message' => 'User and profile created',
+            'token' => JWTAuth::attempt($credentials),
+            'user' => $user,
+        ], Response::HTTP_CREATED);
 
 
     }

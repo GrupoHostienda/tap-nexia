@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
-use App\Models\UserItem;
+use App\Models\LinkType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
-class ItemController extends Controller
+class LinkTypeController extends Controller
 {
      /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return Inertia::render('Item/index', [
-            'items' => $this->currentUser()->items,
+        return Inertia::render('LinkTypes/index', [
+            'linkTypes' => LinkType::all(),
         ]);
     }
 
@@ -25,7 +24,6 @@ class ItemController extends Controller
      */
     public function create(Request $request)
     {
-
     }
 
     /**
@@ -33,47 +31,39 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        $user = $this->currentUser();
-
-        $items = UserItem::make($request->all());
-        
-        $user->items()->save($items);
+        LinkType::create($request->all());
 
         return Redirect::back()->with([
-            'message' => 'UserItem created successfully',
+            'message' => 'Example created successfully',
         ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(UserItem $example)
+    public function show(LinkType $linkType)
     {
-
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(LinkType $linkType)
     {
-
+        //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, LinkType $linkType)
     {
-        $user = $this->currentUser();
-
-        $item = $user->items()->find($request->id);
-        $item->update($request->all());
-        $user->items()->save($item);
-        
+        $element = LinkType::find($request->id);
+        $element->update($request->all());
 
         return Redirect::back()->with([
-            'message' => 'Item updated successfully',
+            'message' => 'Example updated successfully',
         ]);
     }
 
@@ -82,13 +72,11 @@ class ItemController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $user = $this->currentUser();
-
-        $item = $user->items()->find($id)->delete();
+        LinkType::destroy($id);
 
         return Redirect::back()->with([
-            'message' => 'Item deleted successfully',
-            'buttons' => UserItem::all(),
+            'message' => 'Example deleted successfully',
+            'buttons' => LinkType::all(),
         ]);
     }
 
@@ -99,11 +87,11 @@ class ItemController extends Controller
     {
 
         $exampleIds = collect($request->items)->pluck('id');
-        UserItem::destroy($exampleIds);
+        LinkType::destroy($exampleIds);
 
         return Redirect::back()->with([
-            'message' => 'Selected items deleted successfully',
-            'buttons' => UserItem::all(),
+            'message' => 'Selected link types deleted successfully',
+            'buttons' => LinkType::all(),
         ]);
     }
 }
