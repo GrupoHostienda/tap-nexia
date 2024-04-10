@@ -6,14 +6,16 @@ import PasswordTypeToggle from "@/components/PasswordToggleIcon";
 export function meta() {
   return [
     {
-      title: "Login - Page",
+      title: "Hostienda | Login",
     },
     {
       name: "description",
-      content: "Login - Page",
+      content: "Login Page",
     },
   ];
 }
+
+const disable = true;
 
 export default function loginLayout() {
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
@@ -22,59 +24,69 @@ export default function loginLayout() {
     <>
       <div className="w-screen h-screen bg-gray-50 fixed left-0">
         {/* Formulario */}
-        <div className="absolute top-[8%] left-[10%] md:w-[48%] sm:w-[80%] h-[70%] p-5">
-          <form action="#" className="grid grid-cols-1 gap-2">
-            <h1 className=" text-4xl text-center px-2 pt-2 font-bold">
-              Welcome Back
-            </h1>
-            <h2 className="text-sm text-center">Log into your account</h2>
+        <div className="absolute top-[15%] left-[10%] md:w-[48%] w-[80%]">
+          <form action="#" className="grid grid-cols-1 gap-10">
+            <div className=" flex flex-col gap-1">
+              <h1 className=" text-4xl font-extrabold text-center px-2 pt-2">
+                Welcome Back
+              </h1>
+              <h2 className="text-sm text-center text-gray-500 font-medium">
+                Log into your account
+              </h2>
+            </div>
 
-            <input
-              type="email"
-              placeholder="Email or username"
-              className="bg-gray-200 p-2 px-4 rounded-md "
-              name=""
-              id=""
-            />
-            <div className="bg-gray-200 rounded-md flex items-center w-full">
+            <div className=" flex flex-col gap-3">
               <input
-                type={`${PasswordInputType}`}
-                placeholder="password"
-                className="bg-transparent p-2 px-4 rounded-md w-[90%]"
-                name=""
-                id=""
+                type="email"
+                placeholder="Email or username"
+                className="input z-10"
               />
-              {ToggleIcon}
+              <div className="bg-gray-200 rounded-md flex items-center w-full">
+                <input
+                  type={`${PasswordInputType}`}
+                  placeholder="password"
+                  className="input relative w-full z-10"
+                  name=""
+                  id=""
+                />
+                <div className=" absolute right-3 z-20">{ToggleIcon}</div>
+              </div>
+
+              <div className="flex gap-3">
+                <Link className="text-blue-600 text-sm z-10 tap" to="#">
+                  Forgot your password?
+                </Link>
+                <Link className="text-blue-600 text-sm tap" to="#">
+                  Forgot your username?
+                </Link>
+              </div>
             </div>
 
-            <div className="flex gap-3">
-              <Link className="text-blue-600 text-sm" to="#">
-                Forgot your password?
-              </Link>
-              <Link className="text-blue-600 text-sm" to="#">
-                Forgot your username?
-              </Link>
+            <div className=" flex flex-col gap-3">
+              <input
+                type="submit"
+                value="Log in"
+                className={`bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 cursor-pointer transition ${
+                  disable &&
+                  "bg-gray-400 opacity-80 text-gray-700 tap hover:bg-gray-400"
+                } `}
+              />
+              <p className="text-center text-gray-500 font-medium">OR</p>
+              <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100 tap">
+                <FcGoogle className="text-2xl" />
+                <p className="font-semibold">Continue with Google</p>
+              </button>
+              <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100 tap">
+                <FaApple className="text-2xl" />
+                <p className="font-semibold">Continue with Apple</p>
+              </button>
+              <p className="text-center text-sm text-gray-500 font-medium">
+                Don&apos;t have an account?{" "}
+                <Link className="text-blue-600 text-sm tap" to="#">
+                  Sign up
+                </Link>
+              </p>
             </div>
-            <input
-              type="submit"
-              value="Log in"
-              className={`bg-blue-600 text-white rounded-full p-3 hover:bg-blue-400 cursor-pointer ${""}`}
-            />
-            <p className="text-center">Or</p>
-            <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100">
-              <FcGoogle className="text-2xl" />
-              <p className="font-semibold">Continue with Google</p>
-            </button>
-            <button className="border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100">
-              <FaApple className="text-2xl" />
-              <p className="font-semibold">Continue with Apple</p>
-            </button>
-            <p className="text-center text-sm">
-              Don't have an account?{" "}
-              <Link className="text-blue-600 text-sm" to="#">
-                Sign up
-              </Link>
-            </p>
           </form>
         </div>
         {/* Imagen lateral */}
