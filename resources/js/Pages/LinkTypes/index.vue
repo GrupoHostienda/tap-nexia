@@ -31,7 +31,7 @@ const isEditing = ref(false);
 const deleteItemDialog = ref(false);
 const deleteItemsDialog = ref(false);
 const item = ref({
-          name:''
+          name:'',
 });
 
 const selectedItems = ref();
@@ -211,6 +211,8 @@ const emptyItem = () => {
                                 <Column field="id" header="ID" sortable />
 
                                 <Column field="name" header="Name" />
+
+                                <Column field="hasSchema" header="Has schema" />
 
 
                                 <!-- Columnas Fin -->

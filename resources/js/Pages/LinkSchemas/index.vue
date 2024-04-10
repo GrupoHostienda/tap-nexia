@@ -2,6 +2,8 @@
 import { Head, router, useForm } from "@inertiajs/vue3";
 import { ref } from 'vue';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import ButtonAdd from "@/Components/ButtonAdd.vue";
+import ButtonRemove from "@/Components/ButtonRemove.vue";
 
 // PrimeVue
 import DataTable from "primevue/datatable";
@@ -9,16 +11,19 @@ import Column from "primevue/column";
 import { FilterMatchMode } from 'primevue/api';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-import ColorPicker from 'primevue/colorpicker';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
-import Editor from 'primevue/editor';
 
 
 defineProps({
-    socialItems: {
+    linkTypes: {
+        type: Array,
+        required: true,
+    },
+    linkSchemas: {
         type: Array,
         required: true,
     },
@@ -30,10 +35,9 @@ const itemDialog = ref(false);
 const isEditing = ref(false);
 const deleteItemDialog = ref(false);
 const deleteItemsDialog = ref(false);
-const socialItem = ref({
-         title:'',
-           url:'',
-          icon:''
+const item = ref({
+          link_type_id:'',
+          properties:[]
 });
 
 const selectedItems = ref();
@@ -52,21 +56,28 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const showItem = (id) => {
-    router.visit(`/socialItems/${id}`);
+    router.visit(`/link-schemas/${id}`);
 }
+
+const addProperty = () => {
+    item.value.properties.push('');
+}
+const removeProperty = (index) => {
+    item.value.properties.splice(index, 1);
+}
+
 const saveItem = () => {
     submitted.value = true;
 
     if (
-        !socialItem.value.title ||
-        !socialItem.value.icon ||
-        !socialItem.value.url 
+        !item.value.properties &&
+        !item.value.link_type_id
     ) {
       return;
     }
 
     const form  = useForm({
-        ...socialItem.value,
+        ...item.value,
     })
 
     if (isEditing.value) {
@@ -74,9 +85,9 @@ const saveItem = () => {
         return
     }
 
-    form.post(`/socialItems`, {
+    form.post(`/link-schemas`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Created', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Created', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -87,9 +98,9 @@ const saveItem = () => {
 const updateItem = (form) => {
     submitted.value = true;
 
-    form.post(`/socialItems/update`, {
+    form.post(`/link-schemas/update`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Updated', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Updated', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -100,10 +111,10 @@ const updateItem = (form) => {
 const editItem = (prod) => {
     itemDialog.value = true;
     isEditing.value = true;
-    socialItem.value = {...prod};
+    item.value = {...prod};
 };
 const confirmDeleteItem = (prod) => {
-    socialItem.value = prod;
+    item.value = prod;
     deleteItemDialog.value = true;
 };
 const deleteItem = () => {
@@ -111,9 +122,9 @@ const deleteItem = () => {
 
     const form = useForm({})
 
-    form.delete(`/socialItems/${socialItem.value.id}`, {
+    form.delete(`/link-schemas/${item.value.id}`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -134,13 +145,14 @@ const deleteSelectedItems = () => {
     deleteItemsDialog.value = false;
 
     const form  = useForm({
-        socialItems: selectedItems.value
+        items: selectedItems.value
     })
 
-    form.delete(`/socialItems/deleteSelected`, {
+    console.log(form)
+    form.delete(`/link-schemas/deleteSelected`, {
         onSuccess: () => {
             selectedItems.value = null;
-            toast.add({severity:'success', summary: 'Successful', detail: 'SocialItem Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Link Types  Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -149,13 +161,9 @@ const deleteSelectedItems = () => {
 };
 
 const emptyItem = () => {
-    socialItem.value = {
-         title:'',
-    text_color:'',
-      bg_color:'',
-      bg_image:'',
-           url:'',
-          icon:''
+    item.value = {
+           link_type_id:'',
+           properties:[],
     };
 };
 
@@ -183,7 +191,7 @@ const emptyItem = () => {
                 <div
                     class="bg-white p-5 overflow-hidden shadow-sm sm:rounded-lg"
                 >
-                    <h2 class="text-2xl font-bold mb-4">Social</h2>
+                    <h2 class="text-2xl font-bold mb-4">Link schema</h2>
 
                     <div>
                         <div class="card">
@@ -198,13 +206,13 @@ const emptyItem = () => {
                                 </template>
                             </Toolbar>
 
-                            <DataTable ref="dt" :value="socialItems" v-model:selection="selectedItems" dataKey="id"
+                            <DataTable ref="dt" :value="linkSchemas" v-model:selection="selectedItems" dataKey="id"
                                 :paginator="true" :rows="10" :filters="filters"
                                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
-                                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} social items">
+                                currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} itemos">
                                 <template #header>
                                     <div class="flex flex-wrap gap-2 align-items-center justify-between">
-                                        <h4 class="m-0">Social items</h4>
+                                        <h4 class="m-0">Link schemas</h4>
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText v-model="filters['global'].value" placeholder="Buscar..." />
@@ -218,11 +226,9 @@ const emptyItem = () => {
 
                                 <Column field="id" header="ID" sortable />
 
-                                <Column field="title" header="Title" />
+                                <Column field="type.name" header="Type" />
 
-                                <Column field="url" header="Url" />
-
-                                <Column field="icon" header="Icon" />
+                                <Column field="properties" header="Properties" />
 
 
                                 <!-- Columnas Fin -->
@@ -237,34 +243,52 @@ const emptyItem = () => {
                             </DataTable>
                         </div>
 
-                        <Dialog v-model:visible="itemDialog" :style="{width: '850px'}" header="Item Details" :modal="true" class="p-fluid">
+                        <Dialog v-model:visible="itemDialog" :style="{width: '850px'}" header="Schema Details" :modal="true" class="p-fluid">
 
                             <!-- <div class="field mb-3">
                                 <label for="image">Imagen</label>
                                 <FileUpload mode="basic" name="demo[]" accept="image/*" customUpload @uploader="onUploadImage" :auto="true" chooseLabel="Subir Imagen..." />
                             </div> -->
 
-                            <div class="field mb-3">
-                                <label for="tilte">Title</label>
-                                <InputText id="title" v-model.trim="socialItem.title" required="true" :class="{'p-invalid': submitted && !socialItem.title}" />
-                                <small class="p-error" v-if="submitted && !socialItem.title">Title is required.</small>
-                            </div>
-
-
-
 
                             <div class="field mb-3">
-                                <label for="url">Url</label>
-                                <InputText id="url" v-model.trim="socialItem.url" required="true" :class="{'p-invalid': submitted && !socialItem.url}" />
-                                <small class="p-error" v-if="submitted && !socialItem.url">Url is required.</small>
+                                <label for="name">Type</label>
+                                <Dropdown 
+                                    v-model="item.link_type_id" 
+                                    :options="linkTypes" 
+                                    optionLabel="name" 
+                                    optionValue="id" 
+                                    placeholder="Select a type" 
+                                    class="w-full md:w-14rem" 
+                                />
+                                <small class="p-error" v-if="submitted && !item.link_type_id">type is required.</small>
                             </div>
 
-                            <div class="field mb-3">
-                                <label for="icon">Icon</label>
-                                <InputText id="url" v-model.trim="socialItem.icon" required="true" :class="{'p-invalid': submitted && !socialItem.icon}" />
-                                <small class="p-error" v-if="submitted && !socialItem.icon">Icon is required.</small>
+                            <div class="field mb-3 grid gap-4">
+                                <label for="name">Properties</label>
+                                <div 
+                                    v-for="(property, index) in item.properties" :key="index"
+                                >
+                                    <div class="flex flex-row gap-4" >
+                                        <InputText 
+                                            id="property" 
+                                            v-model.trim="item.properties[index]" 
+                                            required="true" :class="{'p-invalid': submitted && !item.properties[index]}" 
+                                        />
+                                        <ButtonRemove
+                                            @click="removeProperty(index)"
+                                        />
+                                        
+                                    </div>
+                                    <small class="p-error" v-if="submitted && !item.properties[index]">Property is required.</small>
+                                </div>
                             </div>
 
+                            <div class="w-1/2">
+                                <ButtonAdd
+                                    @click="addProperty"
+                                />
+                            </div>
 
                             <template #footer>
                                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"/>
@@ -275,7 +299,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="socialItem">Are you sure you want to delete <b>{{socialItem.name}}</b>?</span>
+                                <span v-if="item">Are you sure you want to delete <b>{{item.name}}</b>?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemDialog = false"/>
@@ -286,7 +310,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="socialItem">Are you sure you want to delete the selected socialItems?</span>
+                                <span v-if="item">Are you sure you want to delete the selected link schema?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemsDialog = false"/>
