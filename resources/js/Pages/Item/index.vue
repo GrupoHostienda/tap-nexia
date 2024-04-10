@@ -142,7 +142,7 @@ const deleteSelectedItems = () => {
         items: selectedItems.value
     })
 
-    form.delete(`/examples/deleteSelected`, {
+    form.delete(`/items/deleteSelected`, {
         onSuccess: () => {
             selectedItems.value = null;
             toast.add({severity:'success', summary: 'Successful', detail: 'Items Deleted', life: 3000});

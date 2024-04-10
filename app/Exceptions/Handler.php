@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+// Custom exceptions
+use App\Exceptions\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -26,5 +28,9 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+        $this->reportable(function (ValidationException $e) {
+            return $e->render();
+        });
+
     }
 }

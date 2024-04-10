@@ -7,6 +7,7 @@ use App\Http\Controllers\ExampleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\UserSocialItemController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,16 +29,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::prefix('/examples')->middleware('auth')->group(function () {
-    Route::get('/', [ExampleController::class, 'index'])->name('examples');
-    Route::post('/', [ExampleController::class, 'store'])->name('examples.store');
-    Route::post('update', [ExampleController::class, 'update'])->name('examples.update');
-    Route::delete('/deleteSelected', [ExampleController::class, 'deleteSelected'])->name('examples.deleteSelected');
-    Route::delete('/{example}', [ExampleController::class, 'destroy'])->name('examples.destroy');
-    // Route::get('/create', [ExampleController::class, 'create'])->name('examples.create');
-    // Route::get('/{example}', [ExampleController::class, 'show'])->name('examples.show');
-    // Route::get('/{example}/edit', [ExampleController::class, 'edit'])->name('examples.edit');
-});
 
 Route::prefix('/items')->middleware('auth')->group(function () {
     Route::get('/', [ItemController::class, 'index'])->name('items');
@@ -50,8 +41,17 @@ Route::prefix('/items')->middleware('auth')->group(function () {
     // Route::get('/{example}/edit', [ItemController::class, 'edit'])->name('items.edit');
 });
 
-Route::get('/usertest', [UserController::class, 'index']);
-   
+Route::prefix('/socialItems')->middleware('auth')->group(function () {
+    Route::get('/', [UserSocialItemController::class, 'index'])->name('socialItems');
+    Route::post('/', [UserSocialItemController::class, 'store'])->name('socialItems.store');
+    Route::post('update', [UserSocialItemController::class, 'update'])->name('socialItems.update');
+    Route::delete('/deleteSelected', [UserSocialItemController::class, 'deleteSelected'])->name('socialItems.deleteSelected');
+    Route::delete('/{example}', [UserSocialItemController::class, 'destroy'])->name('socialItems.destroy');
+    // Route::get('/create', [UserSocialItemController::class, 'create'])->name('socialItems.create');
+    // Route::get('/{example}', [UserSocialItemController::class, 'show'])->name('socialItems.show');
+    // Route::get('/{example}/edit', [UserSocialItemController::class, 'edit'])->name('socialItems.edit');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

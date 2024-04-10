@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+// Model
+use App\Models\User;
 
 return new class extends Migration
 {
@@ -11,14 +13,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('user_social_items', function (Blueprint $table) {
             $table->id();
-            $table->string('username');
-            $table->string('email');
-            $table->text('password');
-            $table->string('role');
-            $table->string('cover')->nullable();
+            $table->string('title');
+            $table->string('url');
+            $table->string('icon');
             $table->timestamps();
+            $table->foreignIdFor(User::class)
+                  ->constrained()
+                  ->cascadeOnDelete()
+                  ->nullable();
         });
     }
 
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('user_social_items');
     }
 };

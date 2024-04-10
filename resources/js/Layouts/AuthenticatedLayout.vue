@@ -22,16 +22,16 @@ const numberOfAlerts = ref(JSON.parse(localStorage.getItem('alertCount') || '0')
 
 const menu = [
     {
-        href: "/examples",
-        title: "Ejemplo",
+        href: "/items",
+        title: "Item",
         icon: {
             element: 'span',
             class: 'pi pi-fw pi-map-marker',
         },
     },
     {
-        href: "/items",
-        title: "Item",
+        href: "/socialItems",
+        title: "Social",
         icon: {
             element: 'span',
             class: 'pi pi-fw pi-map-marker',
@@ -71,7 +71,7 @@ onMounted(() => {
                     <div class="flex">
                         <!-- Logo -->
                         <div class="shrink-0 flex items-center">
-                            <Link :href="route('examples')">
+                            <Link :href="route('items')">
                                 <ApplicationLogo
                                     class="block h-9 w-auto fill-current text-gray-800"
                                 />
@@ -196,10 +196,10 @@ onMounted(() => {
                 >
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink
-                            :href="route('examples')"
-                            :active="route().current('examples')"
+                            :href="route('items')"
+                            :active="route().current('items')"
                         >
-                            examples
+                            Items
                         </ResponsiveNavLink>
                     </div>
 
