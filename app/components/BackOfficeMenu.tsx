@@ -15,16 +15,16 @@ export default function BackOfficeMenu() {
       </div>
       {/* Boton add link */}
       <div className="w-full">
-        <button className="flex justify-center items-center bg-violet-600 text-white rounded-full w-full p-3">
+        <button className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3">
           <FaPlus />
           <p>Add Link</p>
         </button>
         <div className="flex justify-between pt-3">
-          <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 border rounded-full">
+          <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
             <RiLayoutTopLine />
             <p>Add Header</p>
           </button>
-          <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 border rounded-full">
+          <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
             <FiArchive />
             View archive
             <IoIosArrowForward />

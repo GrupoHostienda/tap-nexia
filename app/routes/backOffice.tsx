@@ -16,10 +16,10 @@ export default function LayoutBackOffice() {
   return (
     <>
       <div className="w-screen h-screen bg-slate-200 fixed left-0">
-        <div className="absolute top-[8%] left-[10%] w-[48%] p-5 border-r flex flex-col gap-2">
+        <div className="absolute top-[8%] left-[10%] w-[60%] p-5 border-r flex flex-col gap-2">
 
           <BackOfficeMenu/>
-          <CardBackOffice></CardBackOffice>
+          <CardBackOffice text="Lorem ipsum" url="Lorem.com" id="1" />
 
         </div>
 
