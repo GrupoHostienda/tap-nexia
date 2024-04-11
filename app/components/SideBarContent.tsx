@@ -66,13 +66,6 @@ function SidebarContent() {
     </div>
   );
 
-  const icons: Array<React.ReactElement> = [
-    <FaXTwitter />,
-    <FaFacebook />,
-    <FaInstagram />,
-    <FaSpotify />,
-  ];
-
   return content;
 }
 

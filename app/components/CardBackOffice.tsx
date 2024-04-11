@@ -10,7 +10,7 @@ import { useState } from "react";
 type Card = {
   text: string,
   url: string,
-  id: string
+  id: number
 }
 
 function CardBackOffice({ text, url, id }:Card) {
