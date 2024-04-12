@@ -1,12 +1,43 @@
+import { useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import data from "data.json";
+import { Link } from "framer";
+function PreviewBackOffice() {
 
-function PreviewBackOffice(){
-    return <>
-    <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
-        <div className="w-full h-full bg-white rounded-2xl p-3 grid grid-cols-1 gap-4 justify-items-center overflow-y-scroll hidden-scrollbar">
-<div className="size-16 rounded-full bg-gray-700"></div>
+
+    // Estos datos son temporales hasta usar los datos reales
+  const { links } = data;
+
+  return (
+    <>
+      <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
+        <div className="w-full h-full bg-gradient-to-b from-blue-300 to-blue-500 rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar">
+          {/* Foto de perfil */}
+          <div className="size-16 rounded-full bg-gray-700 self-center"></div>
+          {/* Nombre de usuario y mensaje de biografia */}
+          <div className="text-center">
+            <h1 className="font-bold">USER123@email.com</h1>
+            <p className="text-gray-500 text-sm">xdxdxd</p>
+          </div>
+          {/* Links en linea */}
+          <div className="flex flex-col gap-3">
+            {links.map((link, index) => {
+              return (
+                <a href={link.url} className="bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md">
+                  <p>
+                    {link.title}
+                  </p>
+                  <span>
+                    <BsThreeDotsVertical />
+                  </span>
+                </a>
+              );
+            })}
+          </div>
         </div>
-    </div>
+      </div>
     </>
+  );
 }
 
-export default PreviewBackOffice
+export default PreviewBackOffice;

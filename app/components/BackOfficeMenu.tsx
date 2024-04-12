@@ -7,7 +7,7 @@ export default function BackOfficeMenu() {
   return (
     <>
       {/* Switch de botones */}
-      <div className="grid grid-cols-2 gap-2 border border-gray-400 w-40 rounded-full">
+      <div className="grid grid-cols-2 border border-gray-400 w-52 rounded-full">
         <button className="bg-gray-950 text-white rounded-full p-3 px-5">
           Links
         </button>

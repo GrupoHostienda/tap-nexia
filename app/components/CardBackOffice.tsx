@@ -28,8 +28,8 @@ function CardBackOffice({ text, url, id }:Card) {
           <TbMenu />
         </div>
         <div className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3">
-          <span className="text-wrap flex items-center gap-2">{text}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
-          <span className="flex items-center gap-2">{url}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
+          <span className="text-wrap font-bold flex items-center gap-2">{text}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
+          <span className="flex font-bold items-center gap-2">{url}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
           <div className="flex justify-between p-3 text-gray-600">
             <LuLayoutPanelLeft className="hover:cursor-pointer"/>
             <GiRapidshareArrow className="hover:cursor-pointer"/>
