@@ -29,8 +29,8 @@ function CardBackOffice({ text, url, id }:Card) {
         </div>
         <div className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3">
           <span className="text-wrap font-bold flex items-center gap-2">{text}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
-          <span className="flex font-bold items-center gap-2">{url}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
-          <div className="flex justify-between p-3 text-gray-600">
+          <span className="flex font-bold items-center gap-2">{url.substring(0,19).concat("...")}<MdOutlineEdit className="opacity-50 hover:opacity-100 cursor-pointer"/></span>
+          <div className="flex justify-start gap-3 p-3 text-gray-600">
             <LuLayoutPanelLeft className="hover:cursor-pointer"/>
             <GiRapidshareArrow className="hover:cursor-pointer"/>
             <CiImageOn className="hover:cursor-pointer"/>
@@ -41,8 +41,8 @@ function CardBackOffice({ text, url, id }:Card) {
           </div>
         </div>
         <div className="border-l p-2 flex justify-end">
-          <div className="grid grid-cols-2 grid-rows-[min-content_1fr] gap-y-4 items-center cursor-pointer self-center">
-            <div className="text-gray-700 font-medium flex justify-center">
+          <div className="grid lg:grid-cols-2 grid-cols-1 lg:grid-rows-[min-content_1fr] grid-rows-3 lg:gap-y-4 items-center cursor-pointer self-center">
+            <div className="text-gray-700 font-bold flex justify-center size-max">
               <BsBoxArrowUp />
             </div>
             <div className="relative" onClick={cardActive}>
@@ -50,7 +50,7 @@ function CardBackOffice({ text, url, id }:Card) {
               <div className={`block ${linkActivated? `bg-green-400`: `bg-gray-600`} transition-colors w-14 h-8 rounded-full`}></div>
               <div className={`dot absolute ${linkActivated? `right-2`: `left-1`} transition-all top-1 bg-white w-6 h-6 rounded-full`}></div>
             </div>
-            <div className="col-start-2 text-xl flex justify-center p-5 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max">
+            <div className="lg:col-start-2 text-xl flex justify-center lg:p-5 p-2 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max">
               <LuTrash2/>
             </div>
           </div>
