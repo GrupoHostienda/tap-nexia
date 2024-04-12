@@ -22,7 +22,7 @@ export default function Index() {
   const [iFrameVisible, setIframeVisible] = useState(false);
 
   return (
-    <div className="flex flex-col gap-10 pt-20 ">
+    <div className="flex flex-col gap-10 pt-20 max-w-3xl mx-auto px-4 sm:px-6">
       <div className="flex items-center justify-center flex-col gap-2">
         <div className=" relative ">
           <motion.div

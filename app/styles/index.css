@@ -18,6 +18,24 @@ body {
   );
 }
 
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    hsl(240deg 87% 18%),
+    hsl(290deg 100% 18%),
+    hsl(314deg 100% 23%),
+    hsl(330deg 79% 34%),
+    hsl(346deg 57% 46%),
+    hsl(4deg 59% 56%),
+    hsl(18deg 73% 58%),
+    hsl(30deg 80% 60%),
+    hsl(41deg 82% 62%),
+    hsl(56deg 76% 66%)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .close,
 .handle {
   position: absolute;
@@ -47,7 +65,7 @@ input:-webkit-autofill:active {
 }
 
 .input {
-  @apply bg-gray-200 p-2 px-4 rounded-md outline-none focus:bg-gray-100 focus:scale-[1.01] focus:border border-gray-400 transition-transform;
+  @apply bg-gray-200 p-2 px-4 rounded-md outline-none focus:bg-gray-100 focus:scale-[1.01]  border border-gray-200 focus:border-gray-400 transition-transform;
 }
 
 .tap {

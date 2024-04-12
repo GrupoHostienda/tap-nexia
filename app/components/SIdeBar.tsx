@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
       </div>
 
       {/* Button */}
-      <div className="fixed top-4 left-4 z-10 flex-shrink-0 flex h-16 scale-75">
+      <div className="fixed top-4 left-0 sm:left-4 z-10 flex-shrink-0 flex h-16 scale-75">
         <button
           onClick={toggleSidebar}
           className="px-4 text-white hover:text-gray-600 focus:outline-none rounded-full hover:bg-gray-100 focus:text-gray-600 transition-colors"
