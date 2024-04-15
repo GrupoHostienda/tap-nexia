@@ -26,7 +26,7 @@ export function Layout({ children }: LayoutProps) {
         style={{
           fontFamily: "system-ui, sans-serif",
         }}
-        className={` min-h-screen bg-center bg-no-repeat bg-cover flex flex-col justify-between gap-4 max-w-3xl mx-auto px-4 sm:px-6`}
+        className={` min-h-screen bg-center bg-no-repeat bg-cover flex flex-col justify-between gap-4`}
       >
         <div className=" flex-1">{children}</div>
 
