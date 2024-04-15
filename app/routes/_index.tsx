@@ -4,7 +4,6 @@ import Sidebar from "@/components/SideBar";
 import data from "data.json";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Link } from "@remix-run/react";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -71,9 +70,6 @@ export default function Index() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
       >
-        <Link to="/login">
-        Login
-      </Link>
         <LinksContainer
           setIframeVisible={setIframeVisible}
           iFrameVisible={iFrameVisible}
@@ -88,14 +84,7 @@ export default function Index() {
       >
         <SocialsContainer />
       </motion.div>
-
-      {/*   Necesito esto acá para que la animacion de framer motion funcione bien*/}
-      <div className=" select-none rounded-full opacity-[0.001] text-sm flex justify-center items-center">
-        animation fix | looks like I need some content at the end to make it
-        work
-      </div>
-      
-      <Sidebar title="Social Media"/>
+      <Sidebar title="Social Media" />
     </div>
   );
 }

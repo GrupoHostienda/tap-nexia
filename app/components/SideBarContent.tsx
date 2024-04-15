@@ -1,5 +1,4 @@
 import data from "data.json";
-import React from "react";
 import {
   FaFacebook,
   FaInstagram,
@@ -8,7 +7,6 @@ import {
 } from "react-icons/fa6";
 
 const { socials } = data;
-console.log(socials)
 
 function SidebarContent() {
   const content = (
@@ -17,6 +15,8 @@ function SidebarContent() {
         if (link.title.toLowerCase() === "x") {
           return (
             <a
+              target="_blank"
+              rel="noreferrer"
               href={link.url}
               key={index}
               className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium flex gap-3 items-center"
@@ -29,6 +29,8 @@ function SidebarContent() {
         if (link.title.toLowerCase() === "facebook") {
           return (
             <a
+              target="_blank"
+              rel="noreferrer"
               href={link.url}
               key={index}
               className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium flex gap-3 items-center"
@@ -41,6 +43,8 @@ function SidebarContent() {
         if (link.title.toLowerCase() === "instagram") {
           return (
             <a
+              target="_blank"
+              rel="noreferrer"
               href={link.url}
               key={index}
               className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium flex gap-3 items-center"
@@ -53,6 +57,8 @@ function SidebarContent() {
         if (link.title.toLowerCase() === "spotify") {
           return (
             <a
+              target="_blank"
+              rel="noreferrer"
               href={link.url}
               key={index}
               className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-base font-medium flex gap-3 items-center"
