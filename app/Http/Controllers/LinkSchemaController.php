@@ -79,7 +79,7 @@ class LinkSchemaController extends Controller
     {
         $schema = LinkSchema::find($id);
         $schema->type->setSchema(false);
-        $schema->destroy();
+        $schema->delete();
 
         return Redirect::back()->with([
             'message' => 'Example deleted successfully',
