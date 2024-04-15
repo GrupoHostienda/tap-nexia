@@ -1,5 +1,5 @@
 import BackOfficeMenu from "@/components/BackOffice/BackOfficeMenu";
-import CardBackOffice from "@/components/CardBackOffice";
+import CardBackOffice from "@/components/BackOffice/CardBackOffice";
 import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
 import data from "data.json";
 import { useState } from "react";
@@ -29,7 +29,9 @@ export default function LayoutBackOffice() {
             {links.map((link, index) => {
               linkList.push(link)
               return (
-                <CardBackOffice text={link.title} url={link.url} id={index} />
+                <div key={index}>
+                  <CardBackOffice text={link.title} url={link.url}/>
+                </div>
               );
             })
             }

@@ -10,10 +10,9 @@ import { useState } from "react";
 type Card = {
   text: string,
   url: string,
-  id: number
 }
 
-function CardBackOffice({ text, url, id }:Card) {
+function CardBackOffice({ text, url }:Card) {
 
   const [linkActivated, linkActive] = useState(false)
   const cardActive = ()=>{
@@ -23,7 +22,7 @@ function CardBackOffice({ text, url, id }:Card) {
 
   return (
     <>
-      <div className="bg-gray-50 rounded-3xl w-full grid grid-cols-[5%_70%_20%] gap-2 p-3 shadow-md" key={id}>
+      <div className="bg-gray-50 rounded-3xl w-full grid grid-cols-[5%_70%_20%] gap-2 p-3 shadow-md">
         <div className="border-r self-center">
           <TbMenu />
         </div>
