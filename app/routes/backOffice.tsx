@@ -1,7 +1,8 @@
-import BackOfficeMenu from "@/components/BackOfficeMenu";
+import BackOfficeMenu from "@/components/BackOffice/BackOfficeMenu";
 import CardBackOffice from "@/components/CardBackOffice";
-import PreviewBackOffice from "@/components/PreviewBackOffice";
+import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
 import data from "data.json";
+import { useState } from "react";
 export function meta() {
   return [
     {
@@ -16,7 +17,9 @@ export function meta() {
 
 export default function LayoutBackOffice() {
   const { links } = data;
-
+  // const [previewData, setPreviewData] = useState<Object[]>([]);
+  const linkList:Object[] = []
+  
   return (
     <>
       <div className="absolute top-0 w-full lg:h-[100%] bg-slate-200 left-0 grid lg:grid-cols-[60%_30%] grid-cols-1 lg:gap-10 gap-2">
@@ -24,15 +27,19 @@ export default function LayoutBackOffice() {
           <BackOfficeMenu />
           <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
             {links.map((link, index) => {
+              linkList.push(link)
               return (
                 <CardBackOffice text={link.title} url={link.url} id={index} />
               );
-            })}
+            })
+            }
           </div>
         </div>
         {/* Preview de elementos */}
         <div className="w-full h-screen flex items-center justify-center">
-          <PreviewBackOffice />
+        
+          
+          <PreviewBackOffice data={linkList}/>
         </div>
       </div>
     </>
