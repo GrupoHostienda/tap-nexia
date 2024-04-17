@@ -1,10 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
+interface DataItem {
+ url: string;
+ title: string;
+}
 
-function PreviewBackOffice({data}) {
 
-
+function PreviewBackOffice({data}: {data: DataItem[]}) {
     // Estos datos son temporales hasta usar los datos reales
   
 
