@@ -2,19 +2,19 @@ import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
-import { Item, useGlobalState } from "../Context/GlobalContext";
-import React, { useState } from "react";
+//import { Item, useGlobalState } from "../Context/GlobalContext";
+//import React, { useState } from "react";
 
-const { state, dispatch } = useGlobalState();
+//const { state, dispatch } = useGlobalState();
 
-const handleAddItem = () => {
+/* const handleAddItem = () => {
   const newItem: Item = {
     id: Date.now(),
     text: '',
     url: ''
   };
   dispatch({ type: 'ADD_ITEM', payload: newItem });
-};
+}; */
 
 export default function BackOfficeMenu() {
   return (
@@ -28,7 +28,10 @@ export default function BackOfficeMenu() {
       </div>
       {/* Boton add link */}
       <div className="w-full">
-        <button onClick={handleAddItem} className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3">
+        <button
+          //onClick={handleAddItem}
+          className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
+        >
           <FaPlus />
           <p>Add Link</p>
         </button>

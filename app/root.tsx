@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import {
   Links,
   Meta,
@@ -38,5 +38,9 @@ export function Layout({ children }: LayoutProps) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const [testContext, setTestContext] = useState(false);
+
+  /* definir todos los reducer */
+
+  return <Outlet context={{ testContext, setTestContext }} />;
 }

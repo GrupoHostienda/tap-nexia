@@ -1,4 +1,4 @@
-import { TbMenu } from "react-icons/tb";
+/* import { TbMenu } from "react-icons/tb";
 import { LuLayoutPanelLeft, LuTrash2 } from "react-icons/lu";
 import { GiRapidshareArrow } from "react-icons/gi";
 import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
@@ -153,3 +153,4 @@ function CardBackOffice() {
 }
 
 export default CardBackOffice;
+ */
