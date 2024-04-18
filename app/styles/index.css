@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+.bg-home {
   background-image: linear-gradient(
     40deg,
     hsl(240deg 87% 18%) 0%,
@@ -109,4 +109,38 @@ input:-webkit-autofill:active {
 /* Estilo de la barra de desplazamiento para navegadores webkit (Chrome, Safari, etc.) */
 .hidden-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* border for card */
+.box01 {
+  --mask: radial-gradient(4.46px at 50% 6.3px, #000 99%, #0000 101%)
+      calc(50% - 6px) 0/12px 51% repeat-x,
+    radial-gradient(4.46px at 50% -3.3px, #0000 99%, #000 101%) 50% 3px/12px
+      calc(51% - 3px) repeat-x,
+    radial-gradient(4.46px at 50% calc(100% - 6.3px), #000 99%, #0000 101%)
+      calc(50% - 6px) 100%/12px 51% repeat-x,
+    radial-gradient(4.46px at 50% calc(100% + 3.3px), #0000 99%, #000 101%) 50%
+      calc(100% - 3px) / 12px calc(51% - 3px) repeat-x;
+  -webkit-mask: var(--mask);
+  mask: var(--mask);
+}
+
+/* border for card */
+.box02 {
+  --mask: conic-gradient(
+        from 122.5deg at top,
+        #0000,
+        #000 1deg 114deg,
+        #0000 115deg
+      )
+      top/6.28px 51% repeat-x,
+    conic-gradient(
+        from -57.5deg at bottom,
+        #0000,
+        #000 1deg 114deg,
+        #0000 115deg
+      )
+      bottom/6.28px 51% repeat-x;
+  -webkit-mask: var(--mask);
+  mask: var(--mask);
 }

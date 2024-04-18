@@ -41,5 +41,23 @@
       "title": "spotify",
       "url": "https://open.spotify.com/intl-es"
     }
-  ]
+  ],
+  "styles": {
+    "border": [
+      { "id": 1, "class": "rounded-none" },
+      { "id": 2, "class": "rounded-lg" },
+      { "id": 3, "class": "rounded-full" }
+    ],
+
+    "softShadow": [
+      { "id": 1, "class": "shadow-md " },
+      { "id": 2, "class": "shadow-lg rounded-lg" },
+      { "id": 3, "class": "shadow-xl rounded-full" }
+    ],
+    "hardShadow": [
+      { "id": 1, "class": "rounded-none" },
+      { "id": 2, "class": "rounded-lg" },
+      { "id": 3, "class": "rounded-full" }
+    ]
+  }
 }
