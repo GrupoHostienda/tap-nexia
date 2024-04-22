@@ -35,7 +35,6 @@ export default function LayoutBackOffice() {
         <div className="w-full h-screen pt-7 px-7 flex flex-col gap-2">
           <BackOfficeMenu />
           <div></div>
-          {/* <CardBackOffice/> */}
           <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
             {state.items.map((link, index) => {
               

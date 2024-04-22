@@ -25,6 +25,7 @@ function CardBackOffice({ link }: {link: Card}) {
   const [linkActivated, linkActive] = useState(false);
   const cardActive = () => {
     linkActive(!linkActivated);
+    link.active = linkActivated
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
@@ -121,12 +122,12 @@ function CardBackOffice({ link }: {link: Card}) {
               <input type="checkbox" className="sr-only" />
               <div
                 className={`block ${
-                  linkActivated ? `bg-green-400` : `bg-gray-600`
+                  link.active ? `bg-green-400` : `bg-gray-600`
                 } transition-colors w-14 h-8 rounded-full`}
               ></div>
               <div
                 className={`dot absolute ${
-                  linkActivated ? `right-2` : `left-1`
+                  link.active ? `right-2` : `left-1`
                 } transition-all top-1 bg-white w-6 h-6 rounded-full`}
               ></div>
             </div>
