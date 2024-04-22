@@ -2,21 +2,34 @@ import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
-//import { Item, useGlobalState } from "../Context/GlobalContext";
-//import React, { useState } from "react";
+import { useOutletContext } from "@remix-run/react";
 
-//const { state, dispatch } = useGlobalState();
+type OutletContextProps = {
+  state: {items: []},
+  dispatch: React.Dispatch<React.SetStateAction<{}>>;
+}
 
-/* const handleAddItem = () => {
-  const newItem: Item = {
-    id: Date.now(),
-    text: '',
-    url: ''
-  };
-  dispatch({ type: 'ADD_ITEM', payload: newItem });
-}; */
-
+type Item = {
+  title: string
+  url: string
+  id: number
+}
 export default function BackOfficeMenu() {
+
+
+  const { state, dispatch } =
+  useOutletContext<OutletContextProps>();
+
+  const addValue = () => {
+    const newItem: Item = {
+      id: Date.now(),
+      title: '',
+      url: ''
+    };
+    dispatch({type: 'addItem', payload: newItem});
+    console.log(state.items);
+  }
+
   return (
     <>
       {/* Switch de botones */}
@@ -29,7 +42,7 @@ export default function BackOfficeMenu() {
       {/* Boton add link */}
       <div className="w-full">
         <button
-          //onClick={handleAddItem}
+          onClick={addValue}
           className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
         >
           <FaPlus />

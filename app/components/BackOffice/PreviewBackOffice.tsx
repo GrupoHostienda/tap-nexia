@@ -27,6 +27,7 @@ function PreviewBackOffice({ data }: { data: DataItem[] }) {
                 <a
                   href={datos.url}
                   className="bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md"
+                  key={index}
                 >
                   <p>{datos.title}</p>
                   <span>

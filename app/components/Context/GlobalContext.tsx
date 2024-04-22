@@ -1,80 +1,50 @@
-/* import React, { ReactNode, useReducer, createContext, useContext } from "react";
-
-interface GlobalState {
+import { useOutletContext } from "@remix-run/react";
+import { Reducer, useReducer } from "react";
+// Definir tipos
+interface Item {
+  id: number;
+  title: string;
+  url: string;
+}
+interface State {
   items: Item[];
 }
 
-export interface Item {
-  id: number;
-  text: string;
-  url: string;
-}
-
 type Action =
-  | { type: "ADD_ITEM"; payload: Item }
-  | { type: "REMOVE_ITEM"; payload: number }
-  | {
-      type: "UPDATE_ITEM";
-      payload: { id: number; updatedData: Partial<Item> };
-    };
+  | { type: 'addItem'; payload: Item }
+  | { type: 'updateItem'; payload: Item }
+  | { type: 'deleteItem'; payload: number };
 
-type ContextProvider = {
-  state: GlobalState;
-  dispatch: React.Dispatch<Action>;
-};
-
-type ContextProps = { children: ReactNode };
-
-const initialState: GlobalState = {
+// Define el estado inicial
+const initialState: State = {
   items: [],
 };
 
-const GlobalStateContext = createContext<ContextProvider>(null!);
-
-const reducer = (state: GlobalState, action: Action) => {
+export const reducer: Reducer<State, Action> = (state:State, action:Action) => {
   switch (action.type) {
-    case "ADD_ITEM":
+  case 'addItem':
       return {
         ...state,
         items: [...state.items, action.payload],
       };
-    case "REMOVE_ITEM":
+    case 'updateItem':
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
+        items: state.items.map(item => (item.id === action.payload.id ? action.payload : item)),
       };
-    case "UPDATE_ITEM":
+    case 'deleteItem':
       return {
         ...state,
-        items: state.items.map((item) =>
-          item.id === action.payload.id
-            ? { ...item, ...action.payload.updatedData }
-            : item
-        ),
+        items: state.items.filter(item => item.id !== action.payload),
       };
     default:
       return state;
   }
-};
+}
 
-export const GlobalStateProvider = ({ children }: ContextProps) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+// {
+//   state: initialState,
+//   dispatch: () => null,
+// }
 
-  return (
-    <GlobalStateContext.Provider value={{ state, dispatch }}>
-      {children}
-    </GlobalStateContext.Provider>
-  );
-};
-
-export const useGlobalState = () => {
-  const context = useContext(GlobalStateContext);
-  if (!context) {
-    throw new Error(
-      "useGlobalState debe ser usado dentro de un GlobalStateProvider"
-    );
-  }
-
-  return context;
-};
- */
+// export const [state, dispatch] = useReducer(reducer, initialState)

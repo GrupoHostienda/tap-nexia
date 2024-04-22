@@ -1,9 +1,11 @@
 //import React from "react";
 import BackOfficeMenu from "@/components/BackOffice/BackOfficeMenu";
-//import CardBackOffice from "@/components/BackOffice/CardBackOffice";
-//import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
+import CardBackOffice from "@/components/BackOffice/CardBackOffice";
+import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
+import { useOutletContext } from "@remix-run/react";
 //import { GlobalStateProvider } from "@/components/Context/GlobalContext";
 import data from "data.json";
+
 export function meta() {
   return [
     {
@@ -16,10 +18,16 @@ export function meta() {
   ];
 }
 
+type OutletContextProps = {
+  state: {items: []},
+  dispatch: React.Dispatch<React.SetStateAction<{}>>;
+}
+
 export default function LayoutBackOffice() {
   const { links } = data;
-  // const {state,dispatch} = useGlobalState()
-  // const {items} = state
+  const { state, dispatch } =
+  useOutletContext<OutletContextProps>();
+ console.log(state)
 
   return (
     <>
@@ -27,22 +35,22 @@ export default function LayoutBackOffice() {
         <div className="w-full h-screen pt-7 px-7 flex flex-col gap-2">
           <BackOfficeMenu />
           <div></div>
-          <CardBackOffice />
-          {/* <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
-            {items.map((link, index) => {
+          {/* <CardBackOffice/> */}
+          <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
+            {state.items.map((link, index) => {
               
               return (
                 <div key={index}>
-                  <CardBackOffice text={link.text} url={link.url} active={false} id={index}/>
+                  <CardBackOffice link={link}/>
                 </div>
               );
             })
             }
-          </div> */}
+          </div>
         </div>
         {/* Preview de elementos */}
         <div className="w-full h-screen flex items-center justify-center">
-          <PreviewBackOffice data={links} />
+          <PreviewBackOffice data={state.items} />
         </div>
       </div>
     </>
