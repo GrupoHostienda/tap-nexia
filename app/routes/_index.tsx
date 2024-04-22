@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
 import Sidebar from "@/components/SIdeBar";
-import { useOutletContext } from "@remix-run/react";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -39,20 +38,8 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   return null; // no hay sesión activa, seguir con el renderizado normal
 };
 
-// type OutletContextProps = {
-//   testContext: boolean;
-//   setTestContext: React.Dispatch<React.SetStateAction<boolean>>;
-// };
-
 export default function Index() {
   const [iFrameVisible, setIframeVisible] = useState(false);
-
-  // const { testContext, setTestContext } =
-  //   useOutletContext<OutletContextProps>();
-
-  // const toggleTestContext = () => {
-  //   setTestContext((prev) => !prev);
-  // };
 
   return (
     <div className=" bg-home min-h-screen">
@@ -73,33 +60,6 @@ export default function Index() {
                 className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
               />
             </motion.div>
-    <div className="flex flex-col gap-10 pt-20 max-w-3xl mx-auto px-4 sm:px-6">
-      <div className="flex items-center justify-center flex-col gap-2">
-        {/* <div className=" bg-white p-2 w-full text-center">
-          <button
-            className=" bg-gray-400  px-4 py-2 rounded-lg hover:bg-gray-500 hover:scale-105 active:scale-100 transition-all"
-            onClick={toggleTestContext}
-          >
-            {" "}
-            toggle textContext
-          </button>
-          <p>{`toggle is ${testContext}`}</p>
-        </div> */}
-        <div className=" relative ">
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              type: "tween",
-              duration: 0.2,
-            }}
-          >
-            <img
-              src={data.avatar}
-              alt="avatar"
-              className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
-            />
-          </motion.div>
 
             <motion.span
               className="absolute bottom-0 right-0 text-4xl"

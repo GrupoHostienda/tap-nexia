@@ -10,7 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
 import { motion } from "framer-motion";
 
-import PasswordTypeToggle from "@/components/PasswordToggleIcon";
+import PasswordTypeToggle from "@/components/Login/PasswordToggleIcon";
 import Error from "@/components/Error";
 
 export function meta() {
