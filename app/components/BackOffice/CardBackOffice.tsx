@@ -21,7 +21,7 @@ type OutletContextProps = {
 };
 
 function CardBackOffice({ link }: {link: Card}) {
-  const url = link.url
+  
   const [linkActivated, linkActive] = useState(false);
   const cardActive = () => {
     linkActive(!linkActivated);
@@ -92,7 +92,7 @@ function CardBackOffice({ link }: {link: Card}) {
               value={editedItemUrl}
               onChange={(e) => setEditedItemUrl(e.target.value)}
               className="border-none bg-transparent overflow-hidden"
-              placeholder={url}
+              placeholder={link.url}
               disabled={!inputEnabled}
             />
             <span
