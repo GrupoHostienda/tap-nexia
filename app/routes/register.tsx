@@ -10,7 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
 import { motion } from "framer-motion";
 
-import PasswordTypeToggle from "@/components/Login/PasswordToggleIcon";
+import PasswordTypeToggle from "@/components/PasswordToggleIcon";
 import Error from "@/components/Error";
 
 export function meta() {
@@ -89,7 +89,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function LoginPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation(); //for pending state of form
-  const isSubmitting = navigation.formAction === "/login";
+  const isSubmitting = navigation.formAction === "/register";
 
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
