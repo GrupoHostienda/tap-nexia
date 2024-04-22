@@ -1,9 +1,15 @@
+import { useState } from "react";
+import data from "data.json";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+
+import { sessionStorage } from "@/utils/session.server";
+
+import { motion } from "framer-motion";
+
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
-import Sidebar from "@/components/SideBar";
-import data from "data.json";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import Sidebar from "@/components/SIdeBar";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -17,6 +23,20 @@ export function meta() {
     },
   ];
 }
+
+// loader para verificar sesión
+export const loader = async ({ request }: ActionFunctionArgs) => {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  const authToken = session.get("authToken");
+
+  if (!authToken) {
+    return redirect("/login");
+  }
+
+  return null; // no hay sesión activa, seguir con el renderizado normal
+};
 
 export default function Index() {
   const [iFrameVisible, setIframeVisible] = useState(false);

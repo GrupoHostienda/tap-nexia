@@ -89,7 +89,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function LoginPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation(); //for pending state of form
-  const isSubmitting = navigation.formAction === "/login";
+  const isSubmitting = navigation.formAction === "/register";
 
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
