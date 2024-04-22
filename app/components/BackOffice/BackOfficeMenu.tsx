@@ -2,8 +2,34 @@ import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
+import { useOutletContext } from "@remix-run/react";
 
+type OutletContextProps = {
+  state: {items: []},
+  dispatch: React.Dispatch<React.SetStateAction<{}>>;
+}
+
+type Item = {
+  title: string
+  url: string
+  id: number
+}
 export default function BackOfficeMenu() {
+
+
+  const { state, dispatch } =
+  useOutletContext<OutletContextProps>();
+
+  const addValue = () => {
+    const newItem: Item = {
+      id: Date.now(),
+      title: '',
+      url: ''
+    };
+    dispatch({type: 'addItem', payload: newItem});
+    console.log(state.items);
+  }
+
   return (
     <>
       {/* Switch de botones */}
@@ -15,7 +41,10 @@ export default function BackOfficeMenu() {
       </div>
       {/* Boton add link */}
       <div className="w-full">
-        <button className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3">
+        <button
+          onClick={addValue}
+          className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
+        >
           <FaPlus />
           <p>Add Link</p>
         </button>

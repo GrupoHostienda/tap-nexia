@@ -4,6 +4,7 @@ import Sidebar from "@/components/SideBar";
 import data from "data.json";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useOutletContext } from "@remix-run/react";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -18,12 +19,34 @@ export function meta() {
   ];
 }
 
+// type OutletContextProps = {
+//   testContext: boolean;
+//   setTestContext: React.Dispatch<React.SetStateAction<boolean>>;
+// };
+
 export default function Index() {
   const [iFrameVisible, setIframeVisible] = useState(false);
+
+  // const { testContext, setTestContext } =
+  //   useOutletContext<OutletContextProps>();
+
+  // const toggleTestContext = () => {
+  //   setTestContext((prev) => !prev);
+  // };
 
   return (
     <div className="flex flex-col gap-10 pt-20 max-w-3xl mx-auto px-4 sm:px-6">
       <div className="flex items-center justify-center flex-col gap-2">
+        {/* <div className=" bg-white p-2 w-full text-center">
+          <button
+            className=" bg-gray-400  px-4 py-2 rounded-lg hover:bg-gray-500 hover:scale-105 active:scale-100 transition-all"
+            onClick={toggleTestContext}
+          >
+            {" "}
+            toggle textContext
+          </button>
+          <p>{`toggle is ${testContext}`}</p>
+        </div> */}
         <div className=" relative ">
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
