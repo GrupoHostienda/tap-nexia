@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 
 import LinksContainer from "@/components/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
-import Sidebar from "@/components/SIdeBar";
+import Sidebar from "@/components/SideBar";
 
 /* function for meta data, for improving SEO */
 export function meta() {
