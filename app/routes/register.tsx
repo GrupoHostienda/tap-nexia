@@ -4,7 +4,7 @@ import { Link, Form, useActionData, useNavigation } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 
 import { validateEmail } from "@/utils/helpers";
-import { sessionStorage } from "@/utils/session.server";
+//import { sessionStorage } from "@/utils/session.server";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
@@ -26,7 +26,7 @@ export function meta() {
 }
 
 // loader para verificar sesión
-export const loader = async ({ request }: ActionFunctionArgs) => {
+/* export const loader = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
@@ -37,32 +37,35 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 
   return null; // no hay sesión activa, seguir con el renderizado normal
-};
+}; */
 
 /* action para la form */
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
+  const username = formData.get("username") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
   //campos no vacios
-  if (email.trim() === "" || password.trim() === "") {
-    return json({ error: "Todos los campos son obligatorios." });
+  if (username.trim() === "" || email.trim() === "" || password.trim() === "") {
+    return json({ error: "Todos los campos son obligatorios.", message: [] });
   }
 
   //formato valido de correo
   if (!validateEmail(email)) {
     return json({
       error: "formato de correo no válido.",
+      message: [],
     });
   }
 
-  const response = await fetch(`${process.env.API_BASE}/login`, {
+  const response = await fetch(`${process.env.API_BASE}/register/user`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      username: username,
       email: email,
       password: password,
     }),
@@ -71,18 +74,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = await response.json();
 
   if (!response.ok) {
-    return json({ error: data.error });
+    return json({ error: data.error, message: data.message });
   }
 
-  const session = await sessionStorage.getSession();
-  session.set("authToken", data.token);
+  //const session = await sessionStorage.getSession();
+  // session.set("authToken", data.token);
 
-  const cookieHeader = await sessionStorage.commitSession(session);
+  // const cookieHeader = await sessionStorage.commitSession(session);
 
-  return redirect("/", {
-    headers: {
+  return redirect("/login", {
+    /*    headers: {
       "Set-Cookie": cookieHeader,
-    },
+    }, */
   });
 };
 
@@ -90,7 +93,6 @@ export default function LoginPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation(); //for pending state of form
   const isSubmitting = navigation.formAction === "/register";
-
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -118,7 +120,7 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               className=" text-[2.5rem] whitespace-nowrap sm:text-5xl lg:text-6xl font-extrabold text-center px-2 pt-2 gradient-text"
             >
-              Welcome Back
+              Welcome
             </motion.h1>
 
             <motion.div
@@ -127,8 +129,15 @@ export default function LoginPage() {
               className=" flex flex-col gap-3"
             >
               <h2 className="text-sm text-center text-gray-500 font-medium">
-                Log into your account
+                Create your account
               </h2>
+              <input
+                formNoValidate
+                type="text"
+                placeholder="Username"
+                className="input z-10"
+                name="username"
+              />
               <input
                 formNoValidate
                 type="email"
@@ -147,23 +156,9 @@ export default function LoginPage() {
                 />
                 <div className=" absolute right-3 z-20">{ToggleIcon}</div>
               </div>
-
-              <div className="flex gap-3">
-                <Link className="text-blue-600 text-sm z-10 tap" to="#">
-                  Forgot your password?
-                </Link>
-                <Link className="text-blue-600 text-sm tap" to="#">
-                  Forgot your username?
-                </Link>
-              </div>
             </motion.div>
 
-            {errorMessage &&
-              (actionData?.error === "Unauthorized" ? (
-                <Error>usuario no valido</Error>
-              ) : (
-                <Error>{actionData?.error}</Error>
-              ))}
+            {errorMessage && <Error>{actionData?.message[0]}</Error>}
 
             <div className=" flex flex-col gap-3">
               <motion.div
@@ -175,7 +170,7 @@ export default function LoginPage() {
               >
                 <input
                   type="submit"
-                  value={isSubmitting ? "Loading..." : "Log in"}
+                  value={isSubmitting ? "Loading..." : "Sign up"}
                   className=" bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 cursor-pointer transition z-10 w-full"
                   disabled={isSubmitting}
                 />
@@ -199,9 +194,9 @@ export default function LoginPage() {
                   <p className="font-semibold">Continue with Apple</p>
                 </button>{" "}
                 <p className="text-center text-sm text-gray-500 font-medium">
-                  Don&apos;t have an account?{" "}
-                  <Link className="text-blue-600 text-sm tap" to="#">
-                    Sign up
+                  Already have an account?{" "}
+                  <Link className="text-blue-600 text-sm tap" to="/login">
+                    Log in
                   </Link>
                 </p>
               </motion.div>

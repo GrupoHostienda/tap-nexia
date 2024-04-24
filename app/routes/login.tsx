@@ -200,7 +200,7 @@ export default function LoginPage() {
                 </button>{" "}
                 <p className="text-center text-sm text-gray-500 font-medium">
                   Don&apos;t have an account?{" "}
-                  <Link className="text-blue-600 text-sm tap" to="#">
+                  <Link className="text-blue-600 text-sm tap" to="/register">
                     Sign up
                   </Link>
                 </p>
