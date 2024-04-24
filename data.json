@@ -60,4 +60,33 @@
       { "id": 3, "class": "rounded-full" }
     ]
   }
+  ,
+  "plans": {
+    "starter":{
+      "title": "Starter",
+      "isfor": "For growing influencers",
+      "items": [
+        "Upgraded style options", "Monetization support affiliate marketing tools", "Scheduling", "Audience insights"
+      ],
+      "price": "$3 EUR",
+      "payplan": "Per month, billed annually , or 4$ billed monthly"
+    },
+    "pro":{
+      "title": "Pro",
+      "isfor": "For creators and businesses",
+      "items": [
+        "Advanced customization of buttons, themes, and fonts","Click, convesion, and revenue tracking","Upgraded customer support","Option to hide logo","Social platform integrations to automatically display your latest-content","Multiple admins"
+      ],
+      "price": "Free for 30 days",
+      "payplan": "6$ per month, biled annually, or 6$ biled monthly"
+    },
+    "premium":{
+      "title": "Premium",
+      "isfor": "For brands and businesses",
+      "items": [
+        "Dedicated customer success manager with 1-1 onboarding", "Analitycs: Export lifetime data", "Access to exclusive webinars & best practice videos", "Premium support, response time 4 hours"
+      ],
+      "price": "$18 EUR",
+      "payplan": "Per month, billed annually , or 22$ billed monthly"}
+  }
 }
