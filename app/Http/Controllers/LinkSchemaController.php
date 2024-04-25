@@ -49,10 +49,10 @@ class LinkSchemaController extends Controller
             foreach ($request->schemas as $schemaData) {
                 $schema = LinkSchema::make($schemaData);
                 $link->schemas()->save($schema);
+                $schema->type->setSchema(true);
             }
         }
 
-        $schema->type->setSchema(true);
 
         return Redirect::back()->with([
             'message' => 'Example created successfully',
