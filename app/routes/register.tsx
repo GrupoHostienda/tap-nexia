@@ -48,7 +48,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   //campos no vacios
   if (username.trim() === "" || email.trim() === "" || password.trim() === "") {
-    return json({ error: "Todos los campos son obligatorios.", message: [] });
+    return json({
+      error: "Todos los campos son obligatorios.",
+      message: ["Todos los campos son obligatorios."],
+    });
   }
 
   //formato valido de correo
@@ -158,7 +161,9 @@ export default function LoginPage() {
               </div>
             </motion.div>
 
-            {errorMessage && <Error>{actionData?.message[0]}</Error>}
+            {errorMessage && actionData?.message[0] && (
+              <Error>{actionData?.message[0]}</Error>
+            )}
 
             <div className=" flex flex-col gap-3">
               <motion.div
