@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(LinkType::class)
                 ->constrained();
-            $table->json('properties')->nullable();
+            $table->string('property')->nullable();
+            $table->json('options')->nullable();
             $table->timestamps();
         });
     }

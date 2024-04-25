@@ -18,6 +18,10 @@ class LinkType extends Model
         'hasSchema',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
     public function setSchema(bool $value)
     {
@@ -27,9 +31,9 @@ class LinkType extends Model
     /**
      * Get the schema that owns the LinkType.
      */
-    public function schema()
+    public function schemas()
     {
-        return $this->hasOne(LinkType::class, 'id', 'link_type_id');
+        return $this->hasMany(LinkSchema::class);
     }
 
 }

@@ -10,14 +10,23 @@ use Illuminate\Support\Facades\Redirect;
 
 class LinkSchemaController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        $linkSchemas = LinkSchema::with('type')->get()->groupBy(function ($item) {
+            return $item->type->name;
+        })->map(function ($group) {
+            return $group->sortBy('name')->values()->toArray();
+        });
+
+
         return Inertia::render('LinkSchemas/index', [
             'linkTypes' => LinkType::where('hasSchema',false)->get(),
-            'linkSchemas' => LinkSchema::all(),
+            'linkTypesSchema' => LinkType::where('hasSchema',true)->get(),
+            'linkSchemas' => LinkSchema::all()->load('type'),
+            'linkSchemasGroupBy' => $linkSchemas,
         ]);
     }
 
@@ -34,9 +43,16 @@ class LinkSchemaController extends Controller
     public function store(Request $request)
     {
 
-        $schema = LinkSchema::create($request->all());
+        $link = LinkType::find($request->link_type_id);
+
+        if ($link) {
+            foreach ($request->schemas as $schemaData) {
+                $schema = LinkSchema::make($schemaData);
+                $link->schemas()->save($schema);
+            }
+        }
+
         $schema->type->setSchema(true);
-        
 
         return Redirect::back()->with([
             'message' => 'Example created successfully',
@@ -64,8 +80,15 @@ class LinkSchemaController extends Controller
      */
     public function update(Request $request, LinkSchema $linkType)
     {
-        $element = LinkSchema::find($request->id);
-        $element->update($request->all());
+        $link = LinkType::find($request->link_type_id);
+        $link->schemas()->delete();
+
+        if ($link) {
+            foreach ($request->schemas as $schemaData) {
+                $schema = LinkSchema::make($schemaData);
+                $link->schemas()->save($schema);
+            }
+        }
 
         return Redirect::back()->with([
             'message' => 'Example updated successfully',
@@ -77,9 +100,10 @@ class LinkSchemaController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $schema = LinkSchema::find($id);
-        $schema->type->setSchema(false);
-        $schema->delete();
+        
+        $schema = LinkType::find($id);
+        $schema->setSchema(false);
+        $schema->schemas()->delete();
 
         return Redirect::back()->with([
             'message' => 'Example deleted successfully',
@@ -94,7 +118,11 @@ class LinkSchemaController extends Controller
     {
 
         $exampleIds = collect($request->items)->pluck('id');
-        LinkSchema::destroy($exampleIds);
+        foreach($exampleIds as $id){
+            $schema = LinkType::find($id);
+            $schema->setSchema(false);
+            $schema->schemas()->delete();
+        }
 
         return Redirect::back()->with([
             'message' => 'Selected link types deleted successfully',

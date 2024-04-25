@@ -23,8 +23,16 @@ defineProps({
         type: Array,
         required: true,
     },
-    linkSchemas: {
+    linkTypesSchema: {
         type: Array,
+        required: true,
+    },
+    linkSchemas: {
+        type: Object,
+        required: true,
+    },
+    linkSchemasGroupBy: {
+        type: Object,
         required: true,
     },
 })
@@ -36,9 +44,12 @@ const isEditing = ref(false);
 const deleteItemDialog = ref(false);
 const deleteItemsDialog = ref(false);
 const item = ref({
-          link_type_id:'',
-          properties:[]
+    link_type_id:'',
+    property:'',
+    options:[],
 });
+
+const itemArray = ref([]);
 
 const selectedItems = ref();
 const filters = ref({
@@ -60,24 +71,30 @@ const showItem = (id) => {
 }
 
 const addProperty = () => {
-    item.value.properties.push('');
+    itemArray.value.push({
+        property:'',options:[]
+    });
+}
+const addOption = (index) => {
+    itemArray.value[index].options.push('');
 }
 const removeProperty = (index) => {
-    item.value.properties.splice(index, 1);
+    itemArray.value.splice(index, 1);
 }
 
 const saveItem = () => {
     submitted.value = true;
 
     if (
-        !item.value.properties &&
-        !item.value.link_type_id
+        !item.value.link_type_id &&
+        !itemArray.value.length
     ) {
       return;
     }
 
     const form  = useForm({
-        ...item.value,
+        link_type_id:item.value.link_type_id,
+        schemas:itemArray.value
     })
 
     if (isEditing.value) {
@@ -108,13 +125,14 @@ const updateItem = (form) => {
         }
     })
 };
-const editItem = (prod) => {
+const editItem = (prod,linkSchemasGroupBy) => {
     itemDialog.value = true;
     isEditing.value = true;
-    item.value = {...prod};
+    item.value.link_type_id = prod.id;
+    itemArray.value = [...linkSchemasGroupBy[prod.name]];
 };
 const confirmDeleteItem = (prod) => {
-    item.value = prod;
+    item.value.link_type_id = prod.id;
     deleteItemDialog.value = true;
 };
 const deleteItem = () => {
@@ -122,7 +140,7 @@ const deleteItem = () => {
 
     const form = useForm({})
 
-    form.delete(`/link-schemas/${item.value.id}`, {
+    form.delete(`/link-schemas/${item.value.link_type_id}`, {
         onSuccess: () => {
             toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Deleted', life: 3000});
         },
@@ -144,6 +162,7 @@ const confirmDeleteSelected = () => {
 const deleteSelectedItems = () => {
     deleteItemsDialog.value = false;
 
+    console.log(Object.values(selectedItems.value));
     const form  = useForm({
         items: selectedItems.value
     })
@@ -163,7 +182,8 @@ const deleteSelectedItems = () => {
 const emptyItem = () => {
     item.value = {
            link_type_id:'',
-           properties:[],
+           property:'',
+           options:[],
     };
 };
 
@@ -206,7 +226,7 @@ const emptyItem = () => {
                                 </template>
                             </Toolbar>
 
-                            <DataTable ref="dt" :value="linkSchemas" v-model:selection="selectedItems" dataKey="id"
+                            <DataTable ref="dt" :value="linkTypesSchema" v-model:selection="selectedItems" dataKey="id"
                                 :paginator="true" :rows="10" :filters="filters"
                                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                                 currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} itemos">
@@ -226,9 +246,7 @@ const emptyItem = () => {
 
                                 <Column field="id" header="ID" sortable />
 
-                                <Column field="type.name" header="Type" />
-
-                                <Column field="properties" header="Properties" />
+                                <Column field="name" header="Type" />
 
 
                                 <!-- Columnas Fin -->
@@ -236,7 +254,7 @@ const emptyItem = () => {
                                 <Column :exportable="false" style="min-width:8rem">
                                     <template #body="slotProps">
                                         <Button icon="pi pi-eye" outlined rounded severity="help" class="mr-2" @click="showItem(slotProps.data.id)" />
-                                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data)" />
+                                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data,linkSchemasGroupBy)" />
                                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteItem(slotProps.data)" />
                                     </template>
                                 </Column>
@@ -251,7 +269,9 @@ const emptyItem = () => {
                             </div> -->
 
 
-                            <div class="field mb-3">
+                            <div class="field mb-3"
+                                 v-if="!isEditing"
+                            >
                                 <label for="name">Type</label>
                                 <Dropdown 
                                     v-model="item.link_type_id" 
@@ -267,20 +287,37 @@ const emptyItem = () => {
                             <div class="field mb-3 grid gap-4">
                                 <label for="name">Properties</label>
                                 <div 
-                                    v-for="(property, index) in item.properties" :key="index"
+                                    v-for="(item, index) in itemArray" :key="index"
                                 >
                                     <div class="flex flex-row gap-4" >
                                         <InputText 
                                             id="property" 
-                                            v-model.trim="item.properties[index]" 
-                                            required="true" :class="{'p-invalid': submitted && !item.properties[index]}" 
+                                            v-model.trim="itemArray[index].property" 
+                                            required="true" :class="{'p-invalid': submitted && !item.property}" 
+                                        />
+                                        <ButtonAdd
+                                            @click="addOption(index)"
                                         />
                                         <ButtonRemove
                                             @click="removeProperty(index)"
                                         />
                                         
                                     </div>
-                                    <small class="p-error" v-if="submitted && !item.properties[index]">Property is required.</small>
+                                    <small class="p-error" v-if="submitted && !item.property">Property is required.</small>
+                                    <div v-if="item.options.length != 0">
+                                        <label for="name">options</label>
+                                        <div  class="flex flex-row flex-wrap gap-4">
+                                            <div  v-for="(option, optionIndex) in item.options" :key="optionIndex">
+                                                <InputText 
+                                                    id="option" 
+                                                    v-model.trim="item.options[optionIndex]" 
+                                                    required="true" 
+                                                    :class="{'p-invalid': submitted && !item.options[optionIndex]}"
+                                                />
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -299,7 +336,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="item">Are you sure you want to delete <b>{{item.name}}</b>?</span>
+                                <span v-if="item">Are you sure you want to delete <b>{{item.link_type_id}}</b>?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemDialog = false"/>

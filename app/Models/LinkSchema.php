@@ -14,13 +14,18 @@ class LinkSchema extends Model
 
     protected $fillable = [
         'link_type_id',
-        'properties',
+        'property',
+        'options',
     ];
     protected $casts = [
-        'properties' => 'array', // Will convarted to (Array)
+        'options' => 'array', // Will convarted to (Array)
     ];
     protected $with = [
-        'type'
+    ];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'link_type_id',
     ];
 
 
