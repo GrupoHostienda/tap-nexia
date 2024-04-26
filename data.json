@@ -88,5 +88,59 @@
       ],
       "price": "$18 EUR",
       "payplan": "Per month, billed annually , or 22$ billed monthly"}
-  }
+  },
+  "categories":[
+    {
+      "icon": "business",
+      "title": "Business"
+    },
+    {
+      "icon": "palette",
+      "title": "Influencer & Digital Creator"
+    },
+    {
+      "icon": "star",
+      "title": "Personal"
+    },
+    {
+      "icon": "edit",
+      "title": "Education"
+    },
+    {
+      "icon": "video",
+      "title": "Entertainment"
+    },
+    {
+      "icon": "perfume",
+      "title": "Fashion & Beauty"
+    },
+    {
+      "icon": "food",
+      "title": "Food & Beverage"
+    },
+    {
+      "icon": "balance",
+      "title": "Government & Politics"
+    },
+    {
+      "icon": "health",
+      "title": "Health & Wellness"
+    },
+    {
+      "icon": "banner",
+      "title": "Non-Profit"
+    },
+    {
+      "icon": "layout",
+      "title": "Other"
+    },
+    {
+      "icon": "computer",
+      "title": "Tech"
+    },
+    {
+      "icon": "airplane",
+      "title": "Travel & Tourism"
+    }
+  ]
 }
