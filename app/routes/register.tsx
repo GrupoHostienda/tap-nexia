@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import type { ActionFunctionArgs } from "@remix-run/node";
-import { Link, Form, useActionData, useNavigation } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
-
+import {
+  Link,
+  Form,
+  useActionData,
+  useNavigation,
+  useNavigate,
+} from "@remix-run/react";
+import { json } from "@remix-run/node";
 import { validateEmail } from "@/utils/helpers";
 //import { sessionStorage } from "@/utils/session.server";
 
@@ -12,6 +17,7 @@ import { motion } from "framer-motion";
 
 import PasswordTypeToggle from "@/components/Login/PasswordToggleIcon";
 import Error from "@/components/Error";
+import Success from "@/components/Success";
 
 export function meta() {
   return [
@@ -51,6 +57,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({
       error: "Todos los campos son obligatorios.",
       message: ["Todos los campos son obligatorios."],
+      success: false,
     });
   }
 
@@ -59,6 +66,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({
       error: "formato de correo no válido.",
       message: [],
+      success: false,
     });
   }
 
@@ -77,7 +85,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = await response.json();
 
   if (!response.ok) {
-    return json({ error: data.error, message: data.message });
+    return json({ error: data.error, message: data.message, success: false });
   }
 
   //const session = await sessionStorage.getSession();
@@ -85,16 +93,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   // const cookieHeader = await sessionStorage.commitSession(session);
 
+  return json({ error: "", message: [""], success: true });
+
+  /*  
   return redirect("/login", {
-    /*    headers: {
+      headers: {
       "Set-Cookie": cookieHeader,
-    }, */
+    },
   });
+  */
 };
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation(); //for pending state of form
+  const navigate = useNavigate();
   const isSubmitting = navigation.formAction === "/register";
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
@@ -110,7 +123,13 @@ export default function LoginPage() {
 
       return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
     }
-  }, [actionData]);
+
+    if (actionData?.success) {
+      setTimeout(() => {
+        navigate("/login"); // Redirige después de 3 segundos
+      }, 3000);
+    }
+  }, [actionData, navigate]);
 
   return (
     <>
@@ -134,6 +153,10 @@ export default function LoginPage() {
               <h2 className="text-sm text-center text-gray-500 font-medium">
                 Create your account
               </h2>
+              {actionData?.success && (
+                <Success>Registration successful!</Success>
+              )}
+
               <input
                 formNoValidate
                 type="text"
