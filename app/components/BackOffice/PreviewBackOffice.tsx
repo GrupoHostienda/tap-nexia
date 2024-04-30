@@ -1,12 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import data from "data.json";
-import { Link } from "framer";
-function PreviewBackOffice() {
 
+interface DataItem {
+  url: string;
+  title: string;
+}
 
-    // Estos datos son temporales hasta usar los datos reales
-  const { links } = data;
+function PreviewBackOffice({ data }: { data: DataItem[] }) {
+  // Estos datos son temporales hasta usar los datos reales
 
   return (
     <>
@@ -21,12 +22,14 @@ function PreviewBackOffice() {
           </div>
           {/* Links en linea */}
           <div className="flex flex-col gap-3">
-            {links.map((link, index) => {
+            {data.map((datos, index) => {
               return (
-                <a href={link.url} className="bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md">
-                  <p>
-                    {link.title}
-                  </p>
+                <a
+                  href={datos.url}
+                  className="bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md"
+                  key={index}
+                >
+                  <p>{datos.title}</p>
                   <span>
                     <BsThreeDotsVertical />
                   </span>
