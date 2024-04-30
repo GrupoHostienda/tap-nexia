@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Form, useActionData, useNavigation } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 
@@ -26,7 +26,7 @@ export function meta() {
 }
 
 // loader para verificar sesión
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );

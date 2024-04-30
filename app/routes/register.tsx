@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Link,
   Form,
@@ -7,9 +7,9 @@ import {
   useNavigation,
   useNavigate,
 } from "@remix-run/react";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { validateEmail } from "@/utils/helpers";
-//import { sessionStorage } from "@/utils/session.server";
+import { sessionStorage } from "@/utils/session.server";
 
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa6";
@@ -22,7 +22,7 @@ import Success from "@/components/Success";
 export function meta() {
   return [
     {
-      title: "Hostienda | Login",
+      title: "Hostienda | Register",
     },
     {
       name: "description",
@@ -32,7 +32,7 @@ export function meta() {
 }
 
 // loader para verificar sesión
-/* export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
@@ -43,7 +43,7 @@ export function meta() {
   }
 
   return null; // no hay sesión activa, seguir con el renderizado normal
-}; */
+};
 
 /* action para la form */
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -88,20 +88,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({ error: data.error, message: data.message, success: false });
   }
 
-  //const session = await sessionStorage.getSession();
-  // session.set("authToken", data.token);
-
-  // const cookieHeader = await sessionStorage.commitSession(session);
-
   return json({ error: "", message: [""], success: true });
-
-  /*  
-  return redirect("/login", {
-      headers: {
-      "Set-Cookie": cookieHeader,
-    },
-  });
-  */
 };
 
 export default function RegisterPage() {

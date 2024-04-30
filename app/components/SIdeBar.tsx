@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
+
 import { FaMehBlank } from "react-icons/fa";
+import { CiLogout } from "react-icons/ci";
 import SidebarContent from "@/components/SideBarContent";
+
+import { Form } from "@remix-run/react";
 
 interface SidebarProps {
   title: string;
@@ -39,50 +43,57 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
         }`}
       >
         {/* Sidebar */}
-        <div className={`z-20 bg-gray-800 w-64 pt-5 pb-4`}>
-          <div className="flex items-center justify-between px-4">
-            <h2 className="text-white text-xl font-semibold">{title}</h2>
-            <button
-              onClick={toggleSidebar}
-              className="text-gray-400 focus:outline-none focus:text-white"
-              aria-label="Close sidebar"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-          <nav className="mt-5">
-            <div className="space-y-1">
-              <SidebarContent></SidebarContent>
-            </div>
-
-            <div className="mt-3 mx-2">
+        <div className="z-20 bg-gray-800 w-64 pt-5 pb-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between px-4">
+              <h2 className="text-white text-xl font-semibold">{title}</h2>
               <button
-                onClick={changeText}
-                className=" grid grid-cols-6 gap-3 items-center cursor-pointer group border border-gray-600 py-1 px-2 rounded-lg w-full text-white bg-gray-600"
+                onClick={toggleSidebar}
+                className="text-gray-400 focus:outline-none focus:text-white"
+                aria-label="Close sidebar"
               >
-                <FaMehBlank className="text-2xl text-green-700" />
-                <span className=" col-span-3"> webpage url</span>
-                <span
-                  id="url-for-copy"
-                  className={`${
-                    change ? "text-green-500" : "text-gray-950"
-                  }  col-span-2 block group-active:scale-95 border border-transparent border-l-gray-500 border-dotted p-3 text-sm`}
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  {copy}
-                </span>
+                  <path d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
               </button>
             </div>
-          </nav>
+            <nav className="mt-5">
+              <div className="space-y-1">
+                <SidebarContent></SidebarContent>
+              </div>
+
+              <div className="mt-3 mx-2">
+                <button
+                  onClick={changeText}
+                  className=" grid grid-cols-6 gap-3 items-center cursor-pointer group border border-gray-600 py-1 px-2 rounded-lg w-full text-white bg-gray-600 hover:bg-gray-700 transition-colors"
+                >
+                  <FaMehBlank className="text-2xl text-green-700" />
+                  <span className=" col-span-3"> webpage url</span>
+                  <span
+                    id="url-for-copy"
+                    className={`${
+                      change ? "text-green-500" : "text-gray-950"
+                    }  col-span-2 block group-active:scale-95 border border-transparent border-l-gray-500 border-dotted p-3 text-sm`}
+                  >
+                    {copy}
+                  </span>
+                </button>
+              </div>
+            </nav>
+          </div>
+          <Form action="/logout" method="post" className="px-2">
+            <button className=" w-full text-white px-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 ">
+              <CiLogout /> Log out
+            </button>
+          </Form>
         </div>
       </div>
 
