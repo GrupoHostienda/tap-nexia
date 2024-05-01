@@ -14,15 +14,15 @@ const Pricing = () => {
               aria-label="Close sidebar"
             ><IoIosClose className="size-9"/>
             </button>
-      <div className="absolute top-10 w-full px-[16%] z-50">
-        <div className="grid lg:grid-cols-3 grid-cols-1 gap-4">
-          <div className="bg-white h-[500px] w-72 rounded-lg border-2 border-purple-900">
+      <div className="absolute top-10 w-full flex justify-center items-center z-50">
+        <div className="grid lg:grid-cols-[repeat(3,1fr)] grid-cols-1 gap-7">
+          <div className="bg-white h-[500px] w-80 rounded-3xl border-2 border-purple-900">
           <PriceCard plan={plans.starter}/>
           </div>
-          <div className="bg-white h-[500px] w-72 rounded-lg border-2 border-purple-900">
+          <div className="bg-white h-[500px] w-80 rounded-3xl border-2 border-purple-900">
             <PriceCard plan={plans.pro}/>
           </div>
-          <div className="bg-white h-[500px] w-72 rounded-lg border-2 border-purple-900">
+          <div className="bg-white h-[500px] w-80 rounded-3xl border-2 border-purple-900">
           <PriceCard plan={plans.premium}/>
           </div>
         </div>
