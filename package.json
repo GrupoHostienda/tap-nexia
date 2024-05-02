@@ -6,7 +6,7 @@
   "scripts": {
     "motion": "npm uninstall framer",
     "install": "npm install",
-    "clean-cache": "npm cache clean --force ",
+    "clean-cache": "npm cache clean",
     "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
