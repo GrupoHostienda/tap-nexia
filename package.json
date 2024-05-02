@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "motion": "npm uninstall framer",
-    "dependencies": "npm install",
+    "dependencies": "npm cache clean --force && npm install",
     "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
