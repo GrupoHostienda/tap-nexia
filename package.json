@@ -8,6 +8,7 @@
     "install": "npm install --force",
     "build-app": "npm ci --production=false && npm run build && npm prune --production",
     "clean-cache": "npm cache clean --force",
+    "cache-verify": "npm cache verify",
     "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
