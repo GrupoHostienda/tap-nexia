@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "framer": "npm uninstall framer",
-    "install": "npm install --force",
     "build-app": "npm ci --production=false && npm run build && npm prune --production",
     "clean-cache": "npm cache clean --force",
     "cache-verify": "npm cache verify",
