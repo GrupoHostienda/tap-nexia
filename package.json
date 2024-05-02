@@ -4,7 +4,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dependencies": "npm config set legacy-peer-deps true && npm install  --legacy-peer-deps",
+    "dependencies": "npm install  --legacy-peer-deps",
+    "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
