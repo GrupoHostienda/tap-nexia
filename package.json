@@ -4,7 +4,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dependencies": "npm install  --legacy-peer-deps",
+    "motion": "npm unistall framer",
+    "dependencies": "npm install",
     "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
@@ -16,7 +17,7 @@
     "@remix-run/react": "^2.8.1",
     "@remix-run/serve": "^2.8.1",
     "framer": "^2.4.1",
-    "framer-motion": "^10.13.1",
+    "framer-motion": "^11.0.25",
     "isbot": "^4.1.0",
     "motion": "^10.17.0",
     "react": "^18.2.0",
