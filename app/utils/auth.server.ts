@@ -35,7 +35,7 @@ async function handleSocialAuthCallback({
 }: {
   profile: GoogleProfileType;
 }) {
-  // Intentar registrar al usuario
+  // Registrar al usuario
   let response = await fetch(`${process.env.API_BASE}/register/user`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -58,7 +58,6 @@ async function handleSocialAuthCallback({
   ) {
     console.log("User already exists. Attempting to log in.");
   } else {
-    console.error("Registration error:", data);
     throw new Error("Error registering the user.");
   }
 
@@ -74,8 +73,8 @@ async function handleSocialAuthCallback({
 
   data = await response.json();
   if (!response.ok) {
-    console.error("Login error:", data);
-    throw new Error("Error logging in the user.");
+    throw new Error("Login error: " + data.message);
+    return redirect("/error");
   }
 
   // Configuracion la sesión después de todas las validaciones

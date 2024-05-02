@@ -6,14 +6,12 @@ import { json, redirect } from "@remix-run/node";
 import { validateEmail } from "@/utils/helpers";
 import { sessionStorage } from "@/utils/session.server";
 
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa6";
 import { motion } from "framer-motion";
 
 import PasswordTypeToggle from "@/components/Login/PasswordToggleIcon";
-import Error from "@/components/Error";
-
-import { SocialsProvider } from "remix-auth-socials";
+import Error from "@/components/ErrorMessage";
+import TwoColGridLayout from "@/components/TwoColGridLayout";
+import ContinueWith from "@/components/Login/ContinueWith";
 
 export function meta() {
   return [
@@ -49,13 +47,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   //campos no vacios
   if (email.trim() === "" || password.trim() === "") {
-    return json({ error: "Todos los campos son obligatorios." });
+    return json({ error: "All fields are required." });
   }
 
   //formato valido de correo
   if (!validateEmail(email)) {
     return json({
-      error: "formato de correo no válido.",
+      error: "Not valid email.",
     });
   }
 
@@ -93,7 +91,6 @@ export default function LoginPage() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation(); //for pending state of form
   const isSubmitting = navigation.formAction === "/login";
-  const isSubmittingWithGoogle = navigation.formAction === "/auth/google";
 
   const [PasswordInputType, ToggleIcon] = PasswordTypeToggle();
 
@@ -112,122 +109,79 @@ export default function LoginPage() {
   }, [actionData]);
 
   return (
-    <div className=" min-h-screen grid md:grid-cols-7 bg-gray-50">
-      <div className=" max-w-[37.5rem] w-[80%] mx-auto col-span-5 self-center py-8 ">
-        {/* Formulario */}
-        <Form method="post" noValidate className="grid grid-cols-1 gap-6">
-          <motion.h1
-            initial={{ opacity: 0, y: -100 }}
-            animate={{ opacity: 1, y: 0 }}
-            className=" text-[2.5rem] whitespace-nowrap sm:text-5xl lg:text-6xl font-extrabold text-center px-2 pt-2 gradient-text"
-          >
-            Welcome Back
-          </motion.h1>
+    <TwoColGridLayout>
+      {/* Formulario */}
+      <Form method="post" noValidate className="grid grid-cols-1 gap-6">
+        <motion.h1
+          initial={{ opacity: 0, y: -100 }}
+          animate={{ opacity: 1, y: 0 }}
+          className=" text-[2.5rem] whitespace-nowrap sm:text-5xl lg:text-6xl font-extrabold text-center px-2 pt-2 gradient-text"
+        >
+          Welcome Back
+        </motion.h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            className=" flex flex-col gap-3"
-          >
-            <h2 className="text-sm text-center text-gray-500 font-medium">
-              Log into your account
-            </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className=" flex flex-col gap-3"
+        >
+          <h2 className="text-sm text-center text-gray-500 font-medium">
+            Log into your account
+          </h2>
+          <input
+            formNoValidate
+            type="email"
+            placeholder="Email"
+            className="input z-10"
+            name="email"
+          />
+
+          <div className="bg-gray-200 rounded-md flex items-center w-full relative">
             <input
               formNoValidate
-              type="email"
-              placeholder="Email"
-              className="input z-10"
-              name="email"
+              type={`${PasswordInputType}`}
+              placeholder="password"
+              className="input relative w-full z-10"
+              name="password"
             />
+            <div className=" absolute right-3 z-20">{ToggleIcon}</div>
+          </div>
 
-            <div className="bg-gray-200 rounded-md flex items-center w-full relative">
-              <input
-                formNoValidate
-                type={`${PasswordInputType}`}
-                placeholder="password"
-                className="input relative w-full z-10"
-                name="password"
-              />
-              <div className=" absolute right-3 z-20">{ToggleIcon}</div>
-            </div>
+          <div className="flex gap-3">
+            <Link className="text-blue-600 text-sm z-10 tap" to="#">
+              Forgot your password?
+            </Link>
+            <Link className="text-blue-600 text-sm tap" to="#">
+              Forgot your username?
+            </Link>
+          </div>
+        </motion.div>
 
-            <div className="flex gap-3">
-              <Link className="text-blue-600 text-sm z-10 tap" to="#">
-                Forgot your password?
-              </Link>
-              <Link className="text-blue-600 text-sm tap" to="#">
-                Forgot your username?
-              </Link>
-            </div>
-          </motion.div>
+        {errorMessage &&
+          actionData?.error &&
+          (actionData?.error === "Unauthorized" ? (
+            <Error>Not Valid User</Error>
+          ) : (
+            <Error>{actionData?.error}</Error>
+          ))}
 
-          {errorMessage &&
-            actionData?.error &&
-            (actionData?.error === "Unauthorized" ? (
-              <Error>usuario no valido</Error>
-            ) : (
-              <Error>{actionData?.error}</Error>
-            ))}
-
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.15,
-            }}
-          >
-            <input
-              type="submit"
-              value={isSubmitting ? "Loading..." : "Log in"}
-              className=" bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 cursor-pointer transition z-10 w-full"
-              disabled={isSubmitting}
-            />
-          </motion.div>
-        </Form>
-
-        {/* continue with... */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            delay: 0.3,
+            delay: 0.15,
           }}
-          className="flex flex-col gap-3 mt-3"
         >
-          <p className="text-center text-gray-500 font-medium">OR</p>
-
-          <Form method="post" action={`/auth/${SocialsProvider.GOOGLE}`}>
-            <button
-              disabled={isSubmittingWithGoogle}
-              className=" w-full border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100 tap"
-            >
-              <FcGoogle className="text-2xl" />
-              <p className="font-semibold">
-                {isSubmittingWithGoogle ? "Loading..." : "Continue with Google"}
-              </p>
-            </button>
-          </Form>
-          <Form>
-            <button className=" w-full border border-gray-300 rounded-full p-2 flex justify-center items-center gap-3 hover:bg-gray-100 tap">
-              <FaApple className="text-2xl" />
-              <p className="font-semibold">Continue with Apple</p>
-            </button>{" "}
-          </Form>
-
-          <p className="text-center text-sm text-gray-500 font-medium">
-            Don&apos;t have an account?{" "}
-            <Link className="text-blue-600 text-sm tap" to="/register">
-              Sign up
-            </Link>
-          </p>
+          <input
+            type="submit"
+            value={isSubmitting ? "Loading..." : "Log in"}
+            className=" bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 cursor-pointer transition z-10 w-full"
+            disabled={isSubmitting}
+          />
         </motion.div>
-      </div>
+      </Form>
 
-      {/* Imagen lateral */}
-      <div className=" md:bg-gray-800 min-h-screen hidden md:block md:col-span-2"></div>
-      <button className="p-4 sm:p-5 rounded-full bg-violet-800 text-white text-xl fixed bottom-4 right-4 hover:bg-violet-700">
-        <p className="w-7 h-7">?</p>
-      </button>
-    </div>
+      <ContinueWith action="login" />
+    </TwoColGridLayout>
   );
 }
