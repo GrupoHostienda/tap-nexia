@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "motion": "npm uninstall framer",
-    "dependencies": "npm cache clean --force && npm install",
-    "yarn": "yarn install",
+    "install": "npm install",
+    "clean-cache": "npm cache clean --force ",
     "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
