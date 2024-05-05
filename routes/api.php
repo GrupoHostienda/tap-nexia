@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 // Controllers
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LinkController;
+use App\Http\Controllers\BackgroundController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +32,10 @@ Route::post('login', [AuthController::class, 'login']);
 Route::group(['middleware' => ['jwt']], function () {
     // LINK
     Route::get('links',[LinkController::class,'show']);
+    // BACKGROUND
+    Route::get('backgrounds',[BackgroundController::class,'show']);
+    // USER
+    Route::get('user',[UserController::class,'getUser']);
+    Route::post('user/addLink',[UserController::class,'addLink']);
+    Route::get('user/links',[UserController::class,'links']);
 });

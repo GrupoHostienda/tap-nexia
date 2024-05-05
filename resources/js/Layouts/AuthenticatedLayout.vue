@@ -37,6 +37,14 @@ const menu = [
             class: 'pi pi-fw pi-map-marker',
         },
     },
+    {
+        href: "/backgrounds",
+        title: "Background",
+        icon: {
+            element: 'span',
+            class: 'pi pi-fw pi-map-marker',
+        },
+    },
 ];
 
 const showingNavigationDropdown = ref(false);

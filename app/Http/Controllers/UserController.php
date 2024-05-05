@@ -2,9 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Symfony\Component\HttpFoundation\Response;
+
+// Models
 use App\Models\User;
+use App\Models\Link;
+use App\Models\LinkStyle;
+use App\Models\UserLink;
+
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+// VAlidations
+use App\Http\Helpers\Validations\UserValidation;
+
 class UserController extends Controller
 {
     /**
@@ -29,6 +40,42 @@ class UserController extends Controller
     public function store(Request $request)
     {
         //
+    }
+    /**
+     * Store a link for user
+     */
+    public function addLink(Request $request)
+    {
+        $user = $this->currentUser();
+        // Validate data
+        $validation = new UserValidation($request);
+        $data = $validation->storeLink();
+
+        $link = Link::create([
+            'link_type_id'=>$data['link_type_id'],
+                   'title'=>$data['title'],
+                     'url'=>$data['url'],
+        ]);
+        $style = LinkStyle::make([
+            'style'=>$data['style']
+        ]);
+        $link->style()->save($style);
+
+        UserLink::create([
+            'user_id'=>$user->id,
+            'link_id'=>$link->id
+        ]);
+
+        return response()->json([
+            'message' => 'Link added.',
+        ], Response::HTTP_OK);
+
+    }
+    /**
+     * get all user links
+     */
+    public function links() {
+        return $this->currentUser()->links;
     }
 
     /**
@@ -61,5 +108,9 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         //
+    }
+
+    public function getUser(Request $request){
+        return $this->currentUser();
     }
 }
