@@ -16,6 +16,13 @@ class Link extends Model
     ];
 
     protected $hidden = [
+        "created_at",
+        "updated_at"
+    ];
+
+    protected $with = [
+        'style',
+        'type'
     ];
 
     /**
@@ -24,6 +31,11 @@ class Link extends Model
     public function style()
     {
         return $this->hasMany(LinkStyle::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(LinkType::class, 'link_type_id', 'id');
     }
 
     public function userLinks()
