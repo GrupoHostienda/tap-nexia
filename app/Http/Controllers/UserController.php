@@ -75,7 +75,7 @@ class UserController extends Controller
      * get all user links
      */
     public function links() {
-        return $this->currentUser()->links;
+        return $this->currentUser()->links->makeHidden(['link_type_id', 'laravel_through_key']);;
     }
 
     /**

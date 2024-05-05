@@ -35,5 +35,8 @@ class LinkType extends Model
     {
         return $this->hasMany(LinkSchema::class);
     }
-
+    public function links()
+    {
+        return $this->hasMany(Link::class);
+    }
 }
