@@ -2,37 +2,29 @@
 import { Head, router, useForm } from "@inertiajs/vue3";
 import { ref } from 'vue';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import ButtonAdd from "@/Components/ButtonAdd.vue";
-import ButtonRemove from "@/Components/ButtonRemove.vue";
 
 // PrimeVue
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import FileUpload from 'primevue/fileupload';
 import { FilterMatchMode } from 'primevue/api';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import ColorPicker from 'primevue/colorpicker';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
 import Dialog from 'primevue/dialog';
+import Editor from 'primevue/editor';
 
 
 defineProps({
-    linkTypes: {
+    backgrounds: {
         type: Array,
         required: true,
     },
-    linkTypesSchema: {
+    plans: {
         type: Array,
-        required: true,
-    },
-    linkSchemas: {
-        type: Object,
-        required: true,
-    },
-    linkSchemasGroupBy: {
-        type: Object,
         required: true,
     },
 })
@@ -44,12 +36,10 @@ const isEditing = ref(false);
 const deleteItemDialog = ref(false);
 const deleteItemsDialog = ref(false);
 const item = ref({
-    link_type_id:'',
-    property:'',
-    options:[],
+          name:'',
+          plan:'',
+          image:'',
 });
-
-const itemArray = ref([]);
 
 const selectedItems = ref();
 const filters = ref({
@@ -67,34 +57,20 @@ const hideDialog = () => {
     submitted.value = false;
 };
 const showItem = (id) => {
-    router.visit(`/link-schemas/${id}`);
+    router.visit(`/backgrounds/${id}`);
 }
-
-const addProperty = () => {
-    itemArray.value.push({
-        property:'',options:[]
-    });
-}
-const addOption = (index) => {
-    itemArray.value[index].options.push('');
-}
-const removeProperty = (index) => {
-    itemArray.value.splice(index, 1);
-}
-
 const saveItem = () => {
     submitted.value = true;
 
     if (
-        !item.value.link_type_id &&
-        !itemArray.value.length
+        !item.value.name &&
+        !item.value.plan
     ) {
       return;
     }
 
     const form  = useForm({
-        link_type_id:item.value.link_type_id,
-        schemas:itemArray.value
+        ...item.value,
     })
 
     if (isEditing.value) {
@@ -102,9 +78,9 @@ const saveItem = () => {
         return
     }
 
-    form.post(`/link-schemas`, {
+    form.post(`/backgrounds`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Created', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Background Created', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -115,9 +91,9 @@ const saveItem = () => {
 const updateItem = (form) => {
     submitted.value = true;
 
-    form.post(`/link-schemas/update`, {
+    form.post(`/backgrounds/update`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Updated', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Background Updated', life: 3000});
             itemDialog.value = false;
         },
         onError: (error) => {
@@ -125,24 +101,24 @@ const updateItem = (form) => {
         }
     })
 };
-const editItem = (prod,linkSchemasGroupBy) => {
+const editItem = (prod) => {
     itemDialog.value = true;
     isEditing.value = true;
-    item.value.link_type_id = prod.id;
-    itemArray.value = [...linkSchemasGroupBy[prod.name]];
+    item.value = {...prod};
 };
 const confirmDeleteItem = (prod) => {
-    item.value.link_type_id = prod.id;
+    item.value = prod;
     deleteItemDialog.value = true;
 };
 const deleteItem = () => {
     deleteItemDialog.value = false;
 
     const form = useForm({})
+    console.log(item.value.id);
 
-    form.delete(`/link-schemas/${item.value.link_type_id}`, {
+    form.delete(`/backgrounds/${item.value.id}`, {
         onSuccess: () => {
-            toast.add({severity:'success', summary: 'Successful', detail: 'Link schema Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Background Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -167,10 +143,10 @@ const deleteSelectedItems = () => {
     })
 
     console.log(form)
-    form.delete(`/link-schemas/deleteSelected`, {
+    form.delete(`/backgrounds/deleteSelected`, {
         onSuccess: () => {
             selectedItems.value = null;
-            toast.add({severity:'success', summary: 'Successful', detail: 'Link Types  Deleted', life: 3000});
+            toast.add({severity:'success', summary: 'Successful', detail: 'Brackgrounds  Deleted', life: 3000});
         },
         onError: (error) => {
             console.log(error);
@@ -180,23 +156,23 @@ const deleteSelectedItems = () => {
 
 const emptyItem = () => {
     item.value = {
-           link_type_id:'',
-           property:'',
-           options:[],
+           name:'',
+           plan:'',
+           image:'',
     };
 };
 
-// const onUploadImage = async (event) => {
-//     const file = event.files[0];
-//     const reader = new FileReader();
-//     let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+    const onUploadImage = async (event) => {
+    const file = event.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function () {
+        user.cover = reader.result;
 
-//     reader.readAsDataURL(blob);
+        console.log("EL COVER ES ", user.cover);
+    };
 
-//     reader.onloadend = function () {
-//         product.value.image = event.files[0];
-//     };
-// };
+};
 
 </script>
 
@@ -210,7 +186,7 @@ const emptyItem = () => {
                 <div
                     class="bg-white p-5 overflow-hidden shadow-sm sm:rounded-lg"
                 >
-                    <h2 class="text-2xl font-bold mb-4">Link schema</h2>
+                    <h2 class="text-2xl font-bold mb-4">Background</h2>
 
                     <div>
                         <div class="card">
@@ -225,13 +201,13 @@ const emptyItem = () => {
                                 </template>
                             </Toolbar>
 
-                            <DataTable ref="dt" :value="linkTypesSchema" v-model:selection="selectedItems" dataKey="id"
+                            <DataTable ref="dt" :value="backgrounds" v-model:selection="selectedItems" dataKey="id"
                                 :paginator="true" :rows="10" :filters="filters"
                                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" :rowsPerPageOptions="[5,10,25]"
                                 currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} itemos">
                                 <template #header>
                                     <div class="flex flex-wrap gap-2 align-items-center justify-between">
-                                        <h4 class="m-0">Link schemas</h4>
+                                        <h4 class="m-0">Brackgrounds</h4>
                                         <span class="p-input-icon-left">
                                             <i class="pi pi-search" />
                                             <InputText v-model="filters['global'].value" placeholder="Buscar..." />
@@ -245,7 +221,11 @@ const emptyItem = () => {
 
                                 <Column field="id" header="ID" sortable />
 
-                                <Column field="name" header="Type" />
+                                <Column field="name" header="Name" />
+
+                                <Column field="plan" header="Plan" />
+
+                                <Column field="image" header="Image" />
 
 
                                 <!-- Columnas Fin -->
@@ -253,78 +233,45 @@ const emptyItem = () => {
                                 <Column :exportable="false" style="min-width:8rem">
                                     <template #body="slotProps">
                                         <Button icon="pi pi-eye" outlined rounded severity="help" class="mr-2" @click="showItem(slotProps.data.id)" />
-                                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data,linkSchemasGroupBy)" />
+                                        <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data)" />
                                         <Button icon="pi pi-trash" outlined rounded severity="danger" @click="confirmDeleteItem(slotProps.data)" />
                                     </template>
                                 </Column>
                             </DataTable>
                         </div>
 
-                        <Dialog v-model:visible="itemDialog" :style="{width: '850px'}" header="Schema Details" :modal="true" class="p-fluid">
+                        <Dialog v-model:visible="itemDialog" :style="{width: '850px'}" header="Background details" :modal="true" class="p-fluid">
 
                             <!-- <div class="field mb-3">
                                 <label for="image">Imagen</label>
                                 <FileUpload mode="basic" name="demo[]" accept="image/*" customUpload @uploader="onUploadImage" :auto="true" chooseLabel="Subir Imagen..." />
                             </div> -->
 
+                            <div class="field mb-3">
+                                <label for="name">Name</label>
+                                <InputText id="name" v-model.trim="item.name" required="true" :class="{'p-invalid': submitted && !item.name}" />
+                                <small class="p-error" v-if="submitted && !item.name">Name is required.</small>
+                            </div>
 
-                            <div class="field mb-3"
-                                 v-if="!isEditing"
-                            >
-                                <label for="name">Type</label>
-                                <Dropdown 
-                                    v-model="item.link_type_id" 
-                                    :options="linkTypes" 
-                                    optionLabel="name" 
-                                    optionValue="id" 
-                                    placeholder="Select a type" 
-                                    class="w-full md:w-14rem" 
+                            <div class="field mb-3">
+                                <label for="plan">Plan</label>
+                                <InputText id="plan" v-model.trim="item.plan" required="true" :class="{'p-invalid': submitted && !item.plan}" />
+                                <small class="p-error" v-if="submitted && !item.plan">Plan is required.</small>
+                            </div>
+
+                            <div class="field mb-3">
+                                <label for="plan">Image</label>
+                                <FileUpload
+                                    mode="basic"
+                                    name="demo[]"
+                                    accept="image/*"
+                                    customUpload @uploader="onUploadImage"
+                                    :auto="true"
+                                    chooseLabel="Upload image..."
                                 />
-                                <small class="p-error" v-if="submitted && !item.link_type_id">type is required.</small>
+                                <small class="p-error" v-if="submitted && !item.image">Plan is required.</small>
                             </div>
 
-                            <div class="field mb-3 grid gap-4">
-                                <label for="name">Properties</label>
-                                <div 
-                                    v-for="(item, index) in itemArray" :key="index"
-                                >
-                                    <div class="flex flex-row gap-4" >
-                                        <InputText 
-                                            id="property" 
-                                            v-model.trim="itemArray[index].property" 
-                                            required="true" :class="{'p-invalid': submitted && !item.property}" 
-                                        />
-                                        <ButtonAdd
-                                            @click="addOption(index)"
-                                        />
-                                        <ButtonRemove
-                                            @click="removeProperty(index)"
-                                        />
-                                        
-                                    </div>
-                                    <small class="p-error" v-if="submitted && !item.property">Property is required.</small>
-                                    <div v-if="item.options.length != 0">
-                                        <label for="name">options</label>
-                                        <div  class="flex flex-row flex-wrap gap-4">
-                                            <div  v-for="(option, optionIndex) in item.options" :key="optionIndex">
-                                                <InputText 
-                                                    id="option" 
-                                                    v-model.trim="item.options[optionIndex]" 
-                                                    required="true" 
-                                                    :class="{'p-invalid': submitted && !item.options[optionIndex]}"
-                                                />
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="w-1/2">
-                                <ButtonAdd
-                                    @click="addProperty"
-                                />
-                            </div>
 
                             <template #footer>
                                 <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"/>
@@ -335,7 +282,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="item">Are you sure you want to delete <b>{{item.link_type_id}}</b>?</span>
+                                <span v-if="item">Are you sure you want to delete <b>{{item.name}}</b>?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemDialog = false"/>
@@ -346,7 +293,7 @@ const emptyItem = () => {
                         <Dialog v-model:visible="deleteItemsDialog" :style="{width: '450px'}" header="Confirm" :modal="true">
                             <div class="confirmation-content">
                                 <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                                <span v-if="item">Are you sure you want to delete the selected link schema?</span>
+                                <span v-if="item">Are you sure you want to delete the selected link type?</span>
                             </div>
                             <template #footer>
                                 <Button label="No" icon="pi pi-times" text @click="deleteItemsDialog = false"/>

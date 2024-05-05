@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LinkTypeController;
 use App\Http\Controllers\LinkSchemaController;
+use App\Http\Controllers\BackgroundController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,17 @@ Route::prefix('/link-schemas')->middleware('auth')->group(function () {
     // Route::get('/create', [LinkSchemaController::class, 'create'])->name('items.create');
     // Route::get('/{example}', [LinkSchemaController::class, 'show'])->name('items.show');
     // Route::get('/{example}/edit', [LinkSchemaController::class, 'edit'])->name('items.edit');
+});
+
+Route::prefix('/backgrounds')->middleware('auth')->group(function () {
+    Route::get('/', [BackgroundController::class, 'index'])->name('background');
+    Route::post('/', [BackgroundController::class, 'store'])->name('background.store');
+    Route::post('update', [BackgroundController::class, 'update'])->name('background.update');
+    Route::delete('/deleteSelected', [BackgroundController::class, 'deleteSelected'])->name('background.deleteSelected');
+    Route::delete('/{type}', [BackgroundController::class, 'destroy'])->name('background.destroy');
+    // Route::get('/create', [BackgroundController::class, 'create'])->name('items.create');
+    // Route::get('/{example}', [BackgroundController::class, 'show'])->name('items.show');
+    // Route::get('/{example}/edit', [BackgroundController::class, 'edit'])->name('items.edit');
 });
 
 

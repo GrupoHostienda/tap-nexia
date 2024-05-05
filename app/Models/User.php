@@ -20,6 +20,10 @@ class User extends Authenticatable implements JWTSubject
         'role',
     ];
 
+    protected $hidden = [
+        'password',
+    ];
+
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -39,5 +43,20 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+    public function userLinks()
+    {
+        return $this->hasMany(UserLink::class);
+    }
+    public function links()
+    {
+        return $this->hasManyThrough(
+            Link::class,
+            UserLink::class,
+            'user_id', // Foreign key on UserLink table
+            'id',       // Local key on Link table
+            'id',       // Local key on User table
+            'link_id'  // Foreign key on Link table
+        );
     }
 }

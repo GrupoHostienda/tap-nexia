@@ -41,4 +41,18 @@ class UserValidation extends Validation {
         $data['password'] = bcrypt($this->request->password);
         return $data;
     }
+    /**
+     *  Validate store link 
+     *
+     * @return body of request
+     */
+    public function storeLink(){
+        $data = $this->request->only(
+            'link_type_id',
+            'style',
+            'url',
+            'title',
+        );
+        return $data;
+    }
 }
