@@ -25,12 +25,11 @@ const TwoColGridLayout = ({
       <div
         className={`min-h-screen hidden md:block md:col-span-2 ${stylesCol2}`}
       ></div>
-      {location === "/login" ||
-        (location === "/register" && (
-          <button className="p-4 sm:p-5 rounded-full bg-violet-800 text-white text-xl fixed bottom-4 right-4 hover:bg-violet-700">
-            <p className="w-7 h-7">?</p>
-          </button>
-        ))}
+      {(location === "/login" || location === "/register") && (
+        <button className="p-4 sm:p-5 rounded-full bg-violet-800 text-white text-xl fixed bottom-4 right-4 hover:bg-violet-700">
+          <p className="w-7 h-7">?</p>
+        </button>
+      )}
     </div>
   );
 };

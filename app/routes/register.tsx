@@ -5,6 +5,7 @@ import {
   useActionData,
   useNavigation,
   useNavigate,
+  useLocation,
 } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 import { validateEmail } from "@/utils/helpers";
@@ -99,6 +100,8 @@ export default function RegisterPage() {
 
   const [errorMessage, setErrorMessage] = useState("");
 
+  const location = useLocation();
+
   useEffect(() => {
     if (actionData?.error) {
       setErrorMessage(actionData.error);
@@ -118,7 +121,7 @@ export default function RegisterPage() {
   }, [actionData, navigate]);
 
   return (
-    <TwoColGridLayout stylesCol2="md:bg-gray-800">
+    <TwoColGridLayout stylesCol2="md:bg-gray-800" location={location.pathname}>
       {/* Formulario */}
       <Form method="post" noValidate className="grid grid-cols-1 gap-6">
         <motion.h1
