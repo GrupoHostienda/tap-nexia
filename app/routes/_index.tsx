@@ -7,7 +7,7 @@ import { sessionStorage } from "@/utils/session.server";
 
 import { motion } from "framer-motion";
 
-import LinksContainer from "@/components/LinksContainer";
+import LinksContainer from "@/components/ProfilePage/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
 import Sidebar from "@/components/SideBar";
 

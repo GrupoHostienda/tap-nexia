@@ -4,7 +4,11 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dependencies": "npm install --force",
+    "framer": "npm uninstall framer",
+    "build-app": "npm ci --production=false && npm run build && npm prune --production",
+    "clean-cache": "npm cache clean --force",
+    "cache-verify": "npm cache verify",
+    "legacy": "npm config set legacy-peer-deps true",
     "build": "remix vite:build",
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
@@ -22,7 +26,9 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-icons": "^5.0.1",
-    "react-resizable": "^3.0.5"
+    "react-resizable": "^3.0.5",
+    "remix-auth": "^3.6.0",
+    "remix-auth-socials": "^2.0.6"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.1",
