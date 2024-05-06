@@ -74,7 +74,7 @@ async function handleSocialAuthCallback({
   data = await response.json();
   if (!response.ok) {
     throw new Error("Login error: " + data.message);
-    return redirect("/error");
+    return redirect("/error"); // ******************************************************************************
   }
 
   // Configuracion la sesión después de todas las validaciones
@@ -101,7 +101,7 @@ authenticator.use(
       clientID,
       clientSecret,
       scope: ["openid email profile"],
-      callbackURL: `http://localhost:3000/auth/${SocialsProvider.GOOGLE}/callback`,
+      callbackURL: `${process.env.DOMAIN}/auth/${SocialsProvider.GOOGLE}/callback`,
     },
     handleSocialAuthCallback
   )

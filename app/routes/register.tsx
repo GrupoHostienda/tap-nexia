@@ -118,7 +118,7 @@ export default function RegisterPage() {
   }, [actionData, navigate]);
 
   return (
-    <TwoColGridLayout>
+    <TwoColGridLayout stylesCol2="md:bg-gray-800">
       {/* Formulario */}
       <Form method="post" noValidate className="grid grid-cols-1 gap-6">
         <motion.h1

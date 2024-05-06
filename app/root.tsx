@@ -108,7 +108,10 @@ export function ErrorBoundary() {
   const error = useRouteError();
 
   return (
-    <TwoColGridLayout styles="flex flex-col gap-8">
+    <TwoColGridLayout
+      stylesCol1="flex flex-col gap-8"
+      stylesCol2="md:bg-gray-800"
+    >
       <motion.h1
         initial={{ opacity: 0, y: -100 }}
         animate={{ opacity: 1, y: 0 }}
