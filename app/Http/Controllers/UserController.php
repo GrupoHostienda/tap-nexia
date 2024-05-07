@@ -72,6 +72,24 @@ class UserController extends Controller
 
     }
     /**
+     * edit a link for user
+     */
+    public function editLink(Request $request,Link $link)
+    {
+        $user = $this->currentUser();
+        // Validate data
+        return $link;
+        $validation = new UserValidation($request);
+        $data = $validation->editLink();
+
+
+
+        return response()->json([
+            'message' => 'Link added.',
+        ], Response::HTTP_OK);
+
+    }
+    /**
      * get all user links
      */
     public function links() {
@@ -99,7 +117,17 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        // Validate data
+        $validation = new UserValidation($request);
+        $data = $validation->update();
+
+        $this->currentUser()->update($data);
+
+        return response()->json([
+            'message' => 'user updated.',
+        ], Response::HTTP_OK);
+
+
     }
 
     /**
