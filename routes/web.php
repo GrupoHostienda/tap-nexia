@@ -56,7 +56,7 @@ Route::prefix('/backgrounds')->middleware('auth')->group(function () {
     Route::post('/', [BackgroundController::class, 'store'])->name('background.store');
     Route::post('update', [BackgroundController::class, 'update'])->name('background.update');
     Route::delete('/deleteSelected', [BackgroundController::class, 'deleteSelected'])->name('background.deleteSelected');
-    Route::delete('/{type}', [BackgroundController::class, 'destroy'])->name('background.destroy');
+    Route::delete('/{background}', [BackgroundController::class, 'destroy'])->name('background.destroy');
     // Route::get('/create', [BackgroundController::class, 'create'])->name('items.create');
     // Route::get('/{example}', [BackgroundController::class, 'show'])->name('items.show');
     // Route::get('/{example}/edit', [BackgroundController::class, 'edit'])->name('items.edit');

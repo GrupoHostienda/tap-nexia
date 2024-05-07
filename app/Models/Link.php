@@ -13,6 +13,7 @@ class Link extends Model
         'link_type_id',
         'title',
         'url',
+        'isHidden',
     ];
 
     protected $hidden = [
@@ -30,7 +31,7 @@ class Link extends Model
      */
     public function style()
     {
-        return $this->hasMany(LinkStyle::class);
+        return $this->hasOne(LinkStyle::class);
     }
 
     public function type()

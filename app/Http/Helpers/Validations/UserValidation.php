@@ -55,4 +55,63 @@ class UserValidation extends Validation {
         );
         return $data;
     }
+    /**
+     *  Validate edit link 
+     *
+     * @return body of request
+     */
+    public function editLink(){
+        $data = $this->request->only(
+            'link_type_id',
+            'style',
+            'url',
+            'title',
+        );
+        $rules = [
+            'link_type_id' => 'required|string|exists:links',
+            'style' => 'nullable|array',
+            'url' => 'nullable|string',
+            'title' => 'nullable|string',
+        ];
+        $validator = Validator::make($data,$rules);
+        if (
+            $validator->fails()
+        ) {
+            throw new ValidationException([$validator->errors()]);
+        }
+        return $data;
+    }
+
+
+    /**
+     *  Validate edit link 
+     *
+     * @return array
+     */
+    public function update(){
+        $data = $this->request->only(
+            'username',
+            'email',
+            'password',
+        );
+        $rules = [
+            'username' => 'nullable|alpha_num|unique:users',
+            'email' => 'nullable|email|exists:users',
+            'password' => 'nullable|string|min:6|max:50',
+        ];
+
+        $validator = Validator::make($data,$rules);
+        if (
+            $validator->fails()
+        ) {
+            throw new ValidationException([$validator->errors()]);
+        }
+
+        // encript password
+        if($this->request->password){
+            $data['password'] = bcrypt($this->request->password);
+        }
+        return $data;
+
+    }
 }

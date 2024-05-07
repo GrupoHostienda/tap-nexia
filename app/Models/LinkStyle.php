@@ -14,6 +14,10 @@ class LinkStyle extends Model
     protected $casts = [
         'style' => 'array', // Will convarted to (Array)
     ];
+    protected $hidden = [
+        "created_at",
+        "updated_at"
+    ];
     /**
      * Get the schema that owns the LinkType.
      */
