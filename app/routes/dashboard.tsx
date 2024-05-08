@@ -1,140 +1,259 @@
-import data from "data.json";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+
+import { sessionStorage } from "@/utils/session.server";
+
+import Preview from "@/components/Preview";
 import { IoMdLock } from "react-icons/io";
+
+import {
+  SpecialButtonOne,
+  SpecialButtonTwo,
+} from "@/components/Dashboard/SpecialButtons";
+import {
+  getRoundedClass,
+  getSBackgroundClass,
+  getShadowClass,
+  getSpecialButtonClass,
+} from "@/utils/dashboard";
 
 /* function for meta data, for improving SEO */
 export function meta() {
   return [
     {
-      title: "Hostienda | Styles",
+      title: "Hostienda | Dashboard",
     },
     {
       name: "description",
-      content: "Styles page",
+      content: "Dashboard page",
     },
   ];
 }
 
-export default function Styles() {
-  const { styles } = data;
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  /* START | Verificar session */
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  const authToken = session.get("authToken");
 
+  if (!authToken) {
+    return redirect("/login");
+  }
+  /* END | Verificar session */
+
+  /* START | Fetch de datos */
+  const urls = {
+    links: `${process.env.API_BASE}/links`,
+    backgrounds: `${process.env.API_BASE}/backgrounds`,
+  };
+
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  try {
+    const responses = await Promise.all([
+      fetch(urls.links, { headers }),
+      fetch(urls.backgrounds, { headers }),
+    ]);
+
+    if (!responses[0].ok || !responses[1].ok) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const [linksData, backgroundsData] = await Promise.all([
+      responses[0].json(),
+      responses[1].json(),
+    ]);
+    return json({ links: linksData, backgrounds: backgroundsData });
+  } catch (error) {
+    return json({ error: error?.toString() });
+  }
+  /* END | Fetch de datos */
+};
+
+type DataType = {
+  links: [
+    {
+      id: 1;
+
+      name: "Button";
+
+      hasSchema: 1;
+
+      schemas: [
+        { id: 1; property: "Color"; options: [] },
+
+        {
+          id: 2;
+
+          property: "Border";
+
+          options: ["round", "semi-round", "none"];
+        },
+
+        {
+          id: 3;
+
+          property: "Shadow";
+
+          options: ["soft", "middle", "heavy", "none"];
+        },
+
+        { id: 4; property: "Special"; options: ["wave", "label", "triangle"] }
+      ];
+    }
+  ];
+
+  backgrounds: [
+    { id: 1; name: "Flat"; plan: "1"; image: null },
+
+    { id: 2; name: "Gradient"; plan: "2"; image: null }
+  ];
+};
+
+export default function Dashboard() {
+  const data = useLoaderData<DataType>();
+
+  const { links, backgrounds } = data;
   return (
-    <div className=" min-h-screen bg-slate-200 ">
-      {/* Buttons */}
-      <div className="py-4 max-w-3xl mx-auto px-4 sm:px-6 ">
-        <h2 className="text-lg font-bold">Buttons</h2>
+    <div className=" min-h-screen grid lg:grid-cols-7 gap-4 bg-slate-200 py-4 px-4 sm:px-6">
+      <div className="col-span-5 ">
+        {/* Buttons */}
+        <div>
+          <h2 className="text-lg font-bold">Buttons</h2>
 
-        <div className=" bg-white p-4 rounded-lg flex flex-col gap-10">
-          <div>
-            <p className=" pb-2">Border</p>
-            <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
-              {styles.border.map((style, index) => {
-                return (
-                  <div
-                    key={index}
-                    className={` border h-10 bg-black ${style.class} `}
-                    // onClick={() => setRadius(style.class)}
-                  ></div>
-                );
-              })}
+          <div className=" bg-white p-4 rounded-lg flex flex-col gap-10">
+            {/* colors */}
+            <div>
+              <p className=" pb-2">Fill</p>
+              <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
+                <div className={` border h-10 bg-white `} />
+                <div className={` border h-10 bg-black `} />
+                <div className={` border h-10 bg-blue-200 `} />
+                <div className={` border h-10 bg-green-200 `} />
+                <div className={` border h-10 bg-red-200 `} />
+                <div
+                  className={` border h-10 bg-gradient-to-r from-red-400 to-blue-400 `}
+                />
+              </div>
+            </div>
+
+            {/* outline */}
+            <div>
+              <p className=" pb-2">Outline</p>
+              <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
+                {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
+                {[...links[0].schemas[1].options]
+                  .reverse()
+                  .map((style, index) => {
+                    const roundedClass = getRoundedClass(style);
+                    return (
+                      <div
+                        key={index}
+                        className={` border h-10 ${roundedClass}`}
+                      />
+                    );
+                  })}
+              </div>
+            </div>
+
+            {/* shadow */}
+            <div>
+              <p className=" pb-2">Shadow</p>
+              <div className=" grid grid-cols-1  sm:grid-cols-3 gap-6 sm:gap-4 ">
+                {links[0].schemas[2].options.map((style, index) => {
+                  const shadowClass = getShadowClass(style);
+
+                  return (
+                    <div key={index} className=" relative z-0 h-10">
+                      <div
+                        className={` border relative bg-white h-full ${shadowClass} `}
+                      />
+
+                      {style === "heavy" && (
+                        <div
+                          className={` h-full w-full bg-black absolute top-[0.30rem] left-[0.30rem] -z-10`}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* special */}
+            <div>
+              <div className=" flex gap-3 items-center pb-2">
+                <p>Special</p>
+                <p className=" bg-black text-white px-2 rounded-md flex items-center gap-1">
+                  <span>Upgrade</span>
+                  <IoMdLock />
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {links[0].schemas[3].options.map((style, index) => {
+                  const specialButtonClass = getSpecialButtonClass(style);
+                  return (
+                    <div
+                      key={index}
+                      className={`h-10 ${specialButtonClass}`}
+                    ></div>
+                  );
+                })}
+                <div className="  h-10 bg-black rounded-full"></div>
+                <SpecialButtonOne />
+                <SpecialButtonTwo />
+              </div>
             </div>
           </div>
-          <div>
-            <p className=" pb-2">Soft shadow</p>
-            <div className=" grid grid-cols-1  sm:grid-cols-3 gap-6 sm:gap-4 ">
-              {styles.softShadow.map((style, index) => {
-                return (
-                  <div
-                    key={index}
-                    className={` border h-10 ${style.class} `}
-                    // onClick={() => setRadius(style.class)}
-                  ></div>
-                );
-              })}
-            </div>
-          </div>
-          <div>
-            <p className=" pb-2">Hard shadow</p>
+        </div>
+
+        {/* backgrounds */}
+        <div>
+          <h2 className="text-lg font-bold">Backgrounds</h2>
+
+          <div className=" bg-white p-4 rounded-lg">
             <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
-              {styles.hardShadow.map((style, index) => {
+              {backgrounds.map((style, index) => {
+                const bg = getSBackgroundClass(style.name);
                 return (
-                  <div
-                    key={index}
-                    className=" relative z-0 h-10"
-                    // onClick={() => setRadius(style.class)}
-                  >
+                  <div key={index}>
                     <div
-                      className={`h-full w-full border bg-white ${style.class}`}
+                      className={` h-[30rem] sm:h-80 ${bg} rounded-md`}
                     ></div>
-                    <div
-                      className={` h-full w-full bg-black absolute top-[0.30rem] left-[0.30rem] -z-10 ${style.class} `}
-                    ></div>
+                    <p className=" pt-2 text-center">{style.name} Colour</p>
                   </div>
                 );
               })}
-            </div>
-          </div>
-          {/* special */}
-          <div>
-            <div className=" flex gap-3 items-center pb-2">
-              <p>Special</p>
-              <p className=" bg-black text-white px-2 rounded-md flex items-center gap-1">
-                <span>Upgrade</span>
-                <IoMdLock />
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className=" box01 h-10 bg-black"></div>
-              <div className=" box02 h-10 bg-black"></div>
-              <div className="  h-10 bg-black rounded-l-full"></div>
-              <div className=" h-10 relative">
-                <div className=" absolute top-1/2 -translate-y-1/2 h-[75%] w-full border border-black border-solid"></div>
-                <div className=" absolute left-1/2 -translate-x-1/2 w-[95%] h-full border border-black border-solid"></div>
-              </div>
-              <div className="  h-10 bg-black rounded-full"></div>
-              <div className=" h-10 relative">
-                <div className=" absolute w-full h-full border border-black border-solid"></div>
-                <div className=" absolute -top-1 -left-1 bg-white w-2 h-2 border border-black border-solid"></div>
-                <div className=" absolute -top-1 -right-1 bg-white w-2 h-2 border border-black border-solid"></div>
-                <div className=" absolute -bottom-1 -left-1 bg-white w-2 h-2 border border-black border-solid"></div>
-                <div className=" absolute -bottom-1 -right-1 bg-white w-2 h-2 border border-black border-solid"></div>
+              <div className=" relative">
+                <div
+                  className=" h-[30rem] sm:h-80 border border-black rounded-md"
+                  style={{
+                    backgroundImage: 'url("/no-image.svg")',
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    backgroundSize: "30%",
+                    opacity: "0.2",
+                  }}
+                ></div>
+                <p className=" pt-2 text-center">Image</p>
+                <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
+                  <span>Upgrade</span>
+                  <IoMdLock />
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* backgrounds */}
-      <div className="py-4 max-w-3xl mx-auto px-4 sm:px-6 ">
-        <h2 className="text-lg font-bold">Backgrounds</h2>
-
-        <div className=" bg-white p-4 rounded-lg">
-          <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
-            <div>
-              <div className=" h-[30rem] sm:h-80 bg-gray-300 rounded-md"></div>
-              <p className=" pt-2 text-center">Flat Colour</p>
-            </div>
-            <div>
-              <div className=" h-[30rem] sm:h-80 bg-home rounded-md"></div>
-              <p className=" pt-2 text-center">Gradient</p>
-            </div>
-            <div className=" relative">
-              <div
-                className=" h-[30rem] sm:h-80 border border-black rounded-md"
-                style={{
-                  backgroundImage: 'url("/no-image.svg")',
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                  backgroundSize: "30%",
-                  opacity: "0.2",
-                }}
-              ></div>
-              <p className=" pt-2 text-center">Image</p>
-              <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
-                <span>Upgrade</span>
-                <IoMdLock />
-              </p>
-            </div>
-          </div>
+      {/* preview */}
+      <div className="hidden lg:col-span-2 lg:block mx-auto ">
+        <div className=" sticky top-10">
+          <Preview data={[{ url: "url1", title: "title1", styles: "" }]} />
         </div>
       </div>
     </div>
