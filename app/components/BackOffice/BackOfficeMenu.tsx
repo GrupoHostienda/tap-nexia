@@ -3,6 +3,8 @@ import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
 import { useOutletContext } from "@remix-run/react";
+import NewLinkMenu from "./NewLinkMenu"
+import { useState } from "react";
 
 type OutletContextProps = {
   state: {items: []},
@@ -16,7 +18,7 @@ type Item = {
 }
 export default function BackOfficeMenu() {
 
-
+  const [addLinkMenu, setAddLinkMenu] = useState(true);
   const { state, dispatch } =
   useOutletContext<OutletContextProps>();
 
@@ -28,10 +30,13 @@ export default function BackOfficeMenu() {
     };
     dispatch({type: 'addItem', payload: newItem});
     console.log(state.items);
+    setAddLinkMenu(prev => !prev)
+    console.log(addLinkMenu)
   }
 
   return (
     <>
+      <NewLinkMenu isVisible={addLinkMenu}/>
       {/* Switch de botones */}
       <div className="grid grid-cols-2 border border-gray-400 w-52 rounded-full">
         <button className="bg-gray-950 text-white rounded-full p-3 px-5">
