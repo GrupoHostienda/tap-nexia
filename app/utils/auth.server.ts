@@ -82,7 +82,7 @@ async function handleSocialAuthCallback({
   session.set("authToken", data.token);
   const cookieHeader = await sessionStorage.commitSession(session);
 
-  return redirect("/", {
+  return redirect("/dashboard", {
     headers: { "Set-Cookie": cookieHeader },
   });
 }

@@ -38,6 +38,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   );
   const authToken = session.get("authToken");
 
+  console.log(authToken);
+
   if (authToken) {
     return redirect("/");
   }
@@ -84,11 +86,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession();
   session.set("authToken", data.token);
 
-  console.log(session);
-
   const cookieHeader = await sessionStorage.commitSession(session);
 
-  return redirect("/", {
+  return redirect("/dashboard", {
     headers: {
       "Set-Cookie": cookieHeader,
     },

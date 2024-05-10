@@ -154,17 +154,17 @@ export function ErrorBoundary() {
         </motion.p>
       )}
 
-      {/* go to homepage */}
+      {/* go to dashboard */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         className=" py-3"
       >
         <Link
-          to="/"
+          to="/dashboard"
           className=" bg-blue-600 block text-white rounded-full py-3 px-10 hover:bg-blue-700 cursor-pointer transition text-center "
         >
-          Go to Homepage
+          Go to Dashboard
         </Link>
       </motion.div>
     </TwoColGridLayout>
