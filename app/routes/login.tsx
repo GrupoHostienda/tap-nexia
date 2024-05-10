@@ -38,7 +38,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   );
   const authToken = session.get("authToken");
 
-  console.log(authToken);
+  // console.log(authToken);
 
   if (authToken) {
     return redirect("/");

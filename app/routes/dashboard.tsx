@@ -119,24 +119,26 @@ export default function Dashboard() {
 
   const { links, backgrounds } = data;
   return (
-    <div className=" min-h-screen grid lg:grid-cols-7 gap-4 bg-slate-200 py-4 px-4 sm:px-6">
-      <div className="col-span-5 ">
+    <div className=" min-h-screen max-w-[1600px] mx-auto grid lg:grid-cols-7 gap-4 bg-slate-200 py-4 px-4 sm:px-6">
+      <div className="col-span-5 flex flex-col gap-8 ">
         {/* Buttons */}
         <div>
-          <h2 className="text-lg font-bold">Buttons</h2>
+          <h2 className="text-xl font-bold mb-2 max-w-[1000px] mx-auto">
+            Buttons
+          </h2>
 
-          <div className=" bg-white p-4 rounded-lg flex flex-col gap-10">
+          <div className=" bg-white p-4 rounded-lg flex flex-col gap-10 max-w-[1000px] mx-auto">
             {/* colors */}
             <div>
               <p className=" pb-2">Fill</p>
               <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
-                <div className={` border h-10 bg-white `} />
-                <div className={` border h-10 bg-black `} />
-                <div className={` border h-10 bg-blue-200 `} />
-                <div className={` border h-10 bg-green-200 `} />
-                <div className={` border h-10 bg-red-200 `} />
+                <div className={` border border-gray-400 h-10 bg-white `} />
+                <div className={` border border-gray-400 h-10 bg-black `} />
+                <div className={` border border-gray-400 h-10 bg-blue-200 `} />
+                <div className={` border border-gray-400 h-10 bg-green-200 `} />
+                <div className={` border border-gray-400 h-10 bg-red-200 `} />
                 <div
-                  className={` border h-10 bg-gradient-to-r from-red-400 to-blue-400 `}
+                  className={` border border-gray-400 h-10 bg-gradient-to-r from-red-400 to-blue-400 `}
                 />
               </div>
             </div>
@@ -153,7 +155,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={index}
-                        className={` border h-10 ${roundedClass}`}
+                        className={` border border-gray-400 h-10 ${roundedClass}`}
                       />
                     );
                   })}
@@ -170,7 +172,7 @@ export default function Dashboard() {
                   return (
                     <div key={index} className=" relative z-0 h-10">
                       <div
-                        className={` border relative bg-white h-full ${shadowClass} `}
+                        className={` border border-gray-400 relative bg-white h-full ${shadowClass} `}
                       />
 
                       {style === "heavy" && (
@@ -213,37 +215,41 @@ export default function Dashboard() {
 
         {/* backgrounds */}
         <div>
-          <h2 className="text-lg font-bold">Backgrounds</h2>
+          <h2 className="text-xl font-bold mb-2 max-w-[1000px] mx-auto">
+            Backgrounds
+          </h2>
 
-          <div className=" bg-white p-4 rounded-lg">
+          <div className=" bg-white p-4 rounded-lg max-w-[1000px] mx-auto">
             <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
               {backgrounds.map((style, index) => {
                 const bg = getSBackgroundClass(style.name);
                 return (
-                  <div key={index}>
+                  <div key={index} className=" flex flex-col items-center">
                     <div
-                      className={` h-[30rem] sm:h-80 ${bg} rounded-md`}
+                      className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md`}
                     ></div>
                     <p className=" pt-2 text-center">{style.name} Colour</p>
                   </div>
                 );
               })}
-              <div className=" relative">
-                <div
-                  className=" h-[30rem] sm:h-80 border border-black rounded-md"
-                  style={{
-                    backgroundImage: 'url("/no-image.svg")',
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                    backgroundSize: "30%",
-                    opacity: "0.2",
-                  }}
-                ></div>
+              <div className=" flex flex-col items-center">
+                <div className="relative">
+                  <div
+                    className=" h-[23rem] w-[14rem] //xl:h-[30rem] //xl:w-[20rem] border border-black rounded-md"
+                    style={{
+                      backgroundImage: 'url("/no-image.svg")',
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "center",
+                      backgroundSize: "30%",
+                      opacity: "0.2",
+                    }}
+                  />
+                  <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
+                    <span>Upgrade</span>
+                    <IoMdLock />
+                  </p>
+                </div>
                 <p className=" pt-2 text-center">Image</p>
-                <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
-                  <span>Upgrade</span>
-                  <IoMdLock />
-                </p>
               </div>
             </div>
           </div>
