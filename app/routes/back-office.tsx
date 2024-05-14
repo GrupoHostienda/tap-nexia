@@ -24,7 +24,7 @@ export function meta() {
 }
 
 type OutletContextProps = {
-  state: {items: []},
+  state: { items: [] };
   dispatch: React.Dispatch<React.SetStateAction<{}>>;
 }
 
@@ -125,11 +125,10 @@ export default function LayoutBackOffice() {
               
               return (
                 <div key={index}>
-                  <CardBackOffice link={link}/>
+                  <CardBackOffice link={link} />
                 </div>
               );
-            })
-            }
+            })}
           </div>
         </div>
         {/* Preview de elementos */}

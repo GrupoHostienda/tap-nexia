@@ -115,8 +115,8 @@ export default function RegisterPage() {
 
     if (actionData?.success) {
       setTimeout(() => {
-        navigate("/login"); // Redirige después de 4 segundos
-      }, 4000);
+        navigate("/login"); // Redirige después de 3 segundos
+      }, 3000);
     }
   }, [actionData, navigate]);
 

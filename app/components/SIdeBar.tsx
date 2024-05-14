@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 
 import { FaMehBlank } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
+import { MdOutlineDashboard } from "react-icons/md";
+
 import SidebarContent from "@/components/SideBarContent";
 
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 
 interface SidebarProps {
   title: string;
@@ -89,11 +91,19 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
               </div>
             </nav>
           </div>
-          <Form action="/logout" method="post" className="px-2">
-            <button className=" w-full text-white px-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 ">
-              <CiLogout /> Log out
-            </button>
-          </Form>
+          <div className=" flex w-full flex-col gap-2">
+            <Link
+              className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
+              to="/dashboard"
+            >
+              <MdOutlineDashboard /> Go to Dashboard
+            </Link>
+            <Form action="/logout" method="post" className="px-2">
+              <button className=" w-full text-white px-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 ">
+                <CiLogout /> Log out
+              </button>
+            </Form>
+          </div>
         </div>
       </div>
 
