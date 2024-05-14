@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 
 import { sessionStorage } from "@/utils/session.server";
 
@@ -10,7 +10,7 @@ import { IoMdLock } from "react-icons/io";
 import {
   SpecialButtonOne,
   SpecialButtonTwo,
-} from "@/components/Dashboard/SpecialButtons";
+} from "@/components/stylesPage/SpecialButtons";
 import {
   getRoundedClass,
   getSBackgroundClass,
@@ -18,13 +18,7 @@ import {
   getSpecialButtonClass,
 } from "@/utils/dashboard";
 
-const DUMMY_DATA = [
-  { url: "url1", title: "title1", styles: "" },
-  { url: "url2", title: "title2", styles: "" },
-  { url: "url3", title: "title3", styles: "" },
-];
-
-/* function for meta data, for improving SEO */
+//meta
 export function meta() {
   return [
     {
@@ -37,6 +31,7 @@ export function meta() {
   ];
 }
 
+//loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   /* START | Verificar session */
   const session = await sessionStorage.getSession(
@@ -50,9 +45,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   /* END | Verificar session */
 
   /* START | Fetch de datos */
+  const base = process.env.API_BASE;
   const urls = {
-    links: `${process.env.API_BASE}/links`,
-    backgrounds: `${process.env.API_BASE}/backgrounds`,
+    links: `${base}/links`,
+    backgrounds: `${base}/backgrounds`,
+    userLinks: `${base}/user/links`,
   };
 
   const headers = {
@@ -63,23 +60,30 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const responses = await Promise.all([
       fetch(urls.links, { headers }),
       fetch(urls.backgrounds, { headers }),
+      fetch(urls.userLinks, { headers }),
     ]);
 
-    if (!responses[0].ok || !responses[1].ok) {
+    if (!responses[0].ok || !responses[1].ok || !responses[2].ok) {
       throw new Error("Failed to fetch data");
     }
 
-    const [linksData, backgroundsData] = await Promise.all([
+    const [linksData, backgroundsData, userLinksData] = await Promise.all([
       responses[0].json(),
       responses[1].json(),
+      responses[2].json(),
     ]);
-    return json({ links: linksData, backgrounds: backgroundsData });
+    return json({
+      links: linksData,
+      backgrounds: backgroundsData,
+      userLinks: userLinksData,
+    });
   } catch (error) {
     return json({ error: error?.toString() });
   }
   /* END | Fetch de datos */
 };
 
+//action
 export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
@@ -88,6 +92,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   /* START | Fetch de datos */
   const url = `${process.env.API_BASE}/user/link/store`;
+
+  const defaultStyle =
+    "bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md ";
 
   try {
     const response = await fetch(url, {
@@ -99,69 +106,38 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
       body: JSON.stringify({
         link_type_id: 1,
-        title: "title 01",
+        title: "title 03",
         url: "https://www.google.com/",
-        style: "bg-red-700",
+        style: { defaultStyle },
       }),
     });
 
     if (!response) {
-      throw new Error("Failed to fetch data");
+      throw Error("Failed to fetch data");
     }
 
     const data = await response.json();
 
     return json({ data });
   } catch (error) {
-    return json({ error: error?.toString() });
+    throw Error("Failed to fetch data");
+    //  return json({ error: error?.toString() });
   }
   /* END | Fetch de datos */
 };
 
-type DataType = {
-  links: [
-    {
-      id: 1;
-
-      name: "Button";
-
-      hasSchema: 1;
-
-      schemas: [
-        { id: 1; property: "Color"; options: [] },
-
-        {
-          id: 2;
-
-          property: "Border";
-
-          options: ["round", "semi-round", "none"];
-        },
-
-        {
-          id: 3;
-
-          property: "Shadow";
-
-          options: ["soft", "middle", "heavy", "none"];
-        },
-
-        { id: 4; property: "Special"; options: ["wave", "label", "triangle"] }
-      ];
-    }
-  ];
-
-  backgrounds: [
-    { id: 1; name: "Flat"; plan: "1"; image: null },
-
-    { id: 2; name: "Gradient"; plan: "2"; image: null }
-  ];
-};
-
+//component
 export default function Dashboard() {
-  const data = useLoaderData<DataType>();
+  const data = useLoaderData();
+  const navigation = useNavigation();
+  const isSubmitting = !(navigation.state === "idle");
 
-  const { links, backgrounds } = data;
+  const { links, backgrounds, userLinks } = data;
+
+  const previewLinks = userLinks.map((userLink) => {
+    return { url: userLink.id, title: userLink.title, styles: userLink.style };
+  });
+
   return (
     <div className=" min-h-screen max-w-[1600px] mx-auto grid lg:grid-cols-7 gap-4 bg-slate-200 py-4 px-4 sm:px-6">
       <div className="col-span-5 flex flex-col gap-8 ">
@@ -301,10 +277,13 @@ export default function Dashboard() {
       {/* preview */}
       <div className="hidden lg:col-span-2 lg:block mx-auto ">
         <div className=" sticky top-10 flex flex-col gap-4">
-          <Preview data={DUMMY_DATA} />
+          <Preview data={previewLinks} />
           <Form method="post">
-            <button className=" bg-white w-full rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all">
-              Save
+            <button
+              disabled={isSubmitting}
+              className=" bg-white w-full rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all"
+            >
+              {isSubmitting ? "Saving..." : "Save"}
             </button>
           </Form>
         </div>

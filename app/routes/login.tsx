@@ -88,7 +88,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const cookieHeader = await sessionStorage.commitSession(session);
 
-  return redirect("/dashboard", {
+  return redirect("/styles", {
     headers: {
       "Set-Cookie": cookieHeader,
     },

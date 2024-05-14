@@ -3,7 +3,11 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 type PreviewProps = {
   url: string;
   title: string;
-  styles: string;
+  styles: {
+    id: number;
+    link_id: number;
+    class: string;
+  };
 };
 
 function Preview({ data }: { data: PreviewProps[] }) {
@@ -26,11 +30,7 @@ function Preview({ data }: { data: PreviewProps[] }) {
               <a
                 href={datos.url}
                 target="_black"
-                className={`${
-                  !datos.styles
-                    ? "bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md "
-                    : ""
-                } ${datos.styles}`}
+                className={datos.styles.class}
                 key={index}
               >
                 <p>{datos.title}</p>

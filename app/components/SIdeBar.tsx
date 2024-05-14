@@ -3,10 +3,13 @@ import React, { useEffect, useState } from "react";
 import { FaMehBlank } from "react-icons/fa";
 import { CiLogout } from "react-icons/ci";
 import { MdOutlineDashboard } from "react-icons/md";
+import { HiPaintBrush } from "react-icons/hi2";
+import { VscOpenPreview } from "react-icons/vsc";
 
 import SidebarContent from "@/components/SideBarContent";
 
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useLocation } from "@remix-run/react";
+import { l } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 interface SidebarProps {
   title: string;
@@ -16,6 +19,8 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [copy, setCopied] = useState("Copy");
   const [change, setSwitched] = useState(false);
+  const location = useLocation();
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
@@ -92,12 +97,30 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
             </nav>
           </div>
           <div className=" flex w-full flex-col gap-2">
-            <Link
-              className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
-              to="/dashboard"
-            >
-              <MdOutlineDashboard /> Go to Dashboard
-            </Link>
+            {location.pathname !== "/preview" && (
+              <Link
+                className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
+                to="/preview"
+              >
+                <VscOpenPreview /> Go to Preview
+              </Link>
+            )}
+            {location.pathname !== "/back-office" && (
+              <Link
+                className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
+                to="/back-office"
+              >
+                <MdOutlineDashboard /> Go to BackOffice
+              </Link>
+            )}
+            {location.pathname !== "/styles" && (
+              <Link
+                className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
+                to="/styles"
+              >
+                <HiPaintBrush /> Go to Styles
+              </Link>
+            )}
             <Form action="/logout" method="post" className="px-2">
               <button className=" w-full text-white px-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 ">
                 <CiLogout /> Log out
@@ -111,7 +134,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
       <div className="fixed top-4 left-0 sm:left-4 z-10 flex-shrink-0 flex h-16 scale-75">
         <button
           onClick={toggleSidebar}
-          className="px-4 text-white hover:text-gray-600 focus:outline-none rounded-full hover:bg-gray-100 focus:text-gray-600 transition-colors"
+          className="px-4 text-gray-600 hover:text-gray-600 focus:outline-none rounded-full bg-gray-100 hover:scale-110 transition-all hover:bg-gray-100 focus:text-gray-600 //transition-colors"
           aria-label="Open sidebar"
         >
           <svg

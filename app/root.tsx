@@ -12,6 +12,7 @@ import {
 import "./styles/index.css";
 import { motion } from "framer-motion";
 import TwoColGridLayout from "./components/TwoColGridLayout";
+import Sidebar from "./components/SideBar";
 type LayoutProps = {
   children?: ReactNode;
 };
@@ -40,7 +41,7 @@ export function Layout({ children }: LayoutProps) {
     </html>
   );
 }
-//Aplica lo que te pedi antes, hacer que el state resultante sea compatible con el metodo map
+
 export default function App() {
   interface Item {
     id: number;
@@ -87,7 +88,12 @@ export default function App() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  return <Outlet context={{ state, dispatch }} />;
+  return (
+    <>
+      <Sidebar title="Social Media" />
+      <Outlet context={{ state, dispatch }} />;
+    </>
+  );
 }
 
 //Error SEO
@@ -106,7 +112,6 @@ export function meta() {
 //error UI
 export function ErrorBoundary() {
   const error = useRouteError();
-
   return (
     <TwoColGridLayout
       stylesCol1="flex flex-col gap-8"
@@ -154,17 +159,17 @@ export function ErrorBoundary() {
         </motion.p>
       )}
 
-      {/* go to dashboard */}
+      {/* go to styles */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         className=" py-3"
       >
         <Link
-          to="/dashboard"
+          to="/styles"
           className=" bg-blue-600 block text-white rounded-full py-3 px-10 hover:bg-blue-700 cursor-pointer transition text-center "
         >
-          Go to Dashboard
+          Go to Styles
         </Link>
       </motion.div>
     </TwoColGridLayout>
