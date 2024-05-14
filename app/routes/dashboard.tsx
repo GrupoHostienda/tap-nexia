@@ -1,6 +1,6 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 
 import { sessionStorage } from "@/utils/session.server";
 
@@ -17,6 +17,12 @@ import {
   getShadowClass,
   getSpecialButtonClass,
 } from "@/utils/dashboard";
+
+const DUMMY_DATA = [
+  { url: "url1", title: "title1", styles: "" },
+  { url: "url2", title: "title2", styles: "" },
+  { url: "url3", title: "title3", styles: "" },
+];
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -68,6 +74,44 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       responses[1].json(),
     ]);
     return json({ links: linksData, backgrounds: backgroundsData });
+  } catch (error) {
+    return json({ error: error?.toString() });
+  }
+  /* END | Fetch de datos */
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+  const authToken = session.get("authToken");
+
+  /* START | Fetch de datos */
+  const url = `${process.env.API_BASE}/user/link/store`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+
+      body: JSON.stringify({
+        link_type_id: 1,
+        title: "title 01",
+        url: "https://www.google.com/",
+        style: "bg-red-700",
+      }),
+    });
+
+    if (!response) {
+      throw new Error("Failed to fetch data");
+    }
+
+    const data = await response.json();
+
+    return json({ data });
   } catch (error) {
     return json({ error: error?.toString() });
   }
@@ -134,12 +178,10 @@ export default function Dashboard() {
               <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
                 <div className={` border border-gray-400 h-10 bg-white `} />
                 <div className={` border border-gray-400 h-10 bg-black `} />
-                <div className={` border border-gray-400 h-10 bg-blue-200 `} />
-                <div className={` border border-gray-400 h-10 bg-green-200 `} />
-                <div className={` border border-gray-400 h-10 bg-red-200 `} />
-                <div
-                  className={` border border-gray-400 h-10 bg-gradient-to-r from-red-400 to-blue-400 `}
-                />
+                <div className={` border border-gray-400 h-10 bg-[#FD3E81] `} />
+                <div className={` border border-gray-400 h-10 bg-[#FF7F11] `} />
+                <div className={` border border-gray-400 h-10 bg-[#06BEE1] `} />
+                <div className={` border border-gray-400 h-10 bg-[#ABA194] `} />
               </div>
             </div>
 
@@ -258,8 +300,13 @@ export default function Dashboard() {
 
       {/* preview */}
       <div className="hidden lg:col-span-2 lg:block mx-auto ">
-        <div className=" sticky top-10">
-          <Preview data={[{ url: "url1", title: "title1", styles: "" }]} />
+        <div className=" sticky top-10 flex flex-col gap-4">
+          <Preview data={DUMMY_DATA} />
+          <Form method="post">
+            <button className=" bg-white w-full rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all">
+              Save
+            </button>
+          </Form>
         </div>
       </div>
     </div>
