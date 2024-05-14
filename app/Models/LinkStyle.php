@@ -9,10 +9,9 @@ class LinkStyle extends Model
 {
     protected $fillable = [
         'link_id',
-        'schema',
+        'class',
     ];
     protected $casts = [
-        'schema' => 'array', // Will convarted to (Array)
     ];
     protected $hidden = [
         "created_at",
