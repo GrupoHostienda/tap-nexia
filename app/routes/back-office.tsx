@@ -9,7 +9,7 @@ import { sessionStorage } from "@/utils/session.server";
 
 //import { GlobalStateProvider } from "@/components/Context/GlobalContext";
 import data from "data.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function meta() {
   return [
@@ -30,6 +30,7 @@ type OutletContextProps = {
 
 // const [linkList, setLinkList] = useState([])
 let linkList: Card[] = [];
+let linkStatus: number = 0;
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
@@ -43,10 +44,10 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       Authorization: `Bearer ${authToken}`
     }
   });
-  // setLinkList(await links.json())
+  linkStatus = await links.status
   linkList = await links.json()
   console.log(linkList)
-  console.log(authToken)
+  console.log("Este es el token: "+authToken)
 
   if (!authToken) {
     return redirect("/login");
@@ -99,8 +100,17 @@ export default function LayoutBackOffice() {
   // const { links } = data;
   const { state, dispatch } =
   useOutletContext<OutletContextProps>();
- 
-  
+  // const [links, setLinks] = useState<Card[]>([])
+  // useEffect(() => {
+  //   setLinks(linkList)
+  //   // Solo se ejecuta cuando linkList cambia
+  //   // linkList.forEach(link => {
+  //     console.log(links)
+  //     dispatch({ type: 'addItem', payload: links });
+  //   // });
+  // }, [linkList]);
+
+  // console.log("Estos son los links "+links)
 
   return (
     <>
