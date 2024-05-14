@@ -57,7 +57,7 @@ class UserController extends Controller
                      'url'=>$data['url'],
         ]);
         $style = LinkStyle::make([
-            'schema'=>$data['style']
+            'class'=>$data['style']
         ]);
 
         $link->style()->save($style);
