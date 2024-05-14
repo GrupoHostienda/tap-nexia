@@ -7,36 +7,34 @@ import { BsBoxArrowUp } from "react-icons/bs";
 import { MdOutlineEdit } from "react-icons/md";
 import { FaRegSave } from "react-icons/fa";
 import { useState } from "react";
-import { useOutletContext } from "@remix-run/react";
+import { Form, useOutletContext } from "@remix-run/react";
 
-type Card = {
-  title: string;
-  url: string;
-  active: boolean;
-  id: number;
+export interface Card {
+  title: string,
+  url: string,
+  active: boolean,
+  id: number
 };
 type OutletContextProps = {
   state: { items: [] };
   dispatch: React.Dispatch<React.SetStateAction<{}>>;
 };
 
-function CardBackOffice({ link }: {link: Card}) {
-  
+function CardBackOffice({ link }: { link: Card }) {
   const [linkActivated, linkActive] = useState(false);
   const cardActive = () => {
     linkActive(!linkActivated);
-    link.active = linkActivated
+    link.active = linkActivated;
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
-  const toggleInput = (id:number) => {
-    if(!inputEnabled){
+  const toggleInput = (id: number) => {
+    if (!inputEnabled) {
       setInputEnabled(!inputEnabled);
     } else {
-      handleSaveEdit(id)
+      handleSaveEdit(id);
       setInputEnabled(!inputEnabled);
     }
-
   };
 
   const [editedItemUrl, setEditedItemUrl] = useState<string>("");
@@ -44,10 +42,10 @@ function CardBackOffice({ link }: {link: Card}) {
 
   const { state, dispatch } = useOutletContext<OutletContextProps>();
 
-  const handleEditItem = (item: Card) => {
-    setEditedItemUrl(item.url);
-    setEditedItemText(item.title);
-  };
+  // const handleEditItem = (item: Card) => {
+  //   setEditedItemUrl(item.url);
+  //   setEditedItemText(item.title);
+  // };
 
   const handleSaveEdit = (id: number) => {
     dispatch({
@@ -70,7 +68,10 @@ function CardBackOffice({ link }: {link: Card}) {
         <div className="border-r self-center">
           <TbMenu />
         </div>
-        <div className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3">
+        <Form
+          method="POST"
+          className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3"
+        >
           <span className="text-wrap font-bold flex items-center gap-2">
             <input
               type="text"
@@ -80,12 +81,30 @@ function CardBackOffice({ link }: {link: Card}) {
               placeholder={link.title}
               disabled={!inputEnabled}
             />
-            <span
+            {!inputEnabled ? (
+              <span
+                onClick={() => toggleInput(link.id)}
+                className="opacity-50 hover:opacity-100 cursor-pointer"
+              >
+                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
+                <MdOutlineEdit />
+              </span>
+            ) : (
+              <button
+                type="submit"
+                onClick={() => toggleInput(link.id)}
+                className="opacity-50 hover:opacity-100 cursor-pointer"
+              >
+                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
+                <FaRegSave />
+              </button>
+            )}
+            {/* <span
               onClick={() => toggleInput(link.id)}
               className="opacity-50 hover:opacity-100 cursor-pointer"
             >
               {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />}
-            </span>
+            </span> */}
           </span>
           <span className="flex font-bold items-center gap-2">
             <input
@@ -96,12 +115,24 @@ function CardBackOffice({ link }: {link: Card}) {
               placeholder={link.url}
               disabled={!inputEnabled}
             />
-            <span
-              onClick={() => toggleInput(link.id)}
-              className="opacity-50 hover:opacity-100 cursor-pointer"
-            >
-              {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />}
-            </span>
+            {!inputEnabled ? (
+              <span
+                onClick={() => toggleInput(link.id)}
+                className="opacity-50 hover:opacity-100 cursor-pointer"
+              >
+                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
+                <MdOutlineEdit />
+              </span>
+            ) : (
+              <button
+                type="submit"
+                onClick={() => toggleInput(link.id)}
+                className="opacity-50 hover:opacity-100 cursor-pointer"
+              >
+                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
+                <FaRegSave />
+              </button>
+            )}
           </span>
           <div className="flex justify-start gap-3 p-3 text-gray-600">
             <LuLayoutPanelLeft className="hover:cursor-pointer" />
@@ -112,7 +143,7 @@ function CardBackOffice({ link }: {link: Card}) {
             <CiLock className="hover:cursor-pointer" />
             <ImStatsBars2 className="hover:cursor-pointer" />
           </div>
-        </div>
+        </Form>
         <div className="border-l p-2 flex justify-end">
           <div className="grid lg:grid-cols-2 grid-cols-1 lg:grid-rows-[min-content_1fr] grid-rows-3 lg:gap-y-4 items-center cursor-pointer self-center">
             <div className="text-gray-700 font-bold flex justify-center size-max">

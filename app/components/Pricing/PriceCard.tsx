@@ -21,11 +21,13 @@ const PriceCard = ({ plan }: { plan: PlanCard }) => {
       <div
         className={`${
           checked ? "bg-purple-900 text-white" : "text-black"
-        } w-full h-[100px] flex justify-between px-6 items-center`}
+        } w-full h-[100px] flex rounded-t-2xl justify-between px-6 items-center`}
       >
         {plan.title == "Pro" && (
-          <div className="bg-lime-400 text-black rounded-full absolute p-2 -top-4">
+          <div className="absolute lg:-top-4 top-[33%] flex justify-center items-center w-[274px]">
+            <div className="bg-lime-400 text-black p-2 rounded-full">
             Try Pro for free
+            </div>
           </div>
         )}
         <span>
@@ -35,7 +37,7 @@ const PriceCard = ({ plan }: { plan: PlanCard }) => {
         <div>
           <input
             checked={checked}
-            className="size-7 bg-transparent"
+            className="size-5 bg-transparent"
             type="checkbox"
             onClick={check}
           />
