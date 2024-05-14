@@ -68,7 +68,7 @@ class UserValidation extends Validation {
             'title',
         );
         $rules = [
-            'link_type_id' => 'required|string|exists:links',
+            'link_type_id' => 'required|numeric|exists:links',
             'style' => 'nullable|array',
             'url' => 'nullable|string',
             'title' => 'nullable|string',

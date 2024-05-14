@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(Link::class)
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->json('style')->nullable();
+            $table->json('schema')->nullable();
             $table->timestamps();
         });
     }

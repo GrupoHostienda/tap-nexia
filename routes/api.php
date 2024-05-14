@@ -37,7 +37,8 @@ Route::group(['middleware' => ['jwt']], function () {
     // USER
     Route::get('user',[UserController::class,'getUser']);
     Route::post('user/update',[UserController::class,'update']);
-    Route::post('user/addLink',[UserController::class,'addLink']);
-    Route::post('user/editLink/{link}',[UserController::class,'editLink']);
     Route::get('user/links',[UserController::class,'links']);
+    Route::post('user/link/store',[UserController::class,'addLink']);
+    Route::post('user/link/update/{link}',[UserController::class,'editLink']);
+    Route::delete('user/link/delete/{link}',[UserController::class,'deleteLink']);
 });

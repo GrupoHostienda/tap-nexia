@@ -57,8 +57,9 @@ class UserController extends Controller
                      'url'=>$data['url'],
         ]);
         $style = LinkStyle::make([
-            'style'=>$data['style']
+            'schema'=>$data['style']
         ]);
+
         $link->style()->save($style);
 
         UserLink::create([
@@ -78,22 +79,46 @@ class UserController extends Controller
     {
         $user = $this->currentUser();
         // Validate data
-        return $link;
         $validation = new UserValidation($request);
         $data = $validation->editLink();
+
+        $link->update([
+            'link_type_id'=>$data['link_type_id'],
+                   'title'=>$data['title'],
+                     'url'=>$data['url'],
+        ]);
+
+
+        $style = LinkStyle::make([
+            'schema'=>$data['style']
+        ]);
+        $link->style()->delete();
+        $link->style($style);
 
 
 
         return response()->json([
-            'message' => 'Link added.',
+            'message' => 'Link updated.',
         ], Response::HTTP_OK);
 
     }
     /**
      * get all user links
      */
+    public function deleteLink(Link $link) {
+        $link->delete();
+        return response()->json([
+            'message' => 'Link deleted.',
+        ], Response::HTTP_OK);
+    }
+    /**
+     * get all user links
+     */
     public function links() {
-        return $this->currentUser()->links->makeHidden(['link_type_id', 'laravel_through_key']);;
+        
+        return $this->currentUser()
+                    ->links
+                    ->makeHidden(['link_type_id', 'laravel_through_key']);
     }
 
     /**
