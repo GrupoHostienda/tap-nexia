@@ -101,8 +101,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // return null
 };
 
+
 type DataType = {
-  links: [{ tittle: string; link: string }];
+  links: [{ tittle: string; link: string; id: number; isHidden: number }];
 };
 export default function LayoutBackOffice() {
   const { state, dispatch } =
@@ -111,10 +112,23 @@ export default function LayoutBackOffice() {
   const {links} = data
   console.log(links)
 
+  // const addValue = (links:any) => {
+  //   links.map(link => {
+  //     const newItem: Item = {
+  //       id: link.id,
+  //       title: link.tittle,
+  //       url: link.link,
+  //     };
+  //     dispatch({type: 'addItem', payload: newItem});
+
+  //   })};
+  //   useEffect(()=>addValue(links));
+  //   console.log("Estos son los items: "+state.items);
+ 
   return (
     <>
     
-      <div className="absolute top-0 w-full lg:h-[100%] bg-slate-200 left-0 grid lg:grid-cols-[60%_30%] grid-cols-1 lg:gap-10 gap-2">
+      <div className="absolute top-0 w-full lg:h-[100%] bg-slate-200 left-0 grid lg:grid-cols-[60%_30%] grid-cols-1 lg:gap-10 gap-2 overflow-hidden">
         <div className="w-full h-screen pt-7 px-7 flex flex-col gap-2">
           <BackOfficeMenu />
           

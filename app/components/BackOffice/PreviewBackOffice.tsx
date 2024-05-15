@@ -4,6 +4,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 interface DataItem {
   url: string;
   title: string;
+  id: number;
+  isHidden: number;
 }
 
 function PreviewBackOffice({ data }: { data: DataItem[] }) {
@@ -23,14 +25,16 @@ function PreviewBackOffice({ data }: { data: DataItem[] }) {
           {/* Links en linea */}
           <div className="flex flex-col gap-3">
             {data.map((datos, index) => {
+              // console.log(datos.isHidden == 0)
               return (
                 <a
                   href={datos.url}
-                  className="bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md"
-                  key={index}
+                  className={`bg-white p-3 grid grid-cols-[80%_10%] gap-4 items-center text-sm rounded-xl shadow-md ${(datos.isHidden == 0)? "":"hidden"}`}
+                  key={index}                  
                 >
                   <p>{datos.title}</p>
                   <span>
+                  
                     <BsThreeDotsVertical />
                   </span>
                 </a>
