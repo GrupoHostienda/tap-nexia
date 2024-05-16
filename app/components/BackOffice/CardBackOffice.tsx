@@ -5,9 +5,9 @@ import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
 import { ImStatsBars2 } from "react-icons/im";
 import { BsBoxArrowUp } from "react-icons/bs";
 import { MdOutlineEdit } from "react-icons/md";
-import { FaRegSave } from "react-icons/fa";
+import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
-import { Form, useOutletContext } from "@remix-run/react";
+import { Form, useNavigation, useOutletContext } from "@remix-run/react";
 
 export interface Card {
   title: string,
@@ -21,6 +21,11 @@ type OutletContextProps = {
 };
 
 function CardBackOffice({ link }: { link: Card }) {
+  const navigation = useNavigation();
+  const isSubmittingDelete =
+    !(navigation.state === "idle") && navigation.formMethod === "DELETE";
+
+
   const [linkActivated, linkActive] = useState(false);
   const cardActive = () => {
     linkActive(!linkActivated);
@@ -162,15 +167,16 @@ function CardBackOffice({ link }: { link: Card }) {
                 } transition-all top-1 bg-white w-6 h-6 rounded-full`}
               ></div>
             </div>
-            <div className="lg:col-start-2 text-xl flex justify-center lg:p-5 p-2 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max">
-              <button
-                onClick={() =>
-                  dispatch({ type: "deleteItem", payload: link.id })
-                }
-              >
-                <LuTrash2 />
+            <Form method="delete" className="lg:col-start-2 text-xl flex justify-center lg:p-5 p-2 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max ">
+            <input type="hidden" name="link-id" value={link.id} />
+              <button>
+              {isSubmittingDelete ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <LuTrash2 />
+                )}
               </button>
-            </div>
+            </Form>
           </div>
         </div>
       </div>
