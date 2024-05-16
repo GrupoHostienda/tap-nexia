@@ -12,7 +12,6 @@ import {
 import "./styles/index.css";
 import { motion } from "framer-motion";
 import TwoColGridLayout from "./components/TwoColGridLayout";
-import Sidebar from "./components/SideBar";
 type LayoutProps = {
   children?: ReactNode;
 };
@@ -88,12 +87,7 @@ export default function App() {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  return (
-    <>
-      <Sidebar title="Social Media" />
-      <Outlet context={{ state, dispatch }} />;
-    </>
-  );
+  return <Outlet context={{ state, dispatch }} />;
 }
 
 //Error SEO
@@ -159,17 +153,17 @@ export function ErrorBoundary() {
         </motion.p>
       )}
 
-      {/* go to styles */}
+      {/* go to preview */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         className=" py-3"
       >
         <Link
-          to="/styles"
+          to="/preview"
           className=" bg-blue-600 block text-white rounded-full py-3 px-10 hover:bg-blue-700 cursor-pointer transition text-center "
         >
-          Go to Styles
+          Go to Preview
         </Link>
       </motion.div>
     </TwoColGridLayout>
