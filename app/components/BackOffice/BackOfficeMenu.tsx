@@ -23,6 +23,8 @@ export default function BackOfficeMenu() {
   useOutletContext<OutletContextProps>();
 
   const addValue = () => {
+    setAddLinkMenu(prev => !prev)
+    console.log(addLinkMenu)
     const newItem: Item = {
       id: Date.now(),
       title: '',
@@ -30,8 +32,6 @@ export default function BackOfficeMenu() {
     };
     dispatch({type: 'addItem', payload: newItem});
     console.log(state.items);
-    setAddLinkMenu(prev => !prev)
-    console.log(addLinkMenu)
   }
 
   return (

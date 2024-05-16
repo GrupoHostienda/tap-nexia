@@ -4,12 +4,12 @@ import CardBackOffice, { Card } from "@/components/BackOffice/CardBackOffice";
 import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
 import Pricing from "@/components/Pricing/Pricing";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { useOutletContext } from "@remix-run/react";
+import { useLoaderData, useOutletContext } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
 //import { GlobalStateProvider } from "@/components/Context/GlobalContext";
-import { useState } from "react";
-import DashboarHeader from "@/components/DashboarHeader";
+import data from "data.json";
+import { useEffect, useState } from "react";
 
 export function meta() {
   return [
@@ -29,7 +29,7 @@ type OutletContextProps = {
 };
 
 // const [linkList, setLinkList] = useState([])
-let linkList: Card[] = [];
+
 export const loader = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
@@ -43,16 +43,20 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
       Authorization: `Bearer ${authToken}`,
     },
   });
-  // setLinkList(await links.json())
-  linkList = await links.json();
-  console.log(linkList);
-  console.log(authToken);
 
   if (!authToken) {
     return redirect("/login");
   }
+  try {
+    if (!links.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    const response = await links.json();
 
-  return null; // no hay sesión activa, seguir con el renderizado normal
+    return json({ links: response });
+  } catch (error) {
+    return json({ error: error?.toString() });
+  }
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -69,34 +73,41 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (title.trim() === "" || link.trim() === "") {
     return json({ error: "All fields are required." });
   }
-
-  const response = await fetch(`${process.env.API_BASE}/user/addLink`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-    body: JSON.stringify({
-      link_type_id: 1,
-      title: title,
-      url: link,
-      style: [],
-    }),
-  });
-  console.log(response.status);
-  const data = await response.json();
-
-  if (!response.ok) {
-    return json({ error: data.error });
+  try {
+    const response = await fetch(`${process.env.API_BASE}/user/addLink`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        link_type_id: 1,
+        title: title,
+        url: link,
+        style: [],
+      }),
+    });
+    if (!response) {
+      throw new Error("Failed to fetch data");
+    }
+    console.log(response.status);
+    const data = await response.json();
+    console.log(data);
+    return json({ data });
+  } catch (error) {
+    return json({ error: error?.toString() });
   }
-  console.log(data);
-  return data;
   // return null
 };
 
+type DataType = {
+  links: [{ tittle: string; link: string }];
+};
 export default function LayoutBackOffice() {
-  // const { links } = data;
   const { state, dispatch } = useOutletContext<OutletContextProps>();
+  const data = useLoaderData<DataType>();
+  const { links } = data;
+  console.log(links);
 
   return (
     <>
@@ -107,7 +118,7 @@ export default function LayoutBackOffice() {
 
           <div></div>
           <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
-            {linkList.map((link, index) => {
+            {links.map((link, index) => {
               return (
                 <div key={index}>
                   <CardBackOffice link={link} />
@@ -118,7 +129,7 @@ export default function LayoutBackOffice() {
         </div>
         {/* Preview de elementos */}
         <div className="w-full h-screen flex items-center justify-center">
-          <PreviewBackOffice data={state.items} />
+          <PreviewBackOffice data={links} />
         </div>
       </div>
     </>
