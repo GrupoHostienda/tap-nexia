@@ -41,7 +41,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   // console.log(authToken);
 
   if (authToken) {
-    return redirect("/");
+    return redirect("/preview");
   }
 
   return null; // no hay sesión activa, seguir con el renderizado normal

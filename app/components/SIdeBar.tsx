@@ -9,7 +9,6 @@ import { VscOpenPreview } from "react-icons/vsc";
 import SidebarContent from "@/components/SideBarContent";
 
 import { Form, Link, useLocation } from "@remix-run/react";
-import { l } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 interface SidebarProps {
   title: string;
@@ -96,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
               </div>
             </nav>
           </div>
-          <div className=" flex w-full flex-col gap-2">
+          {/*  <div className=" flex w-full flex-col gap-2">
             {location.pathname !== "/preview" && (
               <Link
                 className=" text-white mx-2 py-1 bg-gray-600 hover:bg-gray-700 transition-colors rounded-md flex justify-center items-center gap-2 "
@@ -126,15 +125,15 @@ const Sidebar: React.FC<SidebarProps> = ({ title }) => {
                 <CiLogout /> Log out
               </button>
             </Form>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* Button */}
-      <div className="fixed top-4 left-0 sm:left-4 z-10 flex-shrink-0 flex h-16 scale-75">
+      <div className="fixed top-4 sm:top-10 left-0 sm:left-4 z-10 flex-shrink-0 flex h-16 scale-75">
         <button
           onClick={toggleSidebar}
-          className="px-4 text-gray-600 hover:text-gray-600 focus:outline-none rounded-full bg-gray-100 hover:scale-110 transition-all hover:bg-gray-100 focus:text-gray-600 //transition-colors"
+          className="px-4 text-white hover:text-gray-600 focus:outline-none rounded-full hover:scale-110 transition-all hover:bg-gray-100 focus:text-gray-600"
           aria-label="Open sidebar"
         >
           <svg
