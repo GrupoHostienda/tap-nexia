@@ -153,6 +153,7 @@ export default function LayoutBackOffice() {
           <PreviewBackOffice data={links} />
         </div>
       </div>
+      </div>
     </>
   );
 }
