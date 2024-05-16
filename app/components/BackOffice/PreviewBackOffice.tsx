@@ -16,7 +16,7 @@ function PreviewBackOffice({ data }: { data: DataItem[] }) {
       <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
         <div className="w-full h-full bg-gradient-to-b from-blue-300 to-blue-500 rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar">
           {/* Foto de perfil */}
-          <div className="size-16 rounded-full bg-gray-700 self-center"></div>
+          <div className="size-16 self-center"><img src="favicon.ico" className="rounded-full" alt="" /></div>
           {/* Nombre de usuario y mensaje de biografia */}
           <div className="text-center">
             <h1 className="font-bold">USER123@email.com</h1>

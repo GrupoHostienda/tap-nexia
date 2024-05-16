@@ -19,7 +19,7 @@ type Item = {
 }
 export default function BackOfficeMenu() {
 
-  const [visible, setVisibility] = useState(true)
+  const [visible, setVisibility] = useState(false)
   const { state, dispatch } =
   useOutletContext<OutletContextProps>();
 

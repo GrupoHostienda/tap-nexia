@@ -10,6 +10,7 @@ import { sessionStorage } from "@/utils/session.server";
 //import { GlobalStateProvider } from "@/components/Context/GlobalContext";
 import data from "data.json";
 import { useEffect, useState } from "react";
+import React from "react";
 
 export function meta() {
   return [
@@ -112,19 +113,22 @@ export default function LayoutBackOffice() {
   const {links} = data
   console.log(links)
 
-  // const addValue = (links:any) => {
+  // const addValue = () => {
   //   links.map(link => {
-  //     const newItem: Item = {
+  //     const newItem: any = {
+  //       tittle: link.tittle,
+  //       link: link.link,
   //       id: link.id,
-  //       title: link.tittle,
-  //       url: link.link,
-  //     };
-  //     dispatch({type: 'addItem', payload: newItem});
-
-  //   })};
-  //   useEffect(()=>addValue(links));
-  //   console.log("Estos son los items: "+state.items);
- 
+  //       isHidden: link.isHidden,
+  //     };      
+  //   })
+  //   dispatch({type: 'addItem', payload: links});
+  // };
+  //   useEffect(() => {
+  //     addValue();
+  //   }, []);
+  //   console.log("Este es el state: ")
+  //   console.log(state.items) 
   return (
     <>
     
