@@ -44,7 +44,9 @@ export default function BackOfficeMenu() {
           <Form
             method="post"
             className="bg-white rounded-3xl p-4 flex flex-col gap-4 w-[30%] z-50"
+            onSubmit={() => setVisibility(!visible)}
           >
+            <span className="message"></span>
             <div className="grid grid-cols-[20%_80%]">
               <label
                 className="bg-gray-500 rounded-tl-xl rounded-bl-xl p-2"
@@ -77,6 +79,7 @@ export default function BackOfficeMenu() {
               <button
                 type="submit"
                 className="bg-blue-700 text-white text-xl rounded-xl p-2 hover:bg-blue-600"
+
               >
                 Add link
               </button>

@@ -24,7 +24,7 @@ function CardBackOffice({ link }: { link: Card }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
-
+  const [idLink, setIdLink] = useState<number>()
 
   const [linkActivated, linkActive] = useState(false);
   const cardActive = () => {
@@ -169,8 +169,8 @@ function CardBackOffice({ link }: { link: Card }) {
             </div>
             <Form method="delete" className="lg:col-start-2 text-xl flex justify-center lg:p-5 p-2 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max ">
             <input type="hidden" name="link-id" value={link.id} />
-              <button>
-              {isSubmittingDelete ? (
+              <button onClick={()=>setIdLink(link.id)}>
+              {isSubmittingDelete && idLink == link.id ? (
                   <FaSpinner className="animate-spin" />
                 ) : (
                   <LuTrash2 />

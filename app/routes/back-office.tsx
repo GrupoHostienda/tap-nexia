@@ -17,6 +17,7 @@ import data from "data.json";
 import { useEffect, useState } from "react";
 import DashboarHeader from "@/components/DashboarHeader";
 import React from "react";
+import { validateUrl } from "@/utils/helpers";
 
 export function meta() {
   return [
@@ -71,19 +72,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     request.headers.get("Cookie")
   );
   const authToken = session.get("authToken");
-
+  
   if (request.method === "POST") {
     const formData = await request.formData();
     const title = formData.get("title") as string;
     const link = formData.get("link") as string;
-    console.log(title);
-
+    console.log(title+" -> "+link);
+    console.log(authToken);
+    
     if (title.trim() === "" || link.trim() === "") {
       return json({ error: "All fields are required." });
     }
 
+    if (!validateUrl(link)){
+      return json({ error: "Is not a valid URL." });
+    }
+    
     try {
-      const response = await fetch(`${process.env.API_BASE}/user/addLink`, {
+      const response = await fetch(`${process.env.API_BASE}/user/link/store`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +99,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           link_type_id: 1,
           title: title,
           url: link,
-          style: [],
+          style: 'hola',
         }),
       });
       if (!response) {
@@ -107,7 +113,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return json({ error: error?.toString() });
     }
   }
-  console.log(authToken);
   //campos no vacios
 
   if (request.method === "DELETE") {
