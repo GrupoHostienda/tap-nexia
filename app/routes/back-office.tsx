@@ -113,7 +113,33 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return json({ error: error?.toString() });
     }
   }
-  //campos no vacios
+  
+  // ACTUALIZACION DE DATOS
+  if (request.method === 'UPDATE'){
+    const linkVisible = (await request.formData()).get('isHidden');
+
+    try {
+      const response = await fetch(`${process.env.API_BASE}/user/update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          isHidden: linkVisible
+        }),
+      });
+      if (!response) {
+        throw new Error("Failed to fetch data");
+      }
+      console.log(response.status);
+      const data = await response.json();
+      console.log(data);
+      return json({ data });
+    } catch (error) {
+      return json({ error: error?.toString() });
+    }
+  }
 
   if (request.method === "DELETE") {
     const linkId = (await request.formData()).get("link-id");

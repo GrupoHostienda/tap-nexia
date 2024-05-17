@@ -147,7 +147,7 @@ function CardBackOffice({ link }: { link: Card }) {
               <BsBoxArrowUp />
             </div> */}
             <div className="relative" onClick={cardActive}>
-              <input type="checkbox" className="sr-only" />
+              <input type="checkbox" className="sr-only" value={0}/>
               <div
                 className={`block ${
                   link.active ? `bg-green-400` : `bg-gray-600`
