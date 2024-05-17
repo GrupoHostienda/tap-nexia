@@ -117,6 +117,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // ACTUALIZACION DE DATOS
   if (request.method === 'UPDATE'){
     const linkVisible = (await request.formData()).get('isHidden');
+    const title = (await request.formData()).get('title');
+    const link = (await request.formData()).get('link');
 
     try {
       const response = await fetch(`${process.env.API_BASE}/user/update`, {
