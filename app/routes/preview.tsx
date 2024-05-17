@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import LinksContainer from "@/components/ProfilePage/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
 import DashboarHeader from "@/components/DashboarHeader";
-import Sidebar from "@/components/SideBar";
+import Sidebar from "@/components/SIdeBar";
 
 /* function for meta data, for improving SEO */
 export function meta() {
