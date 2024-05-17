@@ -142,10 +142,10 @@ type DataType = {
 export default function LayoutBackOffice() {
   const { state, dispatch } = useOutletContext<OutletContextProps>();
   const data = useLoaderData<DataType>();
-  const actionData = useActionData<typeof action>();
+  // const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
-  const isSubmittingStyle =
-    navigation.state === "submitting" && navigation.formMethod === "POST";
+  // const isSubmittingStyle =
+  //   navigation.state === "submitting" && navigation.formMethod === "POST";
   const { links } = data;
   console.log(links);
 
