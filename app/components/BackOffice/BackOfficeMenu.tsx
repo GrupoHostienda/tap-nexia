@@ -1,6 +1,7 @@
 import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
+import { BsLayoutWtf } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
 import { Form, useOutletContext } from "@remix-run/react";
 import NewLinkMenu from "./NewLinkMenu";
@@ -89,16 +90,8 @@ export default function BackOfficeMenu() {
       </div>
 
       {/* Switch de botones */}
-      <div className="grid grid-cols-2 border border-gray-400 w-52 rounded-full opacity-0">
-        <button
-          className="bg-gray-950 text-white rounded-full p-3 px-5"
-          disabled
-        >
-          Links
-        </button>
-        <button className="p-3  rounded-full" disabled>
-          Store
-        </button>
+      <div className="flex justify-start gap-4 p-4 w-full border items-center text-2xl font-bold">
+      <BsLayoutWtf /><p>Back-Office</p>
       </div>
       {/* Boton add link */}
       <div className="w-full">
