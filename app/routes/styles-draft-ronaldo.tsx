@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
@@ -28,7 +28,14 @@ import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { PiSelectionBackground } from "react-icons/pi";
 import { FaCircleCheck } from "react-icons/fa6";
 
-import type { ContextType, PreviewProps, UserType } from "@/types";
+import type {
+  BackgroundType,
+  ContextType,
+  LinkStylesType,
+  PreviewProps,
+  UserLinkType,
+  UserType,
+} from "@/types";
 
 import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
 import HeadingMobile from "@/components/layout/HeadingMobile";
@@ -36,13 +43,20 @@ import HeadingDesktop from "@/components/layout/HeadingDesktop";
 import HeadingH2 from "@/components/layout/HeadingH2";
 import Buttons from "@/components/stylesPage/Buttons";
 import DashboarHeader from "@/components/DashboarHeader";
-import Preview from "@/components/Preview";
+import Preview from "@/components/PreviewDraft";
 import {
   SpecialButtonOne,
   SpecialButtonTwo,
 } from "@/components/stylesPage/SpecialButtons";
 import { motion } from "framer-motion";
 import { applyNewStyle } from "@/utils/helpers";
+import { getTokenIfConnected } from "@/services";
+import {
+  BackgroundsSchema,
+  LinksStylesAPISchema,
+  UserLinksSchema,
+  UserSchema,
+} from "@/schemas";
 
 //meta
 export function meta() {
@@ -59,19 +73,12 @@ export function meta() {
 
 //loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  /* START | Verificar session */
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
+  const authToken = await getTokenIfConnected(request); //redirecciona a /login si no estas autenticado
 
-  if (!authToken) {
-    return redirect("/login");
-  }
-  /* END | Verificar session */
-
-  /* START | Fetch de datos */
   const base = process.env.API_BASE;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
   const urls = {
     user: `${base}/user`,
     links: `${base}/links`,
@@ -79,10 +86,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     userLinks: `${base}/user/links`,
   };
 
-  const headers = {
-    Authorization: `Bearer ${authToken}`,
-  };
-
+  /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
+  /* START | Fetch de datos */
   try {
     const responses = await Promise.all([
       fetch(urls.user, { headers }),
@@ -97,7 +102,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       !responses[2].ok ||
       !responses[3].ok
     ) {
-      throw new Error("Failed to fetch data");
+      console.log("error at fetching data");
+      throw new Error("Failed to fetch data"); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
     }
 
     const [userData, linksData, backgroundsData, userLinksData] =
@@ -107,14 +113,33 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         responses[2].json(),
         responses[3].json(),
       ]);
+
+    const userDataVerified = UserSchema.safeParse(userData);
+    const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+    const linksDataVerified = LinksStylesAPISchema.safeParse(linksData);
+    const backgroundsDataVerified =
+      BackgroundsSchema.safeParse(backgroundsData);
+
+    /* si NO pasa la validacion de zod retorno un error*/
+    if (
+      !userDataVerified.success ||
+      !userLinksDataVerified.success ||
+      !linksDataVerified.success ||
+      !backgroundsDataVerified.success
+    ) {
+      console.log("error at validation");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
+
     return json({
-      user: userData,
-      links: linksData,
-      backgrounds: backgroundsData,
-      userLinks: userLinksData,
+      user: userDataVerified,
+      links: linksDataVerified.data,
+      backgrounds: backgroundsDataVerified.data,
+      userLinks: userLinksDataVerified.data,
     });
   } catch (error) {
-    return json({ error: error?.toString() });
+    console.log(error?.toString());
+    return json({ error: `${error?.toString()} ********` });
   }
   /* END | Fetch de datos */
 };
@@ -204,35 +229,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 //type
-type LoaderData = {
+type LoaderDataType = {
   user: UserType;
-  links: any[];
-  backgrounds: any[];
-  userLinks: any[];
+  links: LinkStylesType;
+  backgrounds: BackgroundType[];
+  userLinks: UserLinkType[];
 };
 
 //component
 export default function Styles() {
-  const data = useLoaderData<LoaderData>();
+  const { user, links, backgrounds, userLinks }: LoaderDataType =
+    useLoaderData();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
 
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
-
-  const { user, links, backgrounds, userLinks } = data;
-
-  const previewLinks: PreviewProps[] = userLinks?.map(
-    (userLink: PreviewProps) => {
-      return {
-        id: userLink.id,
-        isHidden: userLink.isHidden,
-        url: userLink.url,
-        title: userLink.title,
-        style: userLink.style,
-      };
-    }
-  );
 
   const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
 
@@ -262,11 +274,9 @@ export default function Styles() {
     color: colorState,
     outline: outlineState,
     shadow: shadowState,
-    background: backgroundState,
     setColor,
     setOutline,
     setShadow,
-    setBackground,
   }: ContextType = useOutletContext();
 
   return (
@@ -325,7 +335,7 @@ export default function Styles() {
                   {[...links[0].schemas[1].options]
                     .reverse()
                     .map((style, index) => {
-                      const roundedClass = getRoundedClass(style);
+                      const roundedClass = getRoundedClass(style) as string;
                       return (
                         <div
                           key={index}
@@ -357,7 +367,7 @@ export default function Styles() {
                 <Buttons label="Shadow">
                   {links[0].schemas[2].options.map(
                     (style: string, index: number) => {
-                      const shadowClass = getShadowClass(style);
+                      const shadowClass = getShadowClass(style) as string;
 
                       return (
                         <div
@@ -435,8 +445,7 @@ export default function Styles() {
                           <FaCircleCheck />
                         </div>
                         <div
-                          onClick={()=>setBackground(bg)}
-                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all`}
+                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md`}
                         ></div>
                         <p className=" pt-2 text-center">{style.name} Colour</p>
                       </div>
@@ -487,12 +496,11 @@ export default function Styles() {
             </div>
 
             <Preview
-              data={previewLinks}
+              data={userLinks}
               user={user}
               selectedLink={selectedLink[0]}
               setSelectedLinkId={setSelectedLinkId}
               idPosition0={userLinks[0]?.id}
-              background={backgroundState}
             />
             {/* save button */}
             <Form method="post">

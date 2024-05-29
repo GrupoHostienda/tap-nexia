@@ -1,12 +1,6 @@
-//import React from "react";
-import BackOfficeMenu from "@/components/BackOffice/BackOfficeMenu";
+import BackOfficeMenuDraft from "@/components/BackOffice/BackOfficeMenuDraft";
 import CardBackOffice from "@/components/BackOffice/CardBackOffice";
-import {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-  json,
-  redirect,
-} from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
@@ -16,8 +10,12 @@ import HeadingMobile from "@/components/layout/HeadingMobile";
 import { BsLayoutWtf } from "react-icons/bs";
 import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
 import HeadingDesktop from "@/components/layout/HeadingDesktop";
-import Preview from "@/components/Preview";
+import Preview from "@/components/PreviewDraft";
+import { getTokenIfConnected } from "@/services";
+import { UserLinksSchema, UserSchema } from "@/schemas";
+import { UserLinkType, UserType } from "@/types";
 
+//meta
 export function meta() {
   return [
     {
@@ -32,28 +30,18 @@ export function meta() {
 
 //loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  /* START | Verificar session */
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
-
-  if (!authToken) {
-    return redirect("/login");
-  }
-  /* END | Verificar session */
-
-  /* START | Fetch de datos */
+  const authToken = await getTokenIfConnected(request); //redirecciona a /login si no estas autenticado
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
   const base = process.env.API_BASE;
   const urls = {
     user: `${base}/user`,
     userLinks: `${base}/user/links`,
   };
 
-  const headers = {
-    Authorization: `Bearer ${authToken}`,
-  };
-
+  /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
+  /* START | Fetch de datos */
   try {
     const responses = await Promise.all([
       fetch(urls.user, { headers }),
@@ -61,7 +49,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     ]);
 
     if (!responses[0].ok || !responses[1].ok) {
-      throw new Error("Failed to fetch data");
+      console.log("error at fetching data");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otros
     }
 
     const [userData, userLinksData] = await Promise.all([
@@ -69,16 +58,27 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       responses[1].json(),
     ]);
 
+    const userDataVerified = UserSchema.safeParse(userData);
+    const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+
+    /* si NO pasa la validacion de zod retorno un error*/
+    if (!userDataVerified.success || !userLinksDataVerified.success) {
+      console.log("error at validation");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
+
     return json({
-      user: userData,
-      userLinks: userLinksData,
+      userLinks: userLinksDataVerified.data,
+      user: userDataVerified,
     });
   } catch (error) {
-    return json({ error: error?.toString() });
+    console.log(error?.toString());
+    return json({ error: `${error?.toString()} ********` });
   }
   /* END | Fetch de datos */
 };
 
+//action
 export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
@@ -185,14 +185,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 };
 
-type DataType = {
-  links: [{ tittle: string; link: string; id: number; isHidden: number }];
-};
+//type
+type LoaderType = { userLinks: UserLinkType[]; user: UserType };
 
+//component
 export default function LayoutBackOffice() {
-  const { userLinks: links, user: data } = useLoaderData<DataType>();
+  const { userLinks, user }: LoaderType = useLoaderData();
 
-  const list = links.slice().reverse();
+  const list = userLinks.slice().reverse();
   return (
     <div className=" pageLayout bg-slate-200">
       <DashboarHeader />
@@ -208,7 +208,7 @@ export default function LayoutBackOffice() {
               <BsLayoutWtf />
             </HeadingDesktop>
 
-            <BackOfficeMenu />
+            <BackOfficeMenuDraft />
 
             <div></div>
             <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
@@ -228,7 +228,7 @@ export default function LayoutBackOffice() {
           <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
             <div className=" lg:h-10"></div>
 
-            <Preview data={links} user={data} />
+            <Preview data={userLinks} user={user} />
           </div>
         </div>
       </TwoColGridLayoutDratf>

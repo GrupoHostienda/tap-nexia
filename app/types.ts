@@ -34,11 +34,7 @@ export type ContextType = {
   shadow: string;
   setShadow: React.Dispatch<React.SetStateAction<string>>;
   linkId: number;
-  setLinkId: React.Dispatch<React.SetStateAction<number>>; //delete | DropDown component
-  //selectedLinkId: number; //editar | styles route
-  //selectedLink: UserLinkType[]; //edit | styles route
-  //setSelectedLinkId: React.Dispatch<React.SetStateAction<number>>; //edit | styles route
-  //idPosition0: number; //edit | styles route
+  setLinkId: React.Dispatch<React.SetStateAction<number>>;
   background: string;
-  setBackground: React.Dispatch<React.SetStateAction<string>>;
+  setBackground: React.Dispatch<React.SetStateAction<string>>
 };

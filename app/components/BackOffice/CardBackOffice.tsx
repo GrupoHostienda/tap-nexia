@@ -7,18 +7,25 @@ import { MdOutlineEdit } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
 import { Form, useNavigation } from "@remix-run/react";
-import { UserLinkType } from "@/types";
 
-function CardBackOffice({ link }: { link: UserLinkType }) {
+export interface Card {
+  title: string;
+  url: string;
+  active: boolean;
+  isHidden: number;
+  id: number;
+}
+
+function CardBackOffice({ link }: { link: Card }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
   const [idLink, setIdLink] = useState<number>();
 
   const [linkActivated, linkActive] = useState(link.isHidden === 0);
-
   const cardActive = () => {
     linkActive(!linkActivated);
+    link.active = linkActivated;
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
@@ -87,9 +94,7 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
               } focus:border-none bg-transparent w-full`}
               disabled={!inputEnabled}
             />
-
             {!inputEnabled ? (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -120,7 +125,6 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
               disabled={!inputEnabled}
             />
             {!inputEnabled ? (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -168,16 +172,16 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
                   type="checkbox"
                   className="sr-only"
                   name="isHidden"
-                  defaultChecked={Boolean(link.isHidden)}
+                  defaultChecked={link.active}
                 />
                 <div
                   className={`block ${
-                    link.isHidden ? `bg-green-400` : `bg-gray-600`
+                    link.active ? `bg-green-400` : `bg-gray-600`
                   } transition-colors w-14 h-8 rounded-full`}
                 ></div>
                 <div
                   className={`dot absolute ${
-                    link.isHidden ? `right-1` : `left-1`
+                    link.active ? `right-1` : `left-1`
                   } transition-all top-1 bg-white w-6 h-6 rounded-full`}
                 ></div>
               </Form>
