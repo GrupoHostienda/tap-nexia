@@ -1,24 +1,26 @@
-//import React from "react";
-import BackOfficeMenu from "@/components/BackOffice/BackOfficeMenu";
-import CardBackOffice, { Card } from "@/components/BackOffice/CardBackOffice";
-import PreviewBackOffice from "@/components/BackOffice/PreviewBackOffice";
-import Pricing from "@/components/Pricing/Pricing";
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
+import CardBackOffice from "@/components/BackOffice/CardBackOffice";
 import {
-  useActionData,
-  useLoaderData,
-  useNavigation,
-  useOutletContext,
-} from "@remix-run/react";
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
-//import { GlobalStateProvider } from "@/components/Context/GlobalContext";
-import data from "data.json";
-import { useEffect, useState } from "react";
 import DashboarHeader from "@/components/DashboarHeader";
-import React from "react";
 import { validateUrl } from "@/utils/helpers";
+import HeadingMobile from "@/components/layout/HeadingMobile";
+import { BsLayoutWtf } from "react-icons/bs";
+import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
+import HeadingDesktop from "@/components/layout/HeadingDesktop";
+import Preview from "@/components/Preview";
+import { getToken } from "@/services";
+import { LinksStylesAPISchema, UserLinksSchema, UserSchema } from "@/schemas";
+import { UserLinkType, UserType } from "@/types";
 
+//meta
 export function meta() {
   return [
     {
@@ -31,115 +33,155 @@ export function meta() {
   ];
 }
 
-type OutletContextProps = {
-  state: { items: [] };
-  dispatch: React.Dispatch<React.SetStateAction<{}>>;
-};
-
-// const [linkList, setLinkList] = useState([])
-
-export const loader = async ({ request }: ActionFunctionArgs) => {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
-
-  const links = await fetch(`${process.env.API_BASE}/user/links`, {
-    method: "get",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
+//loader
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const authToken = await getToken(request);
 
   if (!authToken) {
     return redirect("/login");
   }
-  try {
-    if (!links.ok) {
-      throw new Error("Failed to fetch data");
-    }
-    const response = await links.json();
 
-    return json({ links: response });
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+  const base = process.env.API_BASE;
+  const urls = {
+    links: `${base}/links`,
+    user: `${base}/user`,
+    userLinks: `${base}/user/links`,
+  };
+
+  /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
+  /* START | Fetch de datos */
+  try {
+    const responses = await Promise.all([
+      fetch(urls.links, { headers }),
+      fetch(urls.user, { headers }),
+      fetch(urls.userLinks, { headers }),
+    ]);
+
+    if (!responses[0].ok || !responses[1].ok || !responses[2].ok) {
+      console.log("error at fetching data");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otros
+    }
+
+    const [linksData, userData, userLinksData] = await Promise.all([
+      responses[0].json(),
+      responses[1].json(),
+      responses[2].json(),
+    ]);
+
+    const linksDataVerified = LinksStylesAPISchema.safeParse(linksData);
+    const userDataVerified = UserSchema.safeParse(userData);
+    const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+
+    /* si NO pasa la validacion de zod retorno un error*/
+    if (
+      userDataVerified.success ||
+      !userLinksDataVerified.success ||
+      !linksDataVerified.success
+    ) {
+      console.log("error at validation");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
+
+    return json({
+      links: linksDataVerified.data,
+      userLinks: userLinksDataVerified.data,
+      user: userData,
+    });
   } catch (error) {
-    return json({ error: error?.toString() });
+    console.log(error?.toString());
+    return json({ error: `${error?.toString()} ********` });
   }
+  /* END | Fetch de datos */
 };
 
+//action
 export const action = async ({ request }: ActionFunctionArgs) => {
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
   );
   const authToken = session.get("authToken");
-  
   if (request.method === "POST") {
     const formData = await request.formData();
+    const formType = formData.get("formType");
     const title = formData.get("title") as string;
     const link = formData.get("link") as string;
-    console.log(title+" -> "+link);
-    console.log(authToken);
-    
-    if (title.trim() === "" || link.trim() === "") {
-      return json({ error: "All fields are required." });
-    }
 
-    if (!validateUrl(link)){
-      return json({ error: "Is not a valid URL." });
-    }
-    
-    try {
-      const response = await fetch(`${process.env.API_BASE}/user/link/store`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          link_type_id: 1,
-          title: title,
-          url: link,
-          style: 'hola',
-        }),
-      });
-      if (!response) {
-        throw new Error("Failed to fetch data");
-      }
-      console.log(response.status);
-      const data = await response.json();
-      console.log(data);
-      return json({ data });
-    } catch (error) {
-      return json({ error: error?.toString() });
-    }
-  }
-  
-  // ACTUALIZACION DE DATOS
-  if (request.method === 'UPDATE'){
-    const linkVisible = (await request.formData()).get('isHidden');
-    const title = (await request.formData()).get('title');
-    const link = (await request.formData()).get('link');
+    const color = formData.get("color") as string;
+    const rounded = formData.get("rounded") as string;
+    const shadow = formData.get("shadow") as string;
 
-    try {
-      const response = await fetch(`${process.env.API_BASE}/user/update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          isHidden: linkVisible
-        }),
-      });
-      if (!response) {
-        throw new Error("Failed to fetch data");
-      }
-      console.log(response.status);
-      const data = await response.json();
-      console.log(data);
-      return json({ data });
-    } catch (error) {
-      return json({ error: error?.toString() });
+    //const defaultStyle = "bg-white rounded-full shadow-md text-black";
+
+    switch (formType) {
+      case "add":
+        if (title.trim() === "" || link.trim() === "") {
+          return json({ error: "All fields are required." });
+        }
+
+        if (!validateUrl(link)) {
+          return json({ error: "Is not a valid URL." });
+        }
+
+        try {
+          const response = await fetch(
+            `${process.env.API_BASE}/user/link/store`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify({
+                link_type_id: 1,
+                title: title,
+                url: link,
+                style: `${color} ${rounded} ${shadow}`,
+              }),
+            }
+          );
+
+          if (!response) {
+            throw new Error("Failed to fetch data");
+          }
+
+          const data = await response.json();
+
+          return json({ data });
+        } catch (error) {
+          return json({ error: error?.toString() });
+        }
+      case "update":
+        const linkVisible = formData.get("isHidden");
+        console.log("ejecutando update");
+        console.log(title);
+        try {
+          const response = await fetch(
+            `${process.env.API_BASE}/user/link/update/2`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify({
+                isHidden: linkVisible,
+              }),
+            }
+          );
+          if (!response) {
+            throw new Error("Failed to fetch data");
+          }
+          console.log(response.status);
+          const data = await response.json();
+          console.log(data);
+          return json({ data });
+        } catch (error) {
+          return json({ error: error?.toString() });
+        }
+        break;
     }
   }
 
@@ -161,49 +203,36 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return json({ error: "Failed to delete item, try again later." });
     }
   }
-  // return null
 };
 
-type DataType = {
-  links: [{ tittle: string; link: string; id: number; isHidden: number }];
-};
+//type
+type LoaderType = { userLinks: UserLinkType[]; user: UserType };
+
+//component
 export default function LayoutBackOffice() {
-  const { state, dispatch } = useOutletContext<OutletContextProps>();
-  const data = useLoaderData<DataType>();
-  // const actionData = useActionData<typeof action>();
-  const navigation = useNavigation();
-  // const isSubmittingStyle =
-  //   navigation.state === "submitting" && navigation.formMethod === "POST";
-  const { links } = data;
-  console.log(links);
+  const { userLinks, user }: LoaderType = useLoaderData();
 
-  // const addValue = () => {
-  //   links.map(link => {
-  //     const newItem: any = {
-  //       tittle: link.tittle,
-  //       link: link.link,
-  //       id: link.id,
-  //       isHidden: link.isHidden,
-  //     };
-  //   })
-  //   dispatch({type: 'addItem', payload: links});
-  // };
-  //   useEffect(() => {
-  //     addValue();
-  //   }, []);
-  //   console.log("Este es el state: ")
-  //   console.log(state.items)
+  const list = userLinks?.slice().reverse();
   return (
-    <>
+    <div className=" pageLayout bg-slate-200">
       <DashboarHeader />
-      <div className="absolute top-0 w-full lg:h-[100%] bg-slate-200 left-0 grid lg:grid-cols-[60%_30%] grid-cols-1 lg:gap-10 gap-2">
-        <div className="absolute top-0 w-full lg:h-[100%] bg-slate-200 left-0 grid lg:grid-cols-[60%_30%] grid-cols-1 lg:gap-10 gap-2 overflow-hidden">
-          <div className="w-full h-screen pt-7 px-7 flex flex-col gap-2">
-            <BackOfficeMenu />
+      <HeadingMobile label="Back-Office">
+        <BsLayoutWtf />
+      </HeadingMobile>
+
+      <TwoColGridLayoutDratf>
+        {/* back-office | col-01 */}
+        <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
+          <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
+            <HeadingDesktop label="Back-Office">
+              <BsLayoutWtf />
+            </HeadingDesktop>
+
+            <BackOfficeMenuDraftRonaldo />
 
             <div></div>
             <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
-              {links.map((link, index) => {
+              {list?.map((link, index: number) => {
                 return (
                   <div key={index}>
                     <CardBackOffice link={link} />
@@ -212,12 +241,17 @@ export default function LayoutBackOffice() {
               })}
             </div>
           </div>
-          {/* Preview de elementos */}
-          <div className="w-full h-screen flex items-center justify-center">
-            <PreviewBackOffice data={links} />
+        </div>
+
+        {/* preview | col-02 */}
+        <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
+          <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
+            <div className=" lg:h-10"></div>
+
+            <Preview data={userLinks} user={user} />
           </div>
         </div>
-      </div>
-    </>
+      </TwoColGridLayoutDratf>
+    </div>
   );
 }

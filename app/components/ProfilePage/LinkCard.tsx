@@ -9,6 +9,7 @@ type LinkCardProps = {
   url: string;
   setIframeVisible: React.Dispatch<React.SetStateAction<boolean>>;
   iFrameVisible: boolean;
+  style: string | undefined;
 };
 
 const LinkCard = ({
@@ -16,6 +17,7 @@ const LinkCard = ({
   url,
   setIframeVisible,
   iFrameVisible,
+  style
 }: LinkCardProps) => {
   return (
     <div>
@@ -41,12 +43,13 @@ const LinkCard = ({
           </AnimatePresence>
         </div>
       ) : (
-        <li className=" bg-slate-200 capitalize text-center text-slate-700 rounded-full px-4 py-2 hover:text-slate-200 hover:bg-transparent border border-slate-200 transition-all">
+        <li className={`flex justify-between items-center text-center px-4 py-2 transition-all ${style}`}>
+          {/* className=" bg-slate-200 capitalize text-center text-slate-700 rounded-full px-4 py-2 hover:text-slate-200 hover:bg-transparent border border-slate-200 transition-all" */}
           <a
             target="_blank"
             href={url}
             rel="noreferrer"
-            className=" text-lg block "
+            className="w-full"
           >
             {label}
           </a>

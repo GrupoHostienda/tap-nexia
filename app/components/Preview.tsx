@@ -1,53 +1,135 @@
-import { Form, useNavigation } from "@remix-run/react";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import {
+  useLoaderData,
+  useNavigation,
+  useOutletContext,
+} from "@remix-run/react";
 
-import type { PreviewProps, UserType } from "@/types";
+import type { ContextType, UserLinkType, UserType } from "@/types";
+
 import { useState } from "react";
 
-function Preview({ data, user }: { data: PreviewProps[]; user: UserType }) {
+import DropDown from "./DropDown";
+
+import { BsThreeDotsVertical } from "react-icons/bs";
+import { FaUserEdit } from "react-icons/fa";
+import { motion } from "framer-motion";
+
+import { twMerge } from "tailwind-merge";
+
+//type
+type PreviewProps = {
+  data: UserLinkType[];
+  user: UserType;
+  selectedLink: UserLinkType; //*************** */
+  setSelectedLinkId: React.Dispatch<number>; //********* */
+};
+
+//type *********************************
+type LoaderDataType = {
+  userLinks: UserLinkType[];
+};
+
+//component
+function Preview({
+  data,
+  user,
+  selectedLink, //flag of selected link |styles route
+  setSelectedLinkId, //for setting flag of selected link |styles route
+}: PreviewProps) {
+  const { userLinks }: LoaderDataType = useLoaderData();
+
   const navigation = useNavigation();
+
+  const { color, outline, shadow, linkId, background }: ContextType =
+    useOutletContext();
+
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
-  const [linkId, setLinkId] = useState(0); //for showing user deleting message
 
+  const [dropDown, setDropDown] = useState(0); //for showing dropdown
   return (
     <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
-      <div className="w-full h-full bg-gradient-to-b from-blue-300 to-blue-500 rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar">
-        {/* Foto de perfil */}
-        <div className="size-16 rounded-full bg-gray-700 self-center"></div>
+      <div
+        className={`w-full h-full ${background} rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar`}
+      >
+        {/* profile picture */}
+        <div className="size-16 shrink-0 rounded-full bg-gray-700 self-center"></div>
 
-        {/* Nombre de usuario y mensaje de biografia */}
+        {/* email and username */}
         <div className="text-center">
           <h1 className="font-bold">{user.email}</h1>
           <p className="text-gray-500 text-sm">{user.username}</p>
         </div>
 
-        {/* Links en linea */}
+        {/* Links*/}
         <div className="flex flex-col gap-3">
           {data.map((dataLink, index) => {
+            const flag = dataLink.id === selectedLink?.id;
             return (
-              <div
-                className={`flex justify-between items-center ${dataLink.style?.class}`}
-                key={index}
-              >
-                {isSubmittingDelete && dataLink.id === linkId ? (
-                  <p>Deleting...</p>
-                ) : (
-                  <p>{dataLink.title}</p>
-                )}
-                <div className=" cursor-pointer">
-                  <Form method="delete" action={`/styles`}>
-                    <input type="hidden" name="link-id" value={dataLink.id} />
-                    <button onClick={() => setLinkId(dataLink.id)}>
-                      <BsThreeDotsVertical />
-                    </button>
-                  </Form>
+              <div key={index}>
+                <div
+                  className={twMerge(
+                    "flex justify-between items-center px-4 py-2 whitespace-nowrap",
+                    dataLink.style?.class,
+                    flag && `${color} ${outline} ${shadow}`,
+                    flag && color === "bg-black" && "text-white"
+                  )}
+                >
+                  {/* link text */}
+                  {isSubmittingDelete && dataLink.id === linkId ? (
+                    <p>Deleting...</p>
+                  ) : (
+                    <p
+                      className={twMerge(
+                        " w-full flex items-center justify-between gap-2",
+                        flag && color === "bg-black" && "text-white"
+                      )}
+                      // className="w-full flex items-center justify-between gap-2"
+                    >
+                      {dataLink.title.substring(0, 16)}
+                      {dataLink.title.length >= 20 && "..."}
+                      {flag && (
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className={twMerge(
+                            " text-black text-lg",
+                            flag && `${color}`,
+                            flag && color === "bg-black" && "text-white"
+                          )}
+                        >
+                          <FaUserEdit />
+                        </motion.span>
+                      )}
+                    </p>
+                  )}
+
+                  {/* open dropdown button */}
+                  <button
+                    className={twMerge(
+                      "cursor-pointer text-black",
+                      flag && `${color}`,
+                      flag && color === "bg-black" && "text-white"
+                    )}
+                    onClick={() => setDropDown(dataLink.id)}
+                  >
+                    <BsThreeDotsVertical />
+                  </button>
                 </div>
+                {/* dropdown */}
+                {!isSubmittingDelete && (
+                  <DropDown
+                    setDropDown={setDropDown}
+                    dropDown={dropDown}
+                    dataLink={dataLink}
+                    setSelectedLinkId={setSelectedLinkId} //******************** */
+                    idPosition0={userLinks[0].id} //****************** */
+                  />
+                )}
               </div>
             );
           })}
         </div>
-        {/* ******************************************************** */}
       </div>
     </div>
   );

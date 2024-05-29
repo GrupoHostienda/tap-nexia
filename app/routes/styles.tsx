@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { json, redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -5,17 +7,15 @@ import {
   useActionData,
   useLoaderData,
   useNavigation,
+  useOutletContext,
 } from "@remix-run/react";
 
 import { sessionStorage } from "@/utils/session.server";
 
-import DashboarHeader from "@/components/DashboarHeader";
-import Preview from "@/components/Preview";
+import { useEffect, useState } from "react";
+
 import {
-  SpecialButtonOne,
-  SpecialButtonTwo,
-} from "@/components/stylesPage/SpecialButtons";
-import {
+  COLORS,
   getRoundedClass,
   getSBackgroundClass,
   getShadowClass,
@@ -26,10 +26,37 @@ import { IoMdLock } from "react-icons/io";
 import { HiPaintBrush } from "react-icons/hi2";
 import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { PiSelectionBackground } from "react-icons/pi";
+import { FaCircleCheck } from "react-icons/fa6";
 
-import type { PreviewProps, UserType } from "@/types";
+import type {
+  BackgroundType,
+  ContextType,
+  LinkStylesType,
+  PreviewProps,
+  UserLinkType,
+  UserType,
+} from "@/types";
 
-import { useEffect, useState } from "react";
+import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
+import HeadingMobile from "@/components/layout/HeadingMobile";
+import HeadingDesktop from "@/components/layout/HeadingDesktop";
+import HeadingH2 from "@/components/layout/HeadingH2";
+import Buttons from "@/components/stylesPage/Buttons";
+import DashboarHeader from "@/components/DashboarHeader";
+import Preview from "@/components/Preview";
+import {
+  SpecialButtonOne,
+  SpecialButtonTwo,
+} from "@/components/stylesPage/SpecialButtons";
+import { motion } from "framer-motion";
+import { applyNewStyle } from "@/utils/helpers";
+import { getToken } from "@/services";
+import {
+  BackgroundsSchema,
+  LinksStylesAPISchema,
+  UserLinksSchema,
+  UserSchema,
+} from "@/schemas";
 
 //meta
 export function meta() {
@@ -46,19 +73,16 @@ export function meta() {
 
 //loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  /* START | Verificar session */
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
+  const authToken = await getToken(request);
 
   if (!authToken) {
     return redirect("/login");
   }
-  /* END | Verificar session */
 
-  /* START | Fetch de datos */
   const base = process.env.API_BASE;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
   const urls = {
     user: `${base}/user`,
     links: `${base}/links`,
@@ -66,10 +90,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     userLinks: `${base}/user/links`,
   };
 
-  const headers = {
-    Authorization: `Bearer ${authToken}`,
-  };
-
+  /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
+  /* START | Fetch de datos */
   try {
     const responses = await Promise.all([
       fetch(urls.user, { headers }),
@@ -84,7 +106,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       !responses[2].ok ||
       !responses[3].ok
     ) {
-      throw new Error("Failed to fetch data");
+      console.log("error at fetching data");
+      throw new Error("Failed to fetch data"); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
     }
 
     const [userData, linksData, backgroundsData, userLinksData] =
@@ -94,14 +117,40 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         responses[2].json(),
         responses[3].json(),
       ]);
+
+    const userDataVerified = UserSchema.safeParse(userData);
+    const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+    const linksDataVerified = LinksStylesAPISchema.safeParse(linksData);
+    const backgroundsDataVerified =
+      BackgroundsSchema.safeParse(backgroundsData);
+
+    console.log(userData);
+
+    console.log(userDataVerified);
+    console.log(userLinksDataVerified);
+    console.log(linksDataVerified);
+    console.log(backgroundsDataVerified);
+
+    /* si NO pasa la validacion de zod retorno un error*/
+    if (
+      userDataVerified.success ||
+      !userLinksDataVerified.success ||
+      !linksDataVerified.success ||
+      !backgroundsDataVerified.success
+    ) {
+      console.log("error at validation");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
+
     return json({
       user: userData,
-      links: linksData,
-      backgrounds: backgroundsData,
-      userLinks: userLinksData,
+      links: linksDataVerified.data,
+      backgrounds: backgroundsDataVerified.data,
+      userLinks: userLinksDataVerified.data,
     });
   } catch (error) {
-    return json({ error: error?.toString() });
+    console.log(error?.toString());
+    return json({ error: `${error?.toString()} ********` });
   }
   /* END | Fetch de datos */
 };
@@ -113,9 +162,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   );
   const authToken = session.get("authToken");
 
+  const formData = await request.formData();
+
+  const linkId = formData.get("link-id") as string;
+  const color = formData.get("color") as string;
+  const rounded = formData.get("rounded") as string;
+  const shadow = formData.get("shadow") as string;
+  const background = formData.get("backgroundColor") as string;
+
+  console.log(formData);
+  console.log(color);
+  console.log(background);
+
   //delete
   if (request.method === "DELETE") {
-    const linkId = (await request.formData()).get("link-id");
     const url = `${process.env.API_BASE}/user/link/delete/${linkId}`;
     try {
       const response = await fetch(url, {
@@ -134,9 +194,47 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   /* START | Fetch de datos */
-  const url = `${process.env.API_BASE}/user/link/store`;
-  const defaultStyle = "bg-white rounded-xl shadow-md px-4 py-2 ";
+  const urlLinks = `${process.env.API_BASE}/user/links `;
+
+  const url = `${process.env.API_BASE}/user/link/update/${linkId} `;
+
+  const urlBackgrounds = `${process.env.API_BASE}/user/home-page/store`;
+
   try {
+    const responseLinks = await fetch(urlLinks, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    const responseBackground = await fetch(urlBackgrounds, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        background_id: 1,
+        bio: "bio",
+        style: "home page",
+      }),
+    });
+
+    const links = await responseLinks.json();
+
+    const link = links?.filter(
+      (link: PreviewProps) => link.id === Number(linkId)
+    );
+
+    const newStyles = applyNewStyle(
+      link[0].style.class,
+      color,
+      rounded,
+      shadow
+    );
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -145,11 +243,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
       body: JSON.stringify({
         link_type_id: 1,
-        title: "title 00073 dfvbdgfhfb sfdsf",
-        url: "https://www.youtube.com/",
-        style: `${defaultStyle}`,
+        title: `${link[0]?.title}`,
+        url: `${link[0]?.url}`,
+        style: `${newStyles}`,
       }),
     });
+    await responseBackground.json();
 
     await response.json();
 
@@ -162,34 +261,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 //type
-type LoaderData = {
+type LoaderDataType = {
   user: UserType;
-  links: any[];
-  backgrounds: any[];
-  userLinks: any[];
+  links: LinkStylesType;
+  backgrounds: BackgroundType[];
+  userLinks: UserLinkType[];
 };
 
 //component
 export default function Styles() {
-  const data = useLoaderData<LoaderData>();
+  const { user, links, backgrounds, userLinks }: LoaderDataType =
+    useLoaderData();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
-  const { user, links, backgrounds, userLinks } = data;
+  const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
+  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
 
-  const previewLinks: PreviewProps[] = userLinks?.map(
-    (userLink: PreviewProps) => {
-      return {
-        id: userLink.id,
-        isHidden: userLink.isHidden,
-        url: userLink.url,
-        title: userLink.title,
-        style: userLink.style,
-      };
-    }
-  );
+  console.log(backgrounds);
+
   //message from action
   const [message, setMessage] = useState("");
   useEffect(() => {
@@ -210,128 +303,146 @@ export default function Styles() {
     }
   }, [actionData]);
 
+  const {
+    color: colorState,
+    outline: outlineState,
+    shadow: shadowState,
+    background: backgroundState,
+    setColor,
+    setOutline,
+    setShadow,
+    setBackground,
+  }: ContextType = useOutletContext();
+
   return (
-    <div className="min-h-screen bg-slate-200">
+    <div className="pageLayout bg-slate-200">
       <DashboarHeader />
-      <h1 className=" mx-6 lg:hidden sm:text-center lg:text-left pt-6 sm:pt-10 pb-2 text-3xl uppercase font-bold border-b border-gray-400 border-solid flex items-center gap-1">
+      <HeadingMobile label="Styles">
         <HiPaintBrush />
-        Styles
-      </h1>
-      <div className=" grid lg:grid-cols-7">
-        {/* preview */}
-        <div className=" lg:col-start-6 lg:col-end-8 lg:row-start-1 lg:row-end-2 mt-8 lg:my-8 ">
-          <div className=" sticky top-28 flex flex-col gap-4 items-center bg-white lg:bg-transparent mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4 lg:py-0 ">
-            {message && actionData && "error" in actionData && (
-              <p className=" bg-red-500 text-center min-w-64 text-white px-4 py-2 rounded-full">
-                {message}
-              </p>
-            )}
-            {message && actionData && "message" in actionData && (
-              <p className=" bg-green-500 w-64 text-center text-white px-4 py-2 rounded-full">
-                {message}
-              </p>
-            )}
-            <Preview data={previewLinks} user={user} />
-            <Form method="post">
-              <button
-                disabled={isSubmittingStyle}
-                className=" bg-gray-300 lg:bg-white w-64 rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all"
-              >
-                {isSubmittingStyle ? "Saving..." : "Save"}
-              </button>
-            </Form>
-          </div>
-        </div>
+      </HeadingMobile>
+      <TwoColGridLayoutDratf>
+        {/* styles | col-01 */}
+        <div className="colSpan-01 order-2 lg:order-1 //bg-gray-400">
+          <div className="max-w-[60rem] w-[100%] mx-auto self-center py-8 px-6 flex flex-col gap-8 ">
+            <HeadingDesktop label="Styles">
+              <HiPaintBrush />
+            </HeadingDesktop>
 
-        {/* styles */}
-        <div className="max-w-[60rem] w-[100%] mx-auto lg:col-start-1 lg:col-end-6 lg:row-start-1 lg:row-end-2 self-center py-8 px-6 flex flex-col gap-8 ">
-          <h1 className=" hidden py-2 text-3xl uppercase font-bold border-b border-gray-400 border-solid lg:flex items-center gap-1">
-            <HiPaintBrush /> Styles
-          </h1>
+            {/* Buttons */}
+            <div>
+              <HeadingH2 label=" Buttons">
+                <BsFillMenuButtonWideFill />
+              </HeadingH2>
 
-          {/* Buttons */}
-          <div>
-            <h2 className="text-xl font-bold mb-2 mx-auto flex items-center gap-1 ">
-              <BsFillMenuButtonWideFill />
-              Buttons
-            </h2>
+              <div className=" bg-white p-6 rounded-xl flex flex-col gap-10 ">
+                {/* colors */}
+                <Buttons label="Fill">
+                  {COLORS.map((color) => {
+                    return (
+                      <div
+                        onClick={() => setColor(color)}
+                        key={color}
+                        className="relative cursor-pointer hover:scale-105 transition-all"
+                      >
+                        {((colorState && colorState === color) ||
+                          (!colorState &&
+                            selectedLink[0]?.style.class.includes(color))) && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className=" absolute -top-2 -right-2 bg-white rounded-full text-green-600"
+                          >
+                            <FaCircleCheck />
+                          </motion.div>
+                        )}
 
-            <div className=" bg-white p-6 rounded-xl flex flex-col gap-10 max-w-[1000px] mx-auto">
-              {/* colors */}
-              <div>
-                <p className=" pb-2">Fill</p>
-                <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
-                  <div className={` border border-gray-400 h-10 bg-white `} />
-                  <div className={` border border-gray-400 h-10 bg-black `} />
-                  <div
-                    className={` border border-gray-400 h-10 bg-[#FD3E81] `}
-                  />
-                  <div
-                    className={` border border-gray-400 h-10 bg-[#FF7F11] `}
-                  />
-                  <div
-                    className={` border border-gray-400 h-10 bg-[#06BEE1] `}
-                  />
-                  <div
-                    className={` border border-gray-400 h-10 bg-[#ABA194] `}
-                  />
-                </div>
-              </div>
+                        <div
+                          className={`border border-gray-400 h-10 ${color}`}
+                        ></div>
+                      </div>
+                    );
+                  })}
+                </Buttons>
 
-              {/* outline */}
-              <div>
-                <p className=" pb-2">Outline</p>
-                <div className=" grid grid-cols-1 sm:grid-cols-3 gap-4  ">
+                {/* outline */}
+                <Buttons label="Outline">
                   {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
                   {[...links[0].schemas[1].options]
                     .reverse()
                     .map((style, index) => {
-                      const roundedClass = getRoundedClass(style);
+                      const roundedClass = getRoundedClass(style) as string;
                       return (
                         <div
                           key={index}
-                          className={` border border-gray-400 h-10 ${roundedClass}`}
-                        />
+                          onClick={() => setOutline(roundedClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((outlineState && outlineState === roundedClass) ||
+                            (!outlineState &&
+                              selectedLink[0]?.style.class.includes(
+                                roundedClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          <div
+                            className={` border border-gray-400 h-10 ${roundedClass}`}
+                          />
+                        </div>
                       );
                     })}
-                </div>
-              </div>
+                </Buttons>
 
-              {/* shadow */}
-              <div>
-                <p className=" pb-2">Shadow</p>
-                <div className=" grid grid-cols-1  sm:grid-cols-3 gap-6 sm:gap-4 ">
+                {/* shadow */}
+                <Buttons label="Shadow">
                   {links[0].schemas[2].options.map(
                     (style: string, index: number) => {
-                      const shadowClass = getShadowClass(style);
-                      return (
-                        <div key={index} className=" relative z-0 h-10">
-                          <div
-                            className={` border border-gray-400 relative bg-white h-full ${shadowClass} `}
-                          />
+                      const shadowClass = getShadowClass(style) as string;
 
-                          {style === "heavy" && (
-                            <div
-                              className={` h-full w-full bg-black absolute top-[0.30rem] left-[0.30rem] -z-10`}
-                            />
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => setShadow(shadowClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((shadowState && shadowState === shadowClass) ||
+                            (!shadowState &&
+                              selectedLink[0]?.style.class.includes(
+                                shadowClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
                           )}
+                          <div className=" relative z-0 h-10">
+                            <div
+                              className={` border border-gray-400 relative bg-white h-full ${shadowClass}`}
+                            />
+
+                            {/*  {style === "heavy" && (
+                              <div
+                                className={` h-full w-full bg-black absolute top-[0.30rem] left-[0.30rem] -z-10`}
+                              />
+                            )} */}
+                          </div>
                         </div>
                       );
                     }
                   )}
-                </div>
-              </div>
+                </Buttons>
 
-              {/* special */}
-              <div>
-                <div className=" flex gap-3 items-center pb-2">
-                  <p>Special</p>
-                  <p className=" bg-black text-white px-2 rounded-md flex items-center gap-1">
-                    <span>Upgrade</span>
-                    <IoMdLock />
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* special */}
+
+                <Buttons label="Special" mustUpgrade={true}>
                   {links[0].schemas[3].options.map(
                     (style: string, index: number) => {
                       const specialButtonClass = getSpecialButtonClass(style);
@@ -346,55 +457,119 @@ export default function Styles() {
                   <div className="  h-10 bg-black rounded-full"></div>
                   <SpecialButtonOne />
                   <SpecialButtonTwo />
-                </div>
+                </Buttons>
               </div>
             </div>
-          </div>
 
-          {/* backgrounds */}
-          <div>
-            <h2 className="text-xl font-bold mb-2 max-w-[1000px] mx-auto flex items-center gap-1">
-              <PiSelectionBackground />
-              Backgrounds
-            </h2>
+            {/* backgrounds */}
+            <div>
+              <HeadingH2 label="  Backgrounds">
+                <PiSelectionBackground />
+              </HeadingH2>
+              <div className=" bg-white p-4 rounded-xl ">
+                <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
+                  {backgrounds.map((style, index) => {
+                    const bg = getSBackgroundClass(style.name) as string;
 
-            <div className=" bg-white p-4 rounded-xl max-w-[1000px] mx-auto">
-              <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
-                {backgrounds.map((style, index) => {
-                  const bg = getSBackgroundClass(style.name);
-                  return (
-                    <div key={index} className=" flex flex-col items-center">
+                    return (
+                      <div key={index} className=" flex flex-col items-center">
+                        <div
+                          onClick={() => setBackground(bg)}
+                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all relative`}
+                        >
+                          {/* ***************************** */}
+                          {((backgroundState && backgroundState === bg) ||
+                            (!backgroundState && "linear" === bg)) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 top-1 right-1 bg-white rounded-full text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          {/* ****************************** */}
+                        </div>
+                        <p className=" pt-2 text-center">{style.name} Colour</p>
+                      </div>
+                    );
+                  })}
+                  <div className=" flex flex-col items-center">
+                    <div className="relative">
                       <div
-                        className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md`}
-                      ></div>
-                      <p className=" pt-2 text-center">{style.name} Colour</p>
+                        className=" h-[23rem] w-[14rem] //xl:h-[30rem] //xl:w-[20rem] border border-black rounded-md"
+                        style={{
+                          backgroundImage: 'url("/no-image.svg")',
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
+                          backgroundSize: "30%",
+                          opacity: "0.2",
+                        }}
+                      />
+                      <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
+                        <span>Upgrade</span>
+                        <IoMdLock />
+                      </p>
                     </div>
-                  );
-                })}
-                <div className=" flex flex-col items-center">
-                  <div className="relative">
-                    <div
-                      className=" h-[23rem] w-[14rem] //xl:h-[30rem] //xl:w-[20rem] border border-black rounded-md"
-                      style={{
-                        backgroundImage: 'url("/no-image.svg")',
-                        backgroundRepeat: "no-repeat",
-                        backgroundPosition: "center",
-                        backgroundSize: "30%",
-                        opacity: "0.2",
-                      }}
-                    />
-                    <p className=" absolute top-3 right-3 bg-black text-white px-2 rounded-md flex items-center gap-1">
-                      <span>Upgrade</span>
-                      <IoMdLock />
-                    </p>
+                    <p className=" pt-2 text-center">Image</p>
                   </div>
-                  <p className=" pt-2 text-center">Image</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* preview | col-02 */}
+        <div className="colSpan-02 order-1 lg:order-2 //bg-red-500 ">
+          <div className=" sticky top-20 flex flex-col gap-4 items-center bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
+            {/* for success | error message */}
+            <div className=" lg:h-10">
+              {/* mensaje de success */}
+              {message && actionData && "message" in actionData && (
+                <p className=" bg-green-500 w-64 text-center text-white px-4 py-2 rounded-full">
+                  {message}
+                </p>
+              )}
+              {/* mensaje de error */}
+              {message && actionData && "error" in actionData && (
+                <p className=" bg-red-500 text-center min-w-64 text-white px-4 py-2 rounded-full">
+                  {message}
+                </p>
+              )}
+            </div>
+
+            <Preview
+              data={userLinks}
+              user={user}
+              selectedLink={selectedLink[0]}
+              setSelectedLinkId={setSelectedLinkId}
+              idPosition0={userLinks[0]?.id}
+            />
+            {/* save button */}
+            <Form method="post">
+              <button
+                disabled={isSubmittingStyle}
+                className=" bg-gray-300 lg:bg-white w-64 rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all"
+              >
+                <input
+                  type="hidden"
+                  name="link-id"
+                  defaultValue={selectedLinkId}
+                />
+                <input hidden name="color" defaultValue={colorState} />
+                <input hidden name="rounded" defaultValue={outlineState} />
+                <input hidden name="shadow" defaultValue={shadowState} />
+                <input
+                  hidden
+                  name="backgroundColor"
+                  defaultValue={backgroundState}
+                />
+                {isSubmittingStyle ? "Saving..." : "Save"}
+              </button>
+            </Form>
+          </div>
+        </div>
+      </TwoColGridLayoutDratf>
     </div>
   );
 }

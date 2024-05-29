@@ -9,29 +9,14 @@ export function getRoundedClass(style: string) {
   }
 }
 
-/* export function getShadowClass(style: string) {
-  switch (style) {
-    case "soft":
-      return "shadow-md";
-    case "middle":
-      return "shadow-lg rounded-lg";
-    case "heavy":
-      return "shadow-xl rounded-full";
-    case "none":
-      return "";
-    default: ************************************************
-      return "";
-  }
-} */
-
 export function getShadowClass(style: string) {
   switch (style) {
     case "soft":
       return "shadow-md";
     case "middle":
       return "shadow-lg";
-    case "heavy" || "none":
-      return "";
+    case "heavy":
+      return "shadow-heavy";
   }
 }
 
@@ -54,3 +39,13 @@ export function getSBackgroundClass(style: string) {
       return " bg-home";
   }
 }
+
+//array of link-colors
+export const COLORS = [
+  "bg-white",
+  "bg-[#0f0]",
+  "bg-[#FD3E81]",
+  "bg-[#FF7F11]",
+  "bg-[#06BEE1]",
+  "bg-[#ABA194]",
+];

@@ -3,33 +3,22 @@ import { LuLayoutPanelLeft, LuTrash2 } from "react-icons/lu";
 import { GiRapidshareArrow } from "react-icons/gi";
 import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
 import { ImStatsBars2 } from "react-icons/im";
-import { BsBoxArrowUp } from "react-icons/bs";
 import { MdOutlineEdit } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
-import { Form, useNavigation, useOutletContext } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
+import { UserLinkType } from "@/types";
 
-export interface Card {
-  title: string;
-  url: string;
-  active: boolean;
-  id: number;
-}
-type OutletContextProps = {
-  state: { items: [] };
-  dispatch: React.Dispatch<React.SetStateAction<{}>>;
-};
-
-function CardBackOffice({ link }: { link: Card }) {
+function CardBackOffice({ link }: { link: UserLinkType }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
   const [idLink, setIdLink] = useState<number>();
 
-  const [linkActivated, linkActive] = useState(false);
+  const [linkActivated, linkActive] = useState(link.isHidden === 0);
+
   const cardActive = () => {
     linkActive(!linkActivated);
-    link.active = linkActivated;
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
@@ -37,34 +26,42 @@ function CardBackOffice({ link }: { link: Card }) {
     if (!inputEnabled) {
       setInputEnabled(!inputEnabled);
     } else {
-      handleSaveEdit(id);
       setInputEnabled(!inputEnabled);
     }
   };
 
-  const [editedItemUrl, setEditedItemUrl] = useState<string>("");
-  const [editedItemText, setEditedItemText] = useState<string>("");
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
 
-  const { state, dispatch } = useOutletContext<OutletContextProps>();
+    const form1 = document.getElementById("data") as HTMLFormElement;
+    const form2 = document.getElementById("visibilityBtn") as HTMLFormElement;
+    const formData = new FormData();
 
-  // const handleEditItem = (item: Card) => {
-  //   setEditedItemUrl(item.url);
-  //   setEditedItemText(item.title);
-  // };
-
-  const handleSaveEdit = (id: number) => {
-    dispatch({
-      type: "updateItem",
-      payload: {
-        id: id,
-        updatedData: {
-          text: editedItemText,
-          url: editedItemUrl,
-        },
-      },
+    // Agregar datos de form1 a formData
+    new FormData(form1).forEach((value, key) => {
+      formData.append(key, value);
     });
-    // setEditedItemUrl("");
-    // setEditedItemText("");
+
+    // Agregar datos de form2 a formData
+    const isChecked = (
+      form2.querySelector("input[name='isHidden']") as HTMLInputElement
+    ).checked;
+    formData.append("isHidden", isChecked ? "true" : "false");
+
+    // Enviar los datos combinados con Fetch API
+    fetch("./back-office", {
+      method: "post",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        // Manejar la respuesta
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        // Manejar el error
+      });
   };
 
   return (
@@ -75,18 +72,24 @@ function CardBackOffice({ link }: { link: Card }) {
         </div>
         <Form
           method="POST"
+          id="data"
           className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3"
         >
           <span className="text-wrap font-bold flex items-center gap-2">
+            <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={editedItemText}
-              onChange={(e) => setEditedItemText(e.target.value)}
-              className={`${inputEnabled? 'border-b':'border-none'} focus:border-none bg-transparent w-full`}
-              placeholder={link.title}
+              value={link.title}
+              name="title"
+              // onChange={(e) => setEditedItemText(e.target.value)}
+              className={`${
+                inputEnabled ? "border-b" : "border-none"
+              } focus:border-none bg-transparent w-full`}
               disabled={!inputEnabled}
             />
+
             {!inputEnabled ? (
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -108,13 +111,16 @@ function CardBackOffice({ link }: { link: Card }) {
           <span className="flex font-bold items-center gap-2">
             <input
               type="text"
-              value={editedItemUrl}
-              onChange={(e) => setEditedItemUrl(e.target.value)}
-              className={`${inputEnabled? 'border-b':'border-none'} focus:border-none bg-transparent w-full`}
-              placeholder={link.url}
+              // onChange={(e) => setEditedItemUrl(e.target.value)}
+              className={`${
+                inputEnabled ? "border-b" : "border-none"
+              } focus:border-none bg-transparent w-full`}
+              value={link.url}
+              name="link"
               disabled={!inputEnabled}
             />
             {!inputEnabled ? (
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -143,21 +149,38 @@ function CardBackOffice({ link }: { link: Card }) {
         </Form>
         <div className="border-l p-2 flex justify-end">
           <div className="flex flex-col gap-y-4 items-center self-center">
-            {/* <div className="text-gray-700 font-bold flex justify-center size-max">
-              <BsBoxArrowUp />
-            </div> */}
-            <div className="relative" onClick={cardActive}>
-              <input type="checkbox" className="sr-only" value={0}/>
-              <div
-                className={`block ${
-                  link.active ? `bg-green-400` : `bg-gray-600`
-                } transition-colors w-14 h-8 rounded-full`}
-              ></div>
-              <div
-                className={`dot absolute ${
-                  link.active ? `right-2` : `left-1`
-                } transition-all top-1 bg-white w-6 h-6 rounded-full`}
-              ></div>
+            <div className="flex gap-4 items-center">
+              <div className="text-gray-700 font-bold flex justify-center size-max">
+                <FaRegSave
+                  onClick={handleSubmit}
+                  className="cursor-pointer"
+                  title="save changes"
+                />
+              </div>
+              <Form
+                method="post"
+                id="visibilityBtn"
+                className="relative"
+                onClick={cardActive}
+              >
+                <input type="hidden" name="formType" value="update" />
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  name="isHidden"
+                  defaultChecked={Boolean(link.isHidden)}
+                />
+                <div
+                  className={`block ${
+                    link.isHidden ? `bg-green-400` : `bg-gray-600`
+                  } transition-colors w-14 h-8 rounded-full`}
+                ></div>
+                <div
+                  className={`dot absolute ${
+                    link.isHidden ? `right-1` : `left-1`
+                  } transition-all top-1 bg-white w-6 h-6 rounded-full`}
+                ></div>
+              </Form>
             </div>
             <Form
               method="delete"

@@ -115,3 +115,34 @@ input:-webkit-autofill:active {
   -webkit-mask: var(--mask);
   mask: var(--mask);
 }
+
+/********************* GENERAL | START *********************/
+
+/* PageLayout */
+
+.pageLayout {
+  @apply min-h-screen max-w-[1660px] mx-auto;
+}
+
+/********************* GENERAL | END *********************/
+
+/* TwoColGridLayout style | START */
+.colSpan-01 {
+  @apply lg:col-span-5;
+}
+.colSpan-02 {
+  @apply lg:col-span-2;
+}
+/* TwoColGridLayout style | END */
+
+/* heading h1 style*/
+.heading {
+  @apply text-3xl uppercase font-bold border-b border-gray-400 border-solid;
+}
+
+/* HARD SHADOW */
+.shadow-heavy {
+  box-shadow: 0.7px 0.9px 0.9px hsl(0deg 0% 0% / 0.81),
+    12.8px 17.7px 16.4px -2.5px hsl(0deg 0% 0% / 0.54),
+    98.1px 135.1px 125.2px -5px hsl(0deg 0% 0% / 0.27);
+}

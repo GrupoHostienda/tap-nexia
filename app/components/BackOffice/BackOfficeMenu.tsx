@@ -1,36 +1,14 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
-import { BsLayoutWtf } from "react-icons/bs";
 import { IoIosArrowForward } from "react-icons/io";
-import { Form, useOutletContext } from "@remix-run/react";
-import NewLinkMenu from "./NewLinkMenu";
+import { Form } from "@remix-run/react";
 import { useState } from "react";
 
-type OutletContextProps = {
-  state: { items: [] };
-  dispatch: React.Dispatch<React.SetStateAction<{}>>;
-};
-
-type Item = {
-  title: string;
-  url: string;
-  id: number;
-  isHidden: number;
-};
 export default function BackOfficeMenu() {
   const [visible, setVisibility] = useState(false);
-  const { state, dispatch } = useOutletContext<OutletContextProps>();
-
-  // const addValue = () => {
-  //   // const newItem: Item = {
-  //   //   id: Date.now(),
-  //   //   title: '',
-  //   //   url: '',
-  //   //   isHidden: 0
-  //   // };
-  //   // dispatch({type: 'addItem', payload: newItem});
-  // }
 
   return (
     <>
@@ -48,6 +26,7 @@ export default function BackOfficeMenu() {
             onSubmit={() => setVisibility(!visible)}
           >
             <span className="message"></span>
+            <input type="hidden" name="formType" value="add" />
             <div className="grid grid-cols-[20%_80%]">
               <label
                 className="bg-gray-500 rounded-tl-xl rounded-bl-xl p-2"
@@ -80,7 +59,6 @@ export default function BackOfficeMenu() {
               <button
                 type="submit"
                 className="bg-blue-700 text-white text-xl rounded-xl p-2 hover:bg-blue-600"
-
               >
                 Add link
               </button>
@@ -89,10 +67,6 @@ export default function BackOfficeMenu() {
         </div>
       </div>
 
-      {/* Switch de botones */}
-      <div className="flex justify-start gap-4 p-4 w-full border items-center text-2xl font-bold">
-      <BsLayoutWtf /><p>Back-Office</p>
-      </div>
       {/* Boton add link */}
       <div className="w-full">
         <button
