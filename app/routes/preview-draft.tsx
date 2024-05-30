@@ -87,6 +87,7 @@ export default function Index() {
   const { userLinks: links, user: userdata, backgrounds: backgrounds } = useLoaderData<DataType>();
 
   console.log(backgrounds);
+  console.log(userdata);
   return (
     <div className=" bg-home min-h-screen">
       <DashboarHeader />
@@ -104,7 +105,7 @@ export default function Index() {
                 }}
               >
                 <img
-                  src={data.avatar}
+                  src={userdata.cover}
                   alt="avatar"
                   className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
                 />
