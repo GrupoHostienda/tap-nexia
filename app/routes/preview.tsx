@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import LinksContainer from "@/components/ProfilePage/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
 import DashboarHeader from "@/components/DashboarHeader";
-import Sidebar from "@/components/SIdeBar";
+import Sidebar from "@/components/SideBar";
 import { useLoaderData } from "@remix-run/react";
 import { PreviewProps, UserType } from "@/types";
 import { getToken } from "@/services";
