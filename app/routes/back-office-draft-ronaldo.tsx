@@ -60,6 +60,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     const userDataVerified = UserSchema.safeParse(userData);
     const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+    console.log(userLinksDataVerified);
+    console.log(userDataVerified);
 
     /* si NO pasa la validacion de zod retorno un error*/
     if (!userDataVerified.success || !userLinksDataVerified.success) {
@@ -69,7 +71,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     return json({
       userLinks: userLinksDataVerified.data,
-      user: userDataVerified,
+      user: userDataVerified.data,
     });
   } catch (error) {
     console.log(error?.toString());
@@ -191,7 +193,7 @@ type LoaderType = { userLinks: UserLinkType[]; user: UserType };
 //component
 export default function LayoutBackOffice() {
   const { userLinks, user }: LoaderType = useLoaderData();
-
+  console.log(userLinks.slice().reverse());
   const list = userLinks.slice().reverse();
   return (
     <div className=" pageLayout bg-slate-200">

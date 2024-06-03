@@ -20,6 +20,8 @@ function CardBackOffice({ link }: { link: Card }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
+  const isSubmitting =
+    !(navigation.state === "idle") && navigation.formMethod === "POST";
   const [idLink, setIdLink] = useState<number>();
 
   const [linkActivated, linkActive] = useState(link.isHidden === 0);
@@ -31,10 +33,27 @@ function CardBackOffice({ link }: { link: Card }) {
   const [inputEnabled, setInputEnabled] = useState(false);
   const toggleInput = (id: number) => {
     if (!inputEnabled) {
-      setInputEnabled(!inputEnabled);
+      setInputEnabled(true);
+      setValues({
+        title: "",
+        link: ""
+      });
     } else {
-      setInputEnabled(!inputEnabled);
+      setInputEnabled(false);
     }
+  };
+
+  const [inputs, setValues] = useState({
+    title: link.title,
+    link: link.url
+  });
+
+  const handleInputs = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setValues({
+      ...inputs,
+      [name]: value
+    });
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -73,6 +92,7 @@ function CardBackOffice({ link }: { link: Card }) {
 
   return (
     <>
+    
       <div className="bg-gray-50 rounded-3xl w-full grid grid-cols-[5%_75%_15%] gap-2 p-3 shadow-md">
         <div className="border-r self-center">
           <TbMenu />
@@ -86,9 +106,10 @@ function CardBackOffice({ link }: { link: Card }) {
             <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={link.title}
+              placeholder={link.title}
               name="title"
-              // onChange={(e) => setEditedItemText(e.target.value)}
+              onChange={handleInputs}
+              value={inputs.title}
               className={`${
                 inputEnabled ? "border-b" : "border-none"
               } focus:border-none bg-transparent w-full`}
@@ -116,12 +137,13 @@ function CardBackOffice({ link }: { link: Card }) {
           <span className="flex font-bold items-center gap-2">
             <input
               type="text"
-              // onChange={(e) => setEditedItemUrl(e.target.value)}
+              onChange={handleInputs}
               className={`${
                 inputEnabled ? "border-b" : "border-none"
               } focus:border-none bg-transparent w-full`}
-              value={link.url}
+              placeholder={link.url}
               name="link"
+              value={inputs.link}
               disabled={!inputEnabled}
             />
             {!inputEnabled ? (
@@ -154,13 +176,16 @@ function CardBackOffice({ link }: { link: Card }) {
         <div className="border-l p-2 flex justify-end">
           <div className="flex flex-col gap-y-4 items-center self-center">
             <div className="flex gap-4 items-center">
-              <div className="text-gray-700 font-bold flex justify-center size-max">
-                <FaRegSave
+              <button className="text-gray-700 font-bold flex justify-center size-max" disabled={!inputEnabled}>
+              {isSubmitting && idLink == link.id ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <FaRegSave
                   onClick={handleSubmit}
-                  className="cursor-pointer"
                   title="save changes"
                 />
-              </div>
+                )}
+              </button>
               <Form
                 method="post"
                 id="visibilityBtn"
