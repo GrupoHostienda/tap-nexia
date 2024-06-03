@@ -75,7 +75,7 @@ function CardBackOffice({ link }: { link: Card }) {
     formData.append("isHidden", isChecked ? "true" : "false");
 
     // Enviar los datos combinados con Fetch API
-    fetch("./back-office", {
+    fetch("./back-office-draft-ronaldo", {
       method: "post",
       body: formData,
     })

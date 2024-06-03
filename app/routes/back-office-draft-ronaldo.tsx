@@ -91,6 +91,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const formType = formData.get("formType");
     const title = formData.get("title") as string;
     const link = formData.get("link") as string;
+    const idLink = formData.get("id");
 
     console.log(link);
     console.log(title);
@@ -141,7 +142,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         console.log(title);
         try {
           const response = await fetch(
-            `${process.env.API_BASE}/user/link/update/2`,
+            `${process.env.API_BASE}/user/link/update/${idLink}`,
             {
               method: "POST",
               headers: {
