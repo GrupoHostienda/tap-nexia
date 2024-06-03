@@ -7,27 +7,53 @@ import { MdOutlineEdit } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
 import { Form, useNavigation } from "@remix-run/react";
-import { UserLinkType } from "@/types";
 
-function CardBackOffice({ link }: { link: UserLinkType }) {
+export interface Card {
+  title: string;
+  url: string;
+  active: boolean;
+  isHidden: number;
+  id: number;
+}
+
+function CardBackOffice({ link }: { link: Card }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
+  const isSubmitting =
+    !(navigation.state === "idle") && navigation.formMethod === "POST";
   const [idLink, setIdLink] = useState<number>();
 
   const [linkActivated, linkActive] = useState(link.isHidden === 0);
-
   const cardActive = () => {
     linkActive(!linkActivated);
+    link.active = linkActivated;
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
   const toggleInput = (id: number) => {
     if (!inputEnabled) {
-      setInputEnabled(!inputEnabled);
+      setInputEnabled(true);
+      setValues({
+        title: "",
+        link: ""
+      });
     } else {
-      setInputEnabled(!inputEnabled);
+      setInputEnabled(false);
     }
+  };
+
+  const [inputs, setValues] = useState({
+    title: link.title,
+    link: link.url
+  });
+
+  const handleInputs = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setValues({
+      ...inputs,
+      [name]: value
+    });
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -66,6 +92,7 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
 
   return (
     <>
+    
       <div className="bg-gray-50 rounded-3xl w-full grid grid-cols-[5%_75%_15%] gap-2 p-3 shadow-md">
         <div className="border-r self-center">
           <TbMenu />
@@ -79,17 +106,16 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
             <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={link.title}
+              placeholder={link.title}
               name="title"
-              // onChange={(e) => setEditedItemText(e.target.value)}
+              onChange={handleInputs}
+              value={inputs.title}
               className={`${
                 inputEnabled ? "border-b" : "border-none"
               } focus:border-none bg-transparent w-full`}
               disabled={!inputEnabled}
             />
-
             {!inputEnabled ? (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -111,16 +137,16 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
           <span className="flex font-bold items-center gap-2">
             <input
               type="text"
-              // onChange={(e) => setEditedItemUrl(e.target.value)}
+              onChange={handleInputs}
               className={`${
                 inputEnabled ? "border-b" : "border-none"
               } focus:border-none bg-transparent w-full`}
-              value={link.url}
+              placeholder={link.url}
               name="link"
+              value={inputs.link}
               disabled={!inputEnabled}
             />
             {!inputEnabled ? (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
@@ -150,13 +176,16 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
         <div className="border-l p-2 flex justify-end">
           <div className="flex flex-col gap-y-4 items-center self-center">
             <div className="flex gap-4 items-center">
-              <div className="text-gray-700 font-bold flex justify-center size-max">
-                <FaRegSave
+              <button className="text-gray-700 font-bold flex justify-center size-max" disabled={!inputEnabled}>
+              {isSubmitting && idLink == link.id ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <FaRegSave
                   onClick={handleSubmit}
-                  className="cursor-pointer"
                   title="save changes"
                 />
-              </div>
+                )}
+              </button>
               <Form
                 method="post"
                 id="visibilityBtn"
@@ -168,16 +197,16 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
                   type="checkbox"
                   className="sr-only"
                   name="isHidden"
-                  defaultChecked={Boolean(link.isHidden)}
+                  defaultChecked={link.active}
                 />
                 <div
                   className={`block ${
-                    link.isHidden ? `bg-green-400` : `bg-gray-600`
+                    link.active ? `bg-green-400` : `bg-gray-600`
                   } transition-colors w-14 h-8 rounded-full`}
                 ></div>
                 <div
                   className={`dot absolute ${
-                    link.isHidden ? `right-1` : `left-1`
+                    link.active ? `right-1` : `left-1`
                   } transition-all top-1 bg-white w-6 h-6 rounded-full`}
                 ></div>
               </Form>

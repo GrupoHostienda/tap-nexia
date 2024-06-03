@@ -15,25 +15,19 @@ type DropDownProps = {
   setDropDown: Dispatch<React.SetStateAction<number>>;
   dropDown: number;
   dataLink: UserLinkType;
-  setSelectedLinkId: React.Dispatch<number>; //***************** */
-  idPosition0: number; //********************** */
+  setSelectedLinkId: React.Dispatch<number>;
+  idPosition0: number;
 };
 
-const DropDown = ({
+const DropDown: React.FC<DropDownProps> = ({
   setDropDown,
   dropDown,
   dataLink,
   setSelectedLinkId,
   idPosition0,
-}: DropDownProps) => {
-  const {
-    setColor,
-    setOutline,
-    setShadow,
-    setLinkId, //delete link
-  }: //setSelectedLinkId, //edit | styles route
-  //idPosition0, //edit | styles route
-  ContextType = useOutletContext();
+}) => {
+  const { setColor, setOutline, setShadow, setLinkId }: ContextType =
+    useOutletContext();
 
   //const scrollPosition = useScrollPosition();
   //const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 0;
