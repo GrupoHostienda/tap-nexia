@@ -3,7 +3,7 @@ import { LuLayoutPanelLeft, LuTrash2 } from "react-icons/lu";
 import { GiRapidshareArrow } from "react-icons/gi";
 import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
 import { ImStatsBars2 } from "react-icons/im";
-import { MdOutlineEdit } from "react-icons/md";
+import { MdOutlineEdit, MdEditOff } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
 import { Form, useNavigation } from "@remix-run/react";
@@ -23,8 +23,9 @@ function CardBackOffice({ link }: { link: Card }) {
   const isSubmitting =
     !(navigation.state === "idle") && navigation.formMethod === "POST";
   const [idLink, setIdLink] = useState<number>();
-
-  const [linkActivated, linkActive] = useState(link.isHidden === 0);
+  
+  const [linkActivated, linkActive] = useState(link.isHidden == 0);
+  // console.log(linkActivated)
   const cardActive = () => {
     linkActive(!linkActivated);
     link.active = linkActivated;
@@ -59,24 +60,25 @@ function CardBackOffice({ link }: { link: Card }) {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault(); // Prevenir el envío por defecto del formulario
 
-    const form1 = document.getElementById("data") as HTMLFormElement;
-    const form2 = document.getElementById("visibilityBtn") as HTMLFormElement;
+    const form1 = document.getElementById("data"+link.id) as HTMLFormElement;
+    const form2 = document.getElementById("visibilityBtn"+link.id) as HTMLFormElement;
     const formData = new FormData();
 
     // Agregar datos de form1 a formData
     new FormData(form1).forEach((value, key) => {
       formData.append(key, value);
+      console.log(key+" "+value);
     });
 
     // Agregar datos de form2 a formData
     const isChecked = (
       form2.querySelector("input[name='isHidden']") as HTMLInputElement
     ).checked;
-    formData.append("isHidden", isChecked ? "true" : "false");
-
+    formData.append("isHidden", isChecked ? "0" : "1");
+    console.log(isChecked);
     // Enviar los datos combinados con Fetch API
     fetch("./back-office-draft-ronaldo", {
-      method: "post",
+      method: "POST",
       body: formData,
     })
       .then((response) => response.json())
@@ -99,7 +101,7 @@ function CardBackOffice({ link }: { link: Card }) {
         </div>
         <Form
           method="POST"
-          id="data"
+          id={"data"+link.id}
           className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3"
         >
           <span className="text-wrap font-bold flex items-center gap-2">
@@ -120,8 +122,7 @@ function CardBackOffice({ link }: { link: Card }) {
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
               >
-                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
-                <MdOutlineEdit />
+                <MdOutlineEdit title="Editar campos"/>
               </span>
             ) : (
               <button
@@ -129,8 +130,7 @@ function CardBackOffice({ link }: { link: Card }) {
                 onClick={() => toggleInput(link.id)}
                 className="opacity-50 hover:opacity-100 cursor-pointer"
               >
-                {/* {!inputEnabled ? <MdOutlineEdit /> : <FaRegSave />} */}
-                <FaRegSave />
+                <MdEditOff title="Dejar de editar"/>
               </button>
             )}
           </span>
@@ -146,22 +146,6 @@ function CardBackOffice({ link }: { link: Card }) {
               value={inputs.link}
               disabled={!inputEnabled}
             />
-            {!inputEnabled ? (
-              <span
-                onClick={() => toggleInput(link.id)}
-                className="opacity-70 hover:opacity-100 cursor-pointer"
-              >
-                <MdOutlineEdit />
-              </span>
-            ) : (
-              <button
-                type="submit"
-                onClick={() => toggleInput(link.id)}
-                className="opacity-50 hover:opacity-100 cursor-pointer"
-              >
-                <FaRegSave />
-              </button>
-            )}
           </span>
           <div className="flex justify-start gap-3 p-3 text-gray-600">
             <LuLayoutPanelLeft className="hover:cursor-pointer" />
@@ -172,11 +156,15 @@ function CardBackOffice({ link }: { link: Card }) {
             <CiLock className="hover:cursor-pointer" />
             <ImStatsBars2 className="hover:cursor-pointer" />
           </div>
+
+          {/* INPUT PARA ENVIAR EL ID DE LA CARD */}
+          <input type="hidden" value={link.id} name="idCard"/>
+
         </Form>
         <div className="border-l p-2 flex justify-end">
           <div className="flex flex-col gap-y-4 items-center self-center">
             <div className="flex gap-4 items-center">
-              <button className="text-gray-700 font-bold flex justify-center size-max" disabled={!inputEnabled}>
+              <button className={`text-gray-700 font-bold flex justify-center size-max ${inputEnabled? "opacity-100": "opacity-50"}`} disabled={!inputEnabled}>
               {isSubmitting && idLink == link.id ? (
                   <FaSpinner className="animate-spin" />
                 ) : (
@@ -188,7 +176,7 @@ function CardBackOffice({ link }: { link: Card }) {
               </button>
               <Form
                 method="post"
-                id="visibilityBtn"
+                id={"visibilityBtn"+link.id}
                 className="relative"
                 onClick={cardActive}
               >
@@ -197,16 +185,16 @@ function CardBackOffice({ link }: { link: Card }) {
                   type="checkbox"
                   className="sr-only"
                   name="isHidden"
-                  defaultChecked={link.active}
+                  defaultChecked={linkActivated}
                 />
                 <div
                   className={`block ${
-                    link.active ? `bg-green-400` : `bg-gray-600`
+                    linkActivated ? `bg-green-400` : `bg-gray-600`
                   } transition-colors w-14 h-8 rounded-full`}
                 ></div>
                 <div
                   className={`dot absolute ${
-                    link.active ? `right-1` : `left-1`
+                    linkActivated ? `right-1` : `left-1`
                   } transition-all top-1 bg-white w-6 h-6 rounded-full`}
                 ></div>
               </Form>
