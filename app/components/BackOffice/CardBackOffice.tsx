@@ -6,17 +6,17 @@ import { ImStatsBars2 } from "react-icons/im";
 import { MdOutlineEdit, MdEditOff } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useState } from "react";
-import { Form, useNavigation } from "@remix-run/react";
+import { Form, redirect, useNavigation } from "@remix-run/react";
 import { UserLinkType } from "@/types";
 
 function CardBackOffice({ link }: { link: UserLinkType }) {
   const navigation = useNavigation();
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
-    const isSubmitting =
+  const isSubmitting =
     !(navigation.state === "idle") && navigation.formMethod === "POST";
   const [idLink, setIdLink] = useState<number>();
-  
+
   const [linkActivated, linkActive] = useState(link.isHidden == 0);
   // console.log(linkActivated)
   const cardActive = () => {
@@ -27,10 +27,10 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
   const toggleInput = (id: number) => {
     if (!inputEnabled) {
       setInputEnabled(true);
-      setValues({
-        title: "",
-        url: ""
-      });
+      // setValues({
+      //   title: "",
+      //   url: ""
+      // });
     } else {
       setInputEnabled(!inputEnabled);
     }
@@ -38,65 +38,66 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
 
   const [inputs, setValues] = useState({
     title: link.title,
-    url: link.url
+    url: link.url,
   });
 
   const handleInputs = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setValues({
       ...inputs,
-      [name]: value
+      [name]: value,
     });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault(); // Prevenir el envío por defecto del formulario
-    setIdLink(link.id)
-    const form1 = document.getElementById("data" + link.id) as HTMLFormElement;
-    const form2 = document.getElementById(
-      "visibilityBtn" + link.id
-    ) as HTMLFormElement;
-    const formData = new FormData();
+  // const handleSubmit = (event: React.FormEvent) => {
+  //   event.preventDefault(); // Prevenir el envío por defecto del formulario
+  //   setIdLink(link.id);
+  //   const form1 = document.getElementById("data" + link.id) as HTMLFormElement;
+  //   const form2 = document.getElementById(
+  //     "visibilityBtn" + link.id
+  //   ) as HTMLFormElement;
+  //   const formData = new FormData();
 
-    // Agregar datos de form1 a formData
-    new FormData(form1).forEach((value, key) => {
-      if (value != (null || '')) {
-        formData.append(key, value);
-        console.log(key + " " + value);
-      } else {
-        if (key == "title") {
-          value = link.title;
-          formData.append(key, value);
-          console.log(key + " " + value);
-        } else if (key == "url") {
-          value = link.url;
-          formData.append(key, value);
-          console.log(key + " " + value);
-        }
-      }
-    });
+  //   // Agregar datos de form1 a formData
+  //   new FormData(form1).forEach((value, key) => {
+  //     if (value != (null || "")) {
+  //       formData.append(key, value);
+  //       console.log(key + " " + value);
+  //     } else {
+  //       if (key == "title") {
+  //         value = link.title;
+  //         formData.append(key, value);
+  //         console.log(key + " " + value);
+  //       } else if (key == "url") {
+  //         value = link.url;
+  //         formData.append(key, value);
+  //         console.log(key + " " + value);
+  //       }
+  //     }
+  //   });
 
-    // Agregar datos de form2 a formData
-    const isChecked = (
-      form2.querySelector("input[name='isHidden']") as HTMLInputElement
-    ).checked;
-    formData.append("isHidden", isChecked ? "0" : "1");
-    console.log(isChecked);
-    // Enviar los datos combinados con Fetch API
-    fetch("./back-office-draft-ronaldo", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        // Manejar la respuesta
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        // Manejar el error
-      });
-  };
+  //   // Agregar datos de form2 a formData
+  //   const isChecked = (
+  //     form2.querySelector("input[name='isHidden']") as HTMLInputElement
+  //   ).checked;
+  //   formData.append("isHidden", isChecked ? "0" : "1");
+  //   console.log(isChecked);
+  //   // Enviar los datos combinados con Fetch API
+  //   fetch("./back-office-draft-ron", {
+  //     method: "POST",
+  //     body: formData,
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log("Success:", data);
+  //       // Manejar la respuesta
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+  //       // Manejar el error
+  //     });
+  //   redirect("./preview");
+  // };
 
   return (
     <>
@@ -105,48 +106,43 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
           <TbMenu />
         </div>
         <Form
-          method="POST"
-          id={"data"+link.id}
+          // method="POST"
+          // id={"data" + link.id}
           className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3"
         >
           <span className="text-wrap font-bold flex items-center gap-2">
             <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={link.title}
+              value={inputs.title}
               name="title"
-              // onChange={(e) => setEditedItemText(e.target.value)}
-              className={`${
-                inputEnabled ? "border-b" : "border-none"
-              } focus:border-none bg-transparent w-full`}
+              onChange={handleInputs}
+              placeholder={link.title}
+              className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
               disabled={!inputEnabled}
             />
 
             {!inputEnabled ? (
-              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
               <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-70 hover:opacity-100 cursor-pointer"
               >
-                <MdOutlineEdit title="Editar campos"/>
+                <MdOutlineEdit title="Editar campos" />
               </span>
             ) : (
-              <button
-                type="submit"
+              <span
                 onClick={() => toggleInput(link.id)}
                 className="opacity-50 hover:opacity-100 cursor-pointer"
               >
-                <MdEditOff title="Dejar de editar"/>
-              </button>
+                <MdEditOff title="Dejar de editar" />
+              </span>
             )}
           </span>
           <span className="flex font-bold items-center gap-2">
             <input
               type="text"
-              // onChange={(e) => setEditedItemUrl(e.target.value)}
-              className={`${
-                inputEnabled ? "border-b" : "border-none"
-              } focus:border-none bg-transparent w-full`}
+              onChange={handleInputs}
+              className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
               placeholder={link.url}
               name="url"
               value={inputs.url}
@@ -164,26 +160,40 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
           </div>
 
           {/* INPUT PARA ENVIAR EL ID DE LA CARD */}
-          <input type="hidden" value={link.id} name="idCard"/>
-
+          <input type="hidden" value={link.id} name="idCard" />
         </Form>
         <div className="border-l p-2 flex justify-end">
           <div className="flex flex-col gap-y-4 items-center self-center">
             <div className="flex gap-4 items-center">
-              <button className={`text-gray-700 font-bold flex justify-center size-max ${inputEnabled? "opacity-100": "opacity-50"}`} disabled={!inputEnabled}>
-              {isSubmitting && idLink == link.id ? (
-                  <FaSpinner className="animate-spin" />
-                ) : (
-                  <FaRegSave
-                  onClick={handleSubmit}
-                  className="cursor-pointer"
-                  title="save changes"
-                />
-                )}
-              </button>
+              <Form method="POST">
+                <input type="hidden" name="formType" value="update" />
+                <input type="hidden" name="title" value={inputs.title} />
+                <input type="hidden" name="url" value={inputs.url} />
+                <input type="hidden" value={link.id} name="idCard" />
+
+                <button
+                  type="submit"
+                  onClick={() => setIdLink(link.id)}
+                  className={`text-gray-700 font-bold flex justify-center size-max ${
+                    inputEnabled ? "opacity-100" : "opacity-50"
+                  }`}
+                  disabled={!inputEnabled}
+                >
+                  {isSubmitting && idLink == link.id ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    <FaRegSave
+                      // onClick={handleSubmit}
+                      className="cursor-pointer"
+                      title="save changes"
+                    />
+                  )}
+                </button>
+              </Form>
+
               <Form
                 method="post"
-                id={"visibilityBtn"+link.id}
+                id={"visibilityBtn" + link.id}
                 className="relative"
                 onClick={cardActive}
               >

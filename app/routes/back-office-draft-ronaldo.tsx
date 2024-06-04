@@ -90,7 +90,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData();
     const formType = formData.get("formType");
     const title = formData.get("title") as string;
-    const link = formData.get("link") as string;
+    const link = formData.get("url") as string;
     const idLink = formData.get("idCard") as string;
 
     console.log(link);

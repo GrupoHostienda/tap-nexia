@@ -112,8 +112,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const formData = await request.formData();
     const formType = formData.get("formType");
     const title = formData.get("title") as string;
-    const link = formData.get("link") as string;
-
+    const link = formData.get("url") as string;
+    const idLink = formData.get("idCard") as string;
     const color = formData.get("color") as string;
     const rounded = formData.get("rounded") as string;
     const shadow = formData.get("shadow") as string;
@@ -159,12 +159,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           return json({ error: error?.toString() });
         }
       case "update":
-        const linkVisible = formData.get("isHidden");
+        const linkVisibleStr = formData.get("isHidden") as string;
+        const linkVisible = parseInt(linkVisibleStr, 10);
+
         console.log("ejecutando update");
         console.log(title);
+        console.log(linkVisible);
         try {
           const response = await fetch(
-            `${process.env.API_BASE}/user/link/update/2`,
+            `${process.env.API_BASE}/user/link/update/${idLink}`,
             {
               method: "POST",
               headers: {
@@ -172,6 +175,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                 Authorization: `Bearer ${authToken}`,
               },
               body: JSON.stringify({
+                link_type_id: 1,
+                title: title,
+                url: link,
                 isHidden: linkVisible,
               }),
             }
