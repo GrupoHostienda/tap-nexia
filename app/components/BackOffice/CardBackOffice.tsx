@@ -37,7 +37,7 @@ function CardBackOffice({ link }: { link: Card }) {
       setInputEnabled(true);
       setValues({
         title: "",
-        link: ""
+        url: ""
       });
     } else {
       setInputEnabled(false);
@@ -46,7 +46,7 @@ function CardBackOffice({ link }: { link: Card }) {
 
   const [inputs, setValues] = useState({
     title: link.title,
-    link: link.url
+    url: link.url
   });
 
   const handleInputs = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,15 +59,29 @@ function CardBackOffice({ link }: { link: Card }) {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault(); // Prevenir el envío por defecto del formulario
-
-    const form1 = document.getElementById("data"+link.id) as HTMLFormElement;
-    const form2 = document.getElementById("visibilityBtn"+link.id) as HTMLFormElement;
+    setIdLink(link.id)
+    const form1 = document.getElementById("data" + link.id) as HTMLFormElement;
+    const form2 = document.getElementById(
+      "visibilityBtn" + link.id
+    ) as HTMLFormElement;
     const formData = new FormData();
 
     // Agregar datos de form1 a formData
     new FormData(form1).forEach((value, key) => {
-      formData.append(key, value);
-      console.log(key+" "+value);
+      if (value != (null || '')) {
+        formData.append(key, value);
+        console.log(key + " " + value);
+      } else {
+        if (key == "title") {
+          value = link.title;
+          formData.append(key, value);
+          console.log(key + " " + value);
+        } else if (key == "url") {
+          value = link.url;
+          formData.append(key, value);
+          console.log(key + " " + value);
+        }
+      }
     });
 
     // Agregar datos de form2 a formData
@@ -142,8 +156,8 @@ function CardBackOffice({ link }: { link: Card }) {
                 inputEnabled ? "border-b" : "border-none"
               } focus:border-none bg-transparent w-full`}
               placeholder={link.url}
-              name="link"
-              value={inputs.link}
+              name="url"
+              value={inputs.url}
               disabled={!inputEnabled}
             />
           </span>
