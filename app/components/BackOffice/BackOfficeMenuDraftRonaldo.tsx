@@ -51,11 +51,11 @@ export default function BackOfficeMenu() {
       <div className={`${visible ? "block" : "hidden"} w-screen`}>
         {/* Backdrop */}
         <div
-          className="bg-black opacity-50 w-full h-[150%] absolute left-0 top-0 bottom-0 z-40 overflow-hidden"
+          className="bg-black opacity-50 w-full min-h-screen absolute top-0 bottom-0 left-0 right-0 z-40 overflow-hidden"
           onClick={() => setVisibility(!visible)}
         ></div>
         {/*  */}
-        <div className="absolute  top-10 z-50 left-1/2 -translate-x-1/2 w-[90%] max-w-[60rem] flex justify-center items-center">
+        <div className="absolute top-10 z-50 left-1/2 -translate-x-1/2 w-[90%] max-w-[60rem] flex justify-center items-center">
           <Form
             method="post"
             className="bg-white rounded-3xl p-4 flex flex-col gap-4 max-w-[60rem] w-full z-50"

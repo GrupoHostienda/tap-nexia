@@ -3,8 +3,6 @@ import data from "data.json";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 
-import { sessionStorage } from "@/utils/session.server";
-
 import { motion } from "framer-motion";
 
 import LinksContainer from "@/components/ProfilePage/LinksContainer";
@@ -13,6 +11,7 @@ import DashboarHeader from "@/components/DashboarHeader";
 import Sidebar from "@/components/SideBar";
 import { useLoaderData } from "@remix-run/react";
 import { PreviewProps, UserType } from "@/types";
+import { getToken } from "@/services";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -29,22 +28,18 @@ export function meta() {
 
 // loader para verificar sesión
 export const loader = async ({ request }: ActionFunctionArgs) => {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
-  console.log(authToken);
+  const authToken = await getToken(request);
 
   if (!authToken) {
     return redirect("/login");
   }
+
   const base = process.env.API_BASE;
   const urls = {
     user: `${base}/user`,
     userLinks: `${base}/user/links`,
-    backgrounds: `${base}/backgrounds`
+    backgrounds: `${base}/backgrounds`,
   };
-
   const headers = {
     Authorization: `Bearer ${authToken}`,
   };
@@ -69,7 +64,7 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     return json({
       user: userData,
       userLinks: userLinksData,
-      backgrounds: backgroundsData
+      backgrounds: backgroundsData,
     });
   } catch (error) {
     return json({ error: error?.toString() });
@@ -79,15 +74,19 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 type DataType = {
   links: PreviewProps[];
   userdata: UserType;
-  background: any
+  background: any;
 };
 
 export default function Index() {
   const [iFrameVisible, setIframeVisible] = useState(false);
-  const { userLinks: links, user: userdata, backgrounds: backgrounds } = useLoaderData<DataType>();
+  const {
+    userLinks: links,
+    user: userdata,
+    backgrounds: backgrounds,
+  } = useLoaderData<DataType>();
 
   console.log(backgrounds);
-  console.log(userdata);
+
   return (
     <div className=" bg-home min-h-screen">
       <DashboarHeader />
@@ -105,7 +104,7 @@ export default function Index() {
                 }}
               >
                 <img
-                  src={userdata.cover}
+                  src={data.avatar}
                   alt="avatar"
                   className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
                 />

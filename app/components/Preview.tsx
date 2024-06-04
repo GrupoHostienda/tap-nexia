@@ -1,6 +1,10 @@
-import { useNavigation, useOutletContext } from "@remix-run/react";
+import {
+  useLoaderData,
+  useNavigation,
+  useOutletContext,
+} from "@remix-run/react";
 
-import type { ContextType, PreviewProps, UserType } from "@/types";
+import type { ContextType, UserLinkType, UserType } from "@/types";
 
 import { useState } from "react";
 
@@ -12,30 +16,42 @@ import { motion } from "framer-motion";
 
 import { twMerge } from "tailwind-merge";
 
+//type
+type PreviewProps = {
+  data: UserLinkType[];
+  user: UserType;
+  selectedLink: UserLinkType; //*************** */
+  setSelectedLinkId: React.Dispatch<number>; //********* */
+};
+
+//type *********************************
+type LoaderDataType = {
+  userLinks: UserLinkType[];
+};
+
+//component
 function Preview({
   data,
   user,
-  selectedLink, //for setting flag of selected link
-  setSelectedLinkId,
-  idPosition0, //para colocar el id default si borro el link que estoy editando
-}: {
-  data: PreviewProps[];
-  user: UserType;
-  selectedLink: PreviewProps;
-  setSelectedLinkId: React.Dispatch<number>;
-  idPosition0: number;
-}) {
+  selectedLink, //flag of selected link |styles route
+  setSelectedLinkId, //for setting flag of selected link |styles route
+}: PreviewProps) {
+  const { userLinks }: LoaderDataType = useLoaderData();
+
   const navigation = useNavigation();
 
-  const { color, outline, shadow, linkId, background }: ContextType = useOutletContext();
-  console.log(background)
+  const { color, outline, shadow, linkId, background }: ContextType =
+    useOutletContext();
+
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
 
   const [dropDown, setDropDown] = useState(0); //for showing dropdown
   return (
     <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
-      <div className={`w-full h-full ${background} rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar`}>
+      <div
+        className={`w-full h-full ${background} rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar`}
+      >
         {/* profile picture */}
         <div className="size-16 shrink-0 rounded-full bg-gray-700 self-center"></div>
 
@@ -49,7 +65,6 @@ function Preview({
         <div className="flex flex-col gap-3">
           {data.map((dataLink, index) => {
             const flag = dataLink.id === selectedLink?.id;
-
             return (
               <div key={index}>
                 <div
@@ -107,8 +122,8 @@ function Preview({
                     setDropDown={setDropDown}
                     dropDown={dropDown}
                     dataLink={dataLink}
-                    setSelectedLinkId={setSelectedLinkId}
-                    idPosition0={idPosition0}
+                    setSelectedLinkId={setSelectedLinkId} //******************** */
+                    idPosition0={userLinks[0].id} //****************** */
                   />
                 )}
               </div>

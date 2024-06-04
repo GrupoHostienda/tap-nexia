@@ -1,4 +1,4 @@
-import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
+//import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
 import CardBackOffice from "@/components/BackOffice/CardBackOffice";
 import {
   ActionFunctionArgs,
@@ -6,7 +6,7 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
 import DashboarHeader from "@/components/DashboarHeader";
@@ -19,6 +19,11 @@ import Preview from "@/components/Preview";
 import { getToken } from "@/services";
 import { LinksStylesAPISchema, UserLinksSchema, UserSchema } from "@/schemas";
 import { UserLinkType, UserType } from "@/types";
+
+import { FaPlus } from "react-icons/fa";
+import { FiArchive } from "react-icons/fi";
+import { RiLayoutTopLine } from "react-icons/ri";
+import { IoIosArrowForward } from "react-icons/io";
 
 //meta
 export function meta() {
@@ -214,44 +219,70 @@ export default function LayoutBackOffice() {
 
   const list = userLinks?.slice().reverse();
   return (
-    <div className=" pageLayout bg-slate-200">
-      <DashboarHeader />
-      <HeadingMobile label="Back-Office">
-        <BsLayoutWtf />
-      </HeadingMobile>
+    <div className=" w-full bg-red-500">
+      <Outlet />
+      <div className="pageLayout bg-slate-200">
+        <DashboarHeader />
+        <HeadingMobile label="Back-Office">
+          <BsLayoutWtf />
+        </HeadingMobile>
 
-      <TwoColGridLayoutDratf>
-        {/* back-office | col-01 */}
-        <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
-          <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
-            <HeadingDesktop label="Back-Office">
-              <BsLayoutWtf />
-            </HeadingDesktop>
+        <TwoColGridLayoutDratf>
+          {/* back-office | col-01 */}
+          <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
+            <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
+              <HeadingDesktop label="Back-Office">
+                <BsLayoutWtf />
+              </HeadingDesktop>
 
-            <BackOfficeMenuDraftRonaldo />
+              {/* <BackOfficeMenuDraftRonaldo /> */}
 
-            <div></div>
-            <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
-              {list?.map((link, index: number) => {
-                return (
-                  <div key={index}>
-                    <CardBackOffice link={link} />
-                  </div>
-                );
-              })}
+              {/******************************************* *******************************************/}
+              {/* Boton add link */}
+              <div className="w-full">
+                <Link
+                  to="add"
+                  className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
+                >
+                  <FaPlus />
+                  <p>Add Link</p>
+                </Link>
+                <div className="flex justify-between pt-3">
+                  <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
+                    <RiLayoutTopLine />
+                    <p>Add Header</p>
+                  </button>
+                  <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
+                    <FiArchive />
+                    View archive
+                    <IoIosArrowForward />
+                  </button>
+                </div>
+              </div>
+              {/******************************************* *******************************************/}
+
+              <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
+                {list?.map((link, index: number) => {
+                  return (
+                    <div key={index}>
+                      <CardBackOffice link={link} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* preview | col-02 */}
-        <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
-          <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
-            <div className=" lg:h-10"></div>
+          {/* preview | col-02 */}
+          <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
+            <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
+              <div className=" lg:h-10"></div>
 
-            <Preview data={userLinks} user={user} />
+              <Preview data={userLinks} user={user} />
+            </div>
           </div>
-        </div>
-      </TwoColGridLayoutDratf>
+        </TwoColGridLayoutDratf>
+      </div>
     </div>
   );
 }

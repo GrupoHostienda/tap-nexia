@@ -13,10 +13,12 @@ import "./styles/index.css";
 import { motion } from "framer-motion";
 import TwoColGridLayout from "./components/TwoColGridLayout";
 
+//type
 type LayoutProps = {
   children?: ReactNode;
 };
 
+//layout
 export function Layout({ children }: LayoutProps) {
   return (
     <html lang="en">
@@ -42,11 +44,14 @@ export function Layout({ children }: LayoutProps) {
   );
 }
 
+//app
 export default function App() {
   const [color, setColor] = useState("");
   const [outline, setOutline] = useState("");
   const [shadow, setShadow] = useState("");
-  const [background, setBackground] = useState("");
+  const [background, setBackground] = useState(
+    "bg-gradient-to-b from-blue-300 to-blue-500"
+  );
 
   const [linkId, setLinkId] = useState(0); //for showing user deleting message
 
@@ -60,9 +65,9 @@ export default function App() {
         shadow,
         setShadow,
         linkId,
-        setLinkId,
+        setLinkId, // delete | DropDrown component
         background,
-        setBackground
+        setBackground,
       }}
     />
   );

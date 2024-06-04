@@ -28,7 +28,14 @@ import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { PiSelectionBackground } from "react-icons/pi";
 import { FaCircleCheck } from "react-icons/fa6";
 
-import type { ContextType, PreviewProps, UserType } from "@/types";
+import type {
+  BackgroundType,
+  ContextType,
+  LinkStylesType,
+  PreviewProps,
+  UserLinkType,
+  UserType,
+} from "@/types";
 
 import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
 import HeadingMobile from "@/components/layout/HeadingMobile";
@@ -43,6 +50,13 @@ import {
 } from "@/components/stylesPage/SpecialButtons";
 import { motion } from "framer-motion";
 import { applyNewStyle } from "@/utils/helpers";
+import { getToken } from "@/services";
+import {
+  BackgroundsSchema,
+  LinksStylesAPISchema,
+  UserLinksSchema,
+  UserSchema,
+} from "@/schemas";
 
 //meta
 export function meta() {
@@ -59,19 +73,16 @@ export function meta() {
 
 //loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  /* START | Verificar session */
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
+  const authToken = await getToken(request);
 
   if (!authToken) {
     return redirect("/login");
   }
-  /* END | Verificar session */
 
-  /* START | Fetch de datos */
   const base = process.env.API_BASE;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
   const urls = {
     user: `${base}/user`,
     links: `${base}/links`,
@@ -79,10 +90,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     userLinks: `${base}/user/links`,
   };
 
-  const headers = {
-    Authorization: `Bearer ${authToken}`,
-  };
-
+  /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
+  /* START | Fetch de datos */
   try {
     const responses = await Promise.all([
       fetch(urls.user, { headers }),
@@ -97,7 +106,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       !responses[2].ok ||
       !responses[3].ok
     ) {
-      throw new Error("Failed to fetch data");
+      console.log("error at fetching data");
+      throw new Error("Failed to fetch data"); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
     }
 
     const [userData, linksData, backgroundsData, userLinksData] =
@@ -107,14 +117,40 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         responses[2].json(),
         responses[3].json(),
       ]);
+
+    const userDataVerified = UserSchema.safeParse(userData);
+    const userLinksDataVerified = UserLinksSchema.safeParse(userLinksData);
+    const linksDataVerified = LinksStylesAPISchema.safeParse(linksData);
+    const backgroundsDataVerified =
+      BackgroundsSchema.safeParse(backgroundsData);
+
+    console.log(userData);
+
+    console.log(userDataVerified);
+    console.log(userLinksDataVerified);
+    console.log(linksDataVerified);
+    console.log(backgroundsDataVerified);
+
+    /* si NO pasa la validacion de zod retorno un error*/
+    if (
+      userDataVerified.success ||
+      !userLinksDataVerified.success ||
+      !linksDataVerified.success ||
+      !backgroundsDataVerified.success
+    ) {
+      console.log("error at validation");
+      throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
+
     return json({
       user: userData,
-      links: linksData,
-      backgrounds: backgroundsData,
-      userLinks: userLinksData,
+      links: linksDataVerified.data,
+      backgrounds: backgroundsDataVerified.data,
+      userLinks: userLinksDataVerified.data,
     });
   } catch (error) {
-    return json({ error: error?.toString() });
+    console.log(error?.toString());
+    return json({ error: `${error?.toString()} ********` });
   }
   /* END | Fetch de datos */
 };
@@ -132,6 +168,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const color = formData.get("color") as string;
   const rounded = formData.get("rounded") as string;
   const shadow = formData.get("shadow") as string;
+  const background = formData.get("backgroundColor") as string;
+
+  console.log(formData);
+  console.log(color);
+  console.log(background);
 
   //delete
   if (request.method === "DELETE") {
@@ -157,6 +198,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const url = `${process.env.API_BASE}/user/link/update/${linkId} `;
 
+  const urlBackgrounds = `${process.env.API_BASE}/user/home-page/store`;
+
   try {
     const responseLinks = await fetch(urlLinks, {
       method: "GET",
@@ -164,6 +207,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
+    });
+
+    const responseBackground = await fetch(urlBackgrounds, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        background_id: 1,
+        bio: "bio",
+        style: "home page",
+      }),
     });
 
     const links = await responseLinks.json();
@@ -192,6 +248,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         style: `${newStyles}`,
       }),
     });
+    await responseBackground.json();
 
     await response.json();
 
@@ -204,37 +261,27 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 //type
-type LoaderData = {
+type LoaderDataType = {
   user: UserType;
-  links: any[];
-  backgrounds: any[];
-  userLinks: any[];
+  links: LinkStylesType;
+  backgrounds: BackgroundType[];
+  userLinks: UserLinkType[];
 };
 
 //component
 export default function Styles() {
-  const data = useLoaderData<LoaderData>();
+  const { user, links, backgrounds, userLinks }: LoaderDataType =
+    useLoaderData();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
 
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
-  const { user, links, backgrounds, userLinks } = data;
-
-  const previewLinks: PreviewProps[] = userLinks?.map(
-    (userLink: PreviewProps) => {
-      return {
-        id: userLink.id,
-        isHidden: userLink.isHidden,
-        url: userLink.url,
-        title: userLink.title,
-        style: userLink.style,
-      };
-    }
-  );
-
   const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
+  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
+
+  console.log(backgrounds);
 
   //message from action
   const [message, setMessage] = useState("");
@@ -255,8 +302,6 @@ export default function Styles() {
       return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
     }
   }, [actionData]);
-
-  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
 
   const {
     color: colorState,
@@ -325,7 +370,7 @@ export default function Styles() {
                   {[...links[0].schemas[1].options]
                     .reverse()
                     .map((style, index) => {
-                      const roundedClass = getRoundedClass(style);
+                      const roundedClass = getRoundedClass(style) as string;
                       return (
                         <div
                           key={index}
@@ -357,7 +402,7 @@ export default function Styles() {
                 <Buttons label="Shadow">
                   {links[0].schemas[2].options.map(
                     (style: string, index: number) => {
-                      const shadowClass = getShadowClass(style);
+                      const shadowClass = getShadowClass(style) as string;
 
                       return (
                         <div
@@ -424,20 +469,27 @@ export default function Styles() {
               <div className=" bg-white p-4 rounded-xl ">
                 <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
                   {backgrounds.map((style, index) => {
-                    const bg = getSBackgroundClass(style.name);
+                    const bg = getSBackgroundClass(style.name) as string;
 
                     return (
-                      <div
-                        key={index}
-                        className=" flex flex-col items-center relative"
-                      >
-                        <div className=" absolute top-2 right-10 bg-white rounded-full text-green-600">
-                          <FaCircleCheck />
-                        </div>
+                      <div key={index} className=" flex flex-col items-center">
                         <div
-                          onClick={()=>setBackground(bg)}
-                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all`}
-                        ></div>
+                          onClick={() => setBackground(bg)}
+                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all relative`}
+                        >
+                          {/* ***************************** */}
+                          {((backgroundState && backgroundState === bg) ||
+                            (!backgroundState && "linear" === bg)) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 top-1 right-1 bg-white rounded-full text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          {/* ****************************** */}
+                        </div>
                         <p className=" pt-2 text-center">{style.name} Colour</p>
                       </div>
                     );
@@ -487,12 +539,11 @@ export default function Styles() {
             </div>
 
             <Preview
-              data={previewLinks}
+              data={userLinks}
               user={user}
               selectedLink={selectedLink[0]}
               setSelectedLinkId={setSelectedLinkId}
               idPosition0={userLinks[0]?.id}
-              background={backgroundState}
             />
             {/* save button */}
             <Form method="post">
@@ -508,6 +559,11 @@ export default function Styles() {
                 <input hidden name="color" defaultValue={colorState} />
                 <input hidden name="rounded" defaultValue={outlineState} />
                 <input hidden name="shadow" defaultValue={shadowState} />
+                <input
+                  hidden
+                  name="backgroundColor"
+                  defaultValue={backgroundState}
+                />
                 {isSubmittingStyle ? "Saving..." : "Save"}
               </button>
             </Form>

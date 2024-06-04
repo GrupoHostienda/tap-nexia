@@ -31,16 +31,7 @@ export const UserSchema = z.object({
   cover: z.string(),
   created_at: z.string(),
   updated_at: z.string(),
-  home_page: z.object({
-    bio: z.string(),    
-    style: z.string(),
-    background: z.object({
-            id: z.number(),
-            name: z.string(),
-            plan: z.string(),
-            image: z.string().nullable()
-        })
-  }).nullable(),
+  home_page: z.string().nullable(),
 });
 
 export const UserLinkSchema = z.object({

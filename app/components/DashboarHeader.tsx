@@ -118,8 +118,8 @@ const DashboarHeader = () => {
     </>
   );
 
-  const [sidebarSwitch, toggle] = useState(false)
-  const [sidebarButton, toggleButton] = useState(false)
+  const [sidebarSwitch, toggle] = useState(false);
+  const [sidebarButton, toggleButton] = useState(false);
 
   //FUNCION PARA OCULTAR EL SIDEBAR SI LA PANTALLA SOBREPASA CIERTO ANCHO
   const { width } = useViewport();
@@ -127,7 +127,7 @@ const DashboarHeader = () => {
     if (width !== undefined && width > 650) {
       toggle(false); // Cambia el valor según el tamaño del viewport
       toggleButton(false);
-    } else if ((width !== undefined)&&(width < 650)){
+    } else if (width !== undefined && width < 650) {
       toggleButton(true);
     }
   }, [width]);
@@ -136,7 +136,9 @@ const DashboarHeader = () => {
     <>
       <div className=" hidden sm:block fixed z-20 top-4 left-1/2 -translate-x-1/2 bg-white bg-opacity-60 border border-white border-opacity-40 rounded-full shadow-lg shadow-black/[0.05] backdrop-blur-[0.5rem] max-w-[800px] w-[95%] h-10"></div>
       <IoIosMenu
-        className={`${sidebarButton? 'block': 'hidden'} fixed z-30 right-6 top-6 size-10 cursor-pointer`}
+        className={`${
+          sidebarButton ? "block" : "hidden"
+        } absolute z-30 right-6 top-6 size-10 cursor-pointer`}
         onClick={() => toggle(!sidebarSwitch)}
       />
       <ul
