@@ -1,4 +1,4 @@
-import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
+//import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
 import CardBackOffice from "@/components/BackOffice/CardBackOffice";
 import {
   ActionFunctionArgs,
@@ -6,7 +6,7 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
 import DashboarHeader from "@/components/DashboarHeader";
@@ -19,6 +19,11 @@ import Preview from "@/components/Preview";
 import { getToken } from "@/services";
 import { LinksStylesAPISchema, UserLinksSchema, UserSchema } from "@/schemas";
 import { UserLinkType, UserType } from "@/types";
+
+import { FaPlus } from "react-icons/fa";
+import { FiArchive } from "react-icons/fi";
+import { RiLayoutTopLine } from "react-icons/ri";
+import { IoIosArrowForward } from "react-icons/io";
 
 //meta
 export function meta() {
@@ -105,83 +110,43 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const authToken = session.get("authToken");
   if (request.method === "POST") {
     const formData = await request.formData();
-    const formType = formData.get("formType");
+    // const formType = formData.get("formType");
     const title = formData.get("title") as string;
-    const link = formData.get("link") as string;
+    const link = formData.get("url") as string;
+    const idLink = formData.get("idCard") as string;
 
-    const color = formData.get("color") as string;
-    const rounded = formData.get("rounded") as string;
-    const shadow = formData.get("shadow") as string;
+    const linkVisibleStr = formData.get("isHidden") as string;
+    const linkVisible = parseInt(linkVisibleStr, 10);
 
-    //const defaultStyle = "bg-white rounded-full shadow-md text-black";
-
-    switch (formType) {
-      case "add":
-        if (title.trim() === "" || link.trim() === "") {
-          return json({ error: "All fields are required." });
+    console.log("ejecutando update");
+    console.log(title);
+    console.log(linkVisible);
+    try {
+      const response = await fetch(
+        `${process.env.API_BASE}/user/link/update/${idLink}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            link_type_id: 1,
+            title: title,
+            url: link,
+            isHidden: linkVisible,
+          }),
         }
-
-        if (!validateUrl(link)) {
-          return json({ error: "Is not a valid URL." });
-        }
-
-        try {
-          const response = await fetch(
-            `${process.env.API_BASE}/user/link/store`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${authToken}`,
-              },
-              body: JSON.stringify({
-                link_type_id: 1,
-                title: title,
-                url: link,
-                style: `${color} ${rounded} ${shadow}`,
-              }),
-            }
-          );
-
-          if (!response) {
-            throw new Error("Failed to fetch data");
-          }
-
-          const data = await response.json();
-
-          return json({ data });
-        } catch (error) {
-          return json({ error: error?.toString() });
-        }
-      case "update":
-        const linkVisible = formData.get("isHidden");
-        console.log("ejecutando update");
-        console.log(title);
-        try {
-          const response = await fetch(
-            `${process.env.API_BASE}/user/link/update/2`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${authToken}`,
-              },
-              body: JSON.stringify({
-                isHidden: linkVisible,
-              }),
-            }
-          );
-          if (!response) {
-            throw new Error("Failed to fetch data");
-          }
-          console.log(response.status);
-          const data = await response.json();
-          console.log(data);
-          return json({ data });
-        } catch (error) {
-          return json({ error: error?.toString() });
-        }
-        break;
+      );
+      if (!response) {
+        throw new Error("Failed to fetch data");
+      }
+      console.log(response.status);
+      const data = await response.json();
+      console.log(data);
+      return json({ data });
+    } catch (error) {
+      return json({ error: error?.toString() });
     }
   }
 
@@ -214,44 +179,70 @@ export default function LayoutBackOffice() {
 
   const list = userLinks?.slice().reverse();
   return (
-    <div className=" pageLayout bg-slate-200">
-      <DashboarHeader />
-      <HeadingMobile label="Back-Office">
-        <BsLayoutWtf />
-      </HeadingMobile>
+    <div className=" w-full bg-red-500">
+      <Outlet />
+      <div className="pageLayout bg-slate-200">
+        <DashboarHeader />
+        <HeadingMobile label="Back-Office">
+          <BsLayoutWtf />
+        </HeadingMobile>
 
-      <TwoColGridLayoutDratf>
-        {/* back-office | col-01 */}
-        <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
-          <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
-            <HeadingDesktop label="Back-Office">
-              <BsLayoutWtf />
-            </HeadingDesktop>
+        <TwoColGridLayoutDratf>
+          {/* back-office | col-01 */}
+          <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
+            <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
+              <HeadingDesktop label="Back-Office">
+                <BsLayoutWtf />
+              </HeadingDesktop>
 
-            <BackOfficeMenuDraftRonaldo />
+              {/* <BackOfficeMenuDraftRonaldo /> */}
 
-            <div></div>
-            <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
-              {list?.map((link, index: number) => {
-                return (
-                  <div key={index}>
-                    <CardBackOffice link={link} />
-                  </div>
-                );
-              })}
+              {/******************************************* *******************************************/}
+              {/* Boton add link */}
+              <div className="w-full">
+                <Link
+                  to="add"
+                  className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
+                >
+                  <FaPlus />
+                  <p>Add Link</p>
+                </Link>
+                <div className="flex justify-between pt-3">
+                  <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
+                    <RiLayoutTopLine />
+                    <p>Add Header</p>
+                  </button>
+                  <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
+                    <FiArchive />
+                    View archive
+                    <IoIosArrowForward />
+                  </button>
+                </div>
+              </div>
+              {/******************************************* *******************************************/}
+
+              <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
+                {list?.map((link, index: number) => {
+                  return (
+                    <div key={index}>
+                      <CardBackOffice link={link} />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* preview | col-02 */}
-        <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
-          <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
-            <div className=" lg:h-10"></div>
+          {/* preview | col-02 */}
+          <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
+            <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
+              <div className=" lg:h-10"></div>
 
-            <Preview data={userLinks} user={user} />
+              <Preview data={userLinks} user={user} />
+            </div>
           </div>
-        </div>
-      </TwoColGridLayoutDratf>
+        </TwoColGridLayoutDratf>
+      </div>
     </div>
   );
 }

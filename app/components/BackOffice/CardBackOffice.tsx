@@ -114,10 +114,9 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
             <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={inputs.title}
+              value={inputs.title||link.title}
               name="title"
               onChange={handleInputs}
-              placeholder={link.title}
               className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
               disabled={!inputEnabled}
             />
@@ -143,9 +142,8 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
               type="text"
               onChange={handleInputs}
               className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
-              placeholder={link.url}
               name="url"
-              value={inputs.url}
+              value={inputs.url||link.url}
               disabled={!inputEnabled}
             />
           </span>
@@ -183,7 +181,10 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
                     <FaSpinner className="animate-spin" />
                   ) : (
                     <FaRegSave
-                      // onClick={handleSubmit}
+                      onClick={()=> setValues({
+                          title: "",
+                          url: ""
+                        })}
                       className="cursor-pointer"
                       title="save changes"
                     />
