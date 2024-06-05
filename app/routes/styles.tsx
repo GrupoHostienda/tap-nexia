@@ -57,6 +57,8 @@ import {
   UserLinksSchema,
   UserSchema,
 } from "@/schemas";
+import { IoShareSocial } from "react-icons/io5";
+import { TiSocialTwitter } from "react-icons/ti";
 
 //meta
 export function meta() {
@@ -512,6 +514,58 @@ export default function Styles() {
                       </p>
                     </div>
                     <p className=" pt-2 text-center">Image</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div>
+              <HeadingH2 label="  Social Media">
+                <IoShareSocial />
+              </HeadingH2>
+              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4">
+                <h2>Agregar Enlace a redes sociales</h2>
+                <Form
+                  method="POST"
+                  className="grid grid-cols-[20%_60%_10%] gap-4"
+                >
+                  <div className="w-full">
+                    <select className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select">
+                      <option value="facebook">Facebook</option>
+                      <option value="twitter">Twitter</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="youtube">YouTube</option>
+                    </select>
+                  </div>
+                  <div className="w-full">
+                    <input
+                      className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
+                      type="text"
+                      name="media-link"
+                      id=""
+                    />
+                  </div>
+                  <div className="">
+                    <button className="bg-blue-700 text-white rounded-md hover:bg-blue-500 p-2 w-full">
+                      Add Link
+                    </button>
+                  </div>
+                </Form>
+                {/* LISTA DE REDES SOCIALES */}
+                <h2>Lista de redes sociales</h2>
+                <div className="grid grid-cols-[5%_80%] gap-4 w-full">
+                  <div className="w-full h-full flex items-center justify-center text-4xl">
+                    {/* Espacio para icono de red social */}
+                    <TiSocialTwitter />
+                  </div>
+                  <div className="w-full flex p-3">
+                    {/* Espacio para los links y el boton de edicion */}
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Libero, praesentium placeat. Sunt esse explicabo optio illum
+                    itaque rerum, velit, repudiandae ipsam, accusamus corrupti
+                    id sapiente. Praesentium dicta aliquam impedit labore!
                   </div>
                 </div>
               </div>
