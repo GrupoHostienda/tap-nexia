@@ -201,6 +201,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const url = `${process.env.API_BASE}/user/link/update/${linkId} `;
 
   const urlBackgrounds = `${process.env.API_BASE}/user/home-page/store`;
+  const urlSocialLinks = `${process.env.API_BASE}/user/social-media/store`;
 
   try {
     const responseLinks = await fetch(urlLinks, {
@@ -531,7 +532,7 @@ export default function Styles() {
                   className="grid grid-cols-[20%_60%_10%] gap-4"
                 >
                   <div className="w-full">
-                    <select className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select">
+                    <select name="social-type" className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select">
                       <option value="facebook">Facebook</option>
                       <option value="twitter">Twitter</option>
                       <option value="instagram">Instagram</option>
@@ -544,7 +545,6 @@ export default function Styles() {
                       className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
                       type="text"
                       name="media-link"
-                      id=""
                     />
                   </div>
                   <div className="">
