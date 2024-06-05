@@ -5,7 +5,7 @@ import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
 import { ImStatsBars2 } from "react-icons/im";
 import { MdOutlineEdit, MdEditOff } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, redirect, useNavigation } from "@remix-run/react";
 import { UserLinkType } from "@/types";
 
@@ -49,55 +49,14 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
     });
   };
 
-  // const handleSubmit = (event: React.FormEvent) => {
-  //   event.preventDefault(); // Prevenir el envío por defecto del formulario
-  //   setIdLink(link.id);
-  //   const form1 = document.getElementById("data" + link.id) as HTMLFormElement;
-  //   const form2 = document.getElementById(
-  //     "visibilityBtn" + link.id
-  //   ) as HTMLFormElement;
-  //   const formData = new FormData();
-
-  //   // Agregar datos de form1 a formData
-  //   new FormData(form1).forEach((value, key) => {
-  //     if (value != (null || "")) {
-  //       formData.append(key, value);
-  //       console.log(key + " " + value);
-  //     } else {
-  //       if (key == "title") {
-  //         value = link.title;
-  //         formData.append(key, value);
-  //         console.log(key + " " + value);
-  //       } else if (key == "url") {
-  //         value = link.url;
-  //         formData.append(key, value);
-  //         console.log(key + " " + value);
-  //       }
-  //     }
-  //   });
-
-  //   // Agregar datos de form2 a formData
-  //   const isChecked = (
-  //     form2.querySelector("input[name='isHidden']") as HTMLInputElement
-  //   ).checked;
-  //   formData.append("isHidden", isChecked ? "0" : "1");
-  //   console.log(isChecked);
-  //   // Enviar los datos combinados con Fetch API
-  //   fetch("./back-office-draft-ron", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       console.log("Success:", data);
-  //       // Manejar la respuesta
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error);
-  //       // Manejar el error
-  //     });
-  //   redirect("./preview");
-  // };
+  useEffect(() => {
+    // Este efecto se ejecutará cuando las propiedades del enlace cambien
+    setValues({
+      title: link.title,
+      url: link.url,
+    });
+    setInputEnabled(false); // Deshabilita los inputs después de la actualización
+  }, [link]);
 
   return (
     <>
@@ -181,10 +140,10 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
                     <FaSpinner className="animate-spin" />
                   ) : (
                     <FaRegSave
-                      onClick={()=> setValues({
-                          title: "",
-                          url: ""
-                        })}
+                      // onClick={()=> setValues({
+                      //     title: "",
+                      //     url: ""
+                      //   })}
                       className="cursor-pointer"
                       title="save changes"
                     />
