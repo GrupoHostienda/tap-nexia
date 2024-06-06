@@ -50,7 +50,7 @@ import {
 } from "@/components/stylesPage/SpecialButtons";
 import { motion } from "framer-motion";
 import { applyNewStyle } from "@/utils/helpers";
-import { getTokenIfConnected } from "@/services";
+import { getToken as getTokenIfConnected } from "@/services";
 import {
   BackgroundsSchema,
   LinksStylesAPISchema,
