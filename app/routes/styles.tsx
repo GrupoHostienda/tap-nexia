@@ -14,17 +14,10 @@ import { sessionStorage } from "@/utils/session.server";
 
 import { useEffect, useState } from "react";
 
-import {
-  COLORS,
-  getRoundedClass,
-  getSBackgroundClass,
-  getShadowClass,
-  getSpecialButtonClass,
-} from "@/utils/stylesPage";
+import { getSBackgroundClass } from "@/utils/stylesPage";
 
 import { IoMdLock } from "react-icons/io";
 import { HiPaintBrush } from "react-icons/hi2";
-import { BsFillMenuButtonWideFill } from "react-icons/bs";
 import { PiSelectionBackground } from "react-icons/pi";
 import { FaCircleCheck } from "react-icons/fa6";
 
@@ -41,13 +34,8 @@ import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
 import HeadingMobile from "@/components/layout/HeadingMobile";
 import HeadingDesktop from "@/components/layout/HeadingDesktop";
 import HeadingH2 from "@/components/layout/HeadingH2";
-import Buttons from "@/components/stylesPage/Buttons";
 import DashboarHeader from "@/components/DashboarHeader";
 import Preview from "@/components/Preview";
-import {
-  SpecialButtonOne,
-  SpecialButtonTwo,
-} from "@/components/stylesPage/SpecialButtons";
 import { motion } from "framer-motion";
 import { applyNewStyle } from "@/utils/helpers";
 import { getToken } from "@/services";
@@ -273,8 +261,7 @@ type LoaderDataType = {
 
 //component
 export default function Styles() {
-  const { user, links, backgrounds, userLinks }: LoaderDataType =
-    useLoaderData();
+  const { user, backgrounds, userLinks }: LoaderDataType = useLoaderData();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
 
@@ -283,8 +270,6 @@ export default function Styles() {
 
   const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
   const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
-
-  console.log(backgrounds);
 
   //message from action
   const [message, setMessage] = useState("");
@@ -311,9 +296,6 @@ export default function Styles() {
     outline: outlineState,
     shadow: shadowState,
     background: backgroundState,
-    setColor,
-    setOutline,
-    setShadow,
     setBackground,
   }: ContextType = useOutletContext();
 
@@ -325,151 +307,71 @@ export default function Styles() {
       </HeadingMobile>
       <TwoColGridLayoutDratf>
         {/* styles | col-01 */}
-        <div className="colSpan-01 order-2 lg:order-1 //bg-gray-400">
+        <div className="colSpan-01 order-2 lg:order-1 //bg-gray-400 ">
           <div className="max-w-[60rem] w-[100%] mx-auto self-center py-8 px-6 flex flex-col gap-8 ">
             <HeadingDesktop label="Styles">
               <HiPaintBrush />
             </HeadingDesktop>
 
-            {/* Buttons */}
+            {/* Social Media */}
             <div>
-              <HeadingH2 label=" Buttons">
-                <BsFillMenuButtonWideFill />
+              <HeadingH2 label="  Social Media">
+                <IoShareSocial />
               </HeadingH2>
-
-              <div className=" bg-white p-6 rounded-xl flex flex-col gap-10 ">
-                {/* colors */}
-                <Buttons label="Fill">
-                  {COLORS.map((color) => {
-                    return (
-                      <div
-                        onClick={() => setColor(color)}
-                        key={color}
-                        className="relative cursor-pointer hover:scale-105 transition-all"
-                      >
-                        {((colorState && colorState === color) ||
-                          (!colorState &&
-                            selectedLink[0]?.style.class.includes(color))) && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className=" absolute -top-2 -right-2 bg-white rounded-full text-green-600"
-                          >
-                            <FaCircleCheck />
-                          </motion.div>
-                        )}
-
-                        <div
-                          className={`border border-gray-400 h-10 ${color}`}
-                        ></div>
-                      </div>
-                    );
-                  })}
-                </Buttons>
-
-                {/* outline */}
-                <Buttons label="Outline">
-                  {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
-                  {[...links[0].schemas[1].options]
-                    .reverse()
-                    .map((style, index) => {
-                      const roundedClass = getRoundedClass(style) as string;
-                      return (
-                        <div
-                          key={index}
-                          onClick={() => setOutline(roundedClass!)}
-                          className="relative cursor-pointer hover:scale-105 transition-all"
-                        >
-                          {((outlineState && outlineState === roundedClass) ||
-                            (!outlineState &&
-                              selectedLink[0]?.style.class.includes(
-                                roundedClass
-                              ))) && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className=" absolute -top-2 -right-2 bg-white text-green-600"
-                            >
-                              <FaCircleCheck />
-                            </motion.div>
-                          )}
-                          <div
-                            className={` border border-gray-400 h-10 ${roundedClass}`}
-                          />
-                        </div>
-                      );
-                    })}
-                </Buttons>
-
-                {/* shadow */}
-                <Buttons label="Shadow">
-                  {links[0].schemas[2].options.map(
-                    (style: string, index: number) => {
-                      const shadowClass = getShadowClass(style) as string;
-
-                      return (
-                        <div
-                          key={index}
-                          onClick={() => setShadow(shadowClass!)}
-                          className="relative cursor-pointer hover:scale-105 transition-all"
-                        >
-                          {((shadowState && shadowState === shadowClass) ||
-                            (!shadowState &&
-                              selectedLink[0]?.style.class.includes(
-                                shadowClass
-                              ))) && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className=" absolute z-10 -top-2 -right-2 bg-white text-green-600"
-                            >
-                              <FaCircleCheck />
-                            </motion.div>
-                          )}
-                          <div className=" relative z-0 h-10">
-                            <div
-                              className={` border border-gray-400 relative bg-white h-full ${shadowClass}`}
-                            />
-
-                            {/*  {style === "heavy" && (
-                              <div
-                                className={` h-full w-full bg-black absolute top-[0.30rem] left-[0.30rem] -z-10`}
-                              />
-                            )} */}
-                          </div>
-                        </div>
-                      );
-                    }
-                  )}
-                </Buttons>
-
-                {/* special */}
-
-                <Buttons label="Special" mustUpgrade={true}>
-                  {links[0].schemas[3].options.map(
-                    (style: string, index: number) => {
-                      const specialButtonClass = getSpecialButtonClass(style);
-                      return (
-                        <div
-                          key={index}
-                          className={`h-10 ${specialButtonClass}`}
-                        ></div>
-                      );
-                    }
-                  )}
-                  <div className="  h-10 bg-black rounded-full"></div>
-                  <SpecialButtonOne />
-                  <SpecialButtonTwo />
-                </Buttons>
+              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4">
+                <h2>Agregar Enlace a redes sociales</h2>
+                <Form
+                  method="POST"
+                  className="grid grid-cols-[20%_60%_10%] gap-4"
+                >
+                  <div className="w-full">
+                    <select
+                      name="social-type"
+                      className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select"
+                    >
+                      <option value="facebook">Facebook</option>
+                      <option value="twitter">Twitter</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="youtube">YouTube</option>
+                    </select>
+                  </div>
+                  <div className="w-full">
+                    <input
+                      className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
+                      type="text"
+                      name="media-link"
+                    />
+                  </div>
+                  <div className="">
+                    <button className="bg-blue-700 text-white rounded-md hover:bg-blue-500 p-2 w-full">
+                      Add Link
+                    </button>
+                  </div>
+                </Form>
+                {/* LISTA DE REDES SOCIALES */}
+                <h2>Lista de redes sociales</h2>
+                <div className="grid grid-cols-[5%_80%] gap-4 w-full">
+                  <div className="w-full h-full flex items-center justify-center text-4xl">
+                    {/* Espacio para icono de red social */}
+                    <TiSocialTwitter />
+                  </div>
+                  <div className="w-full flex p-3">
+                    {/* Espacio para los links y el boton de edicion */}
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Libero, praesentium placeat. Sunt esse explicabo optio illum
+                    itaque rerum, velit, repudiandae ipsam, accusamus corrupti
+                    id sapiente. Praesentium dicta aliquam impedit labore!
+                  </div>
+                </div>
               </div>
             </div>
-
             {/* backgrounds */}
             <div>
               <HeadingH2 label="  Backgrounds">
                 <PiSelectionBackground />
               </HeadingH2>
-              <div className=" bg-white p-4 rounded-xl ">
+              <div className=" bg-white p-4 rounded-xl">
                 <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
                   {backgrounds.map((style, index) => {
                     const bg = getSBackgroundClass(style.name) as string;
@@ -515,57 +417,6 @@ export default function Styles() {
                       </p>
                     </div>
                     <p className=" pt-2 text-center">Image</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Media */}
-            <div>
-              <HeadingH2 label="  Social Media">
-                <IoShareSocial />
-              </HeadingH2>
-              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4">
-                <h2>Agregar Enlace a redes sociales</h2>
-                <Form
-                  method="POST"
-                  className="grid grid-cols-[20%_60%_10%] gap-4"
-                >
-                  <div className="w-full">
-                    <select name="social-type" className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select">
-                      <option value="facebook">Facebook</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="instagram">Instagram</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="youtube">YouTube</option>
-                    </select>
-                  </div>
-                  <div className="w-full">
-                    <input
-                      className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
-                      type="text"
-                      name="media-link"
-                    />
-                  </div>
-                  <div className="">
-                    <button className="bg-blue-700 text-white rounded-md hover:bg-blue-500 p-2 w-full">
-                      Add Link
-                    </button>
-                  </div>
-                </Form>
-                {/* LISTA DE REDES SOCIALES */}
-                <h2>Lista de redes sociales</h2>
-                <div className="grid grid-cols-[5%_80%] gap-4 w-full">
-                  <div className="w-full h-full flex items-center justify-center text-4xl">
-                    {/* Espacio para icono de red social */}
-                    <TiSocialTwitter />
-                  </div>
-                  <div className="w-full flex p-3">
-                    {/* Espacio para los links y el boton de edicion */}
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Libero, praesentium placeat. Sunt esse explicabo optio illum
-                    itaque rerum, velit, repudiandae ipsam, accusamus corrupti
-                    id sapiente. Praesentium dicta aliquam impedit labore!
                   </div>
                 </div>
               </div>

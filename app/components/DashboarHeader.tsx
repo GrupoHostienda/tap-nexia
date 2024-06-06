@@ -1,22 +1,10 @@
-import {
-  Form,
-  Link,
-  useLocation,
-  useNavigation,
-  useOutletContext,
-} from "@remix-run/react";
+import { Form, Link, useLocation, useNavigation } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import { CiLogout } from "react-icons/ci";
 import { HiPaintBrush } from "react-icons/hi2";
 import { IoIosMenu } from "react-icons/io";
 import { MdOutlineDashboard } from "react-icons/md";
 import { VscOpenPreview } from "react-icons/vsc";
-// import { sidebarSwitch, toggleSidebar } from "./layout/HeadingMobile";
-
-// type OutletContextProps = {
-//   state: { items: [], isSidebarOpen: boolean };
-//   dispatch: React.Dispatch<React.SetStateAction<{}>>;
-// };
 
 const DashboarHeader = () => {
   const linkStyle =
@@ -26,13 +14,6 @@ const DashboarHeader = () => {
   const submitMethod = navigation.formMethod; //para el spiner | cuando el submit viene del onclick en los links esta const es undefined, si viene del crud de /styles será POST
   const [pathname, setPathname] = useState(""); //Para el spiner
   const location = useLocation(); //para el spiner
-
-  // const { state, dispatch } = useOutletContext<OutletContextProps>();
-  // const [sidebarSwitch, toggleSidebar] = useState(state.isSidebarOpen)
-  // const toggle = () => {
-  //   toggleSidebar(!sidebarSwitch)
-  //   dispatch({type: 'sidebarToggle', payload: sidebarSwitch});
-  // }
 
   const useViewport = () => {
     const [width, setWidth] = useState<number | undefined>(
@@ -138,7 +119,7 @@ const DashboarHeader = () => {
       <IoIosMenu
         className={`${
           sidebarButton ? "block" : "hidden"
-        } absolute z-30 right-6 top-6 size-10 cursor-pointer`}
+        } absolute z-30 right-6 top-7 size-8 cursor-pointer`}
         onClick={() => toggle(!sidebarSwitch)}
       />
       <ul

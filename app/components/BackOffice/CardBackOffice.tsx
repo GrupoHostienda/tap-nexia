@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { TbMenu } from "react-icons/tb";
 import { LuLayoutPanelLeft, LuTrash2 } from "react-icons/lu";
 import { GiRapidshareArrow } from "react-icons/gi";
@@ -6,7 +8,7 @@ import { ImStatsBars2 } from "react-icons/im";
 import { MdOutlineEdit, MdEditOff } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { Form, redirect, useNavigation } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { UserLinkType } from "@/types";
 
 function CardBackOffice({ link }: { link: UserLinkType }) {
@@ -18,19 +20,15 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
   const [idLink, setIdLink] = useState<number>();
 
   const [linkActivated, linkActive] = useState(link.isHidden == 0);
-  // console.log(linkActivated)
+
   const cardActive = () => {
     linkActive(!linkActivated);
   };
 
   const [inputEnabled, setInputEnabled] = useState(false);
-  const toggleInput = (id: number) => {
+  const toggleInput = () => {
     if (!inputEnabled) {
       setInputEnabled(true);
-      // setValues({
-      //   title: "",
-      //   url: ""
-      // });
     } else {
       setInputEnabled(!inputEnabled);
     }
@@ -60,53 +58,37 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
 
   return (
     <>
-      <div className="bg-gray-50 rounded-3xl w-full grid grid-cols-[5%_75%_15%] gap-2 p-3 shadow-md">
-        <div className="border-r self-center">
+      <div className="bg-gray-50 rounded-3xl w-full grid sm:grid-cols-12 sm:justify-center gap-2 sm:gap-0 p-4 sm:p-0 shadow-md">
+        <div className="hidden sm:block self-center mx-auto">
           <TbMenu />
         </div>
-        <Form
-          // method="POST"
-          // id={"data" + link.id}
-          className="grid grid-rows-[min-content_min-content_min-content] gap-3 p-3"
-        >
+        <Form className=" sm:col-span-9 grid grid-rows-[min-content_min-content_min-content] gap-3 p-3 sm:p-0 sm:py-3">
           <span className="text-wrap font-bold flex items-center gap-2">
             <input type="hidden" name="formType" value="update" />
             <input
               type="text"
-              value={inputs.title||link.title}
+              value={inputs.title || link.title}
               name="title"
               onChange={handleInputs}
-              className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
+              className={` ${
+                inputEnabled && "border bg-white"
+              } w-full bg-transparent outline-none p-2 rounded-md`}
               disabled={!inputEnabled}
             />
-
-            {!inputEnabled ? (
-              <span
-                onClick={() => toggleInput(link.id)}
-                className="opacity-70 hover:opacity-100 cursor-pointer"
-              >
-                <MdOutlineEdit title="Editar campos" />
-              </span>
-            ) : (
-              <span
-                onClick={() => toggleInput(link.id)}
-                className="opacity-50 hover:opacity-100 cursor-pointer"
-              >
-                <MdEditOff title="Dejar de editar" />
-              </span>
-            )}
           </span>
           <span className="flex font-bold items-center gap-2">
             <input
               type="text"
               onChange={handleInputs}
-              className={`border-b w-full outline-none bg-gray-300 p-2 rounded-md`}
+              className={` ${
+                inputEnabled && "border bg-white"
+              } w-full bg-transparent outline-none p-2 rounded-md`}
               name="url"
-              value={inputs.url||link.url}
+              value={inputs.url || link.url}
               disabled={!inputEnabled}
             />
           </span>
-          <div className="flex justify-start gap-3 p-3 text-gray-600">
+          <div className="flex flex-wrap justify-start items-center gap-3 py-2 text-gray-600">
             <LuLayoutPanelLeft className="hover:cursor-pointer" />
             <GiRapidshareArrow className="hover:cursor-pointer" />
             <CiImageOn className="hover:cursor-pointer" />
@@ -119,69 +101,81 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
           {/* INPUT PARA ENVIAR EL ID DE LA CARD */}
           <input type="hidden" value={link.id} name="idCard" />
         </Form>
-        <div className="border-l p-2 flex justify-end">
-          <div className="flex flex-col gap-y-4 items-center self-center">
-            <div className="flex gap-4 items-center">
-              <Form method="POST">
-                <input type="hidden" name="formType" value="update" />
-                <input type="hidden" name="title" value={inputs.title} />
-                <input type="hidden" name="url" value={inputs.url} />
-                <input type="hidden" value={link.id} name="idCard" />
+        <div className=" sm:col-span-2 flex sm:flex-col gap-4 items-center sm:justify-center p-3 sm:p-0 sm:py-3">
+          <Form
+            method="post"
+            id={"visibilityBtn" + link.id}
+            className="order-2 sm:order-1 relative cursor-pointer"
+            onClick={cardActive}
+          >
+            <input type="hidden" name="formType" value="update" />
+            <input
+              type="checkbox"
+              className="sr-only"
+              name="isHidden"
+              defaultChecked={linkActivated}
+            />
+            <div
+              className={`block ${
+                linkActivated
+                  ? `bg-green-400 transition-all`
+                  : `bg-gray-600 transition-all`
+              } w-14 h-8 rounded-full`}
+            ></div>
+            <div
+              className={`dot absolute ${
+                linkActivated
+                  ? `right-1 transition-all`
+                  : `left-1 transition-all`
+              } top-1 bg-white w-6 h-6 rounded-full`}
+            ></div>
+          </Form>
 
-                <button
-                  type="submit"
-                  onClick={() => setIdLink(link.id)}
-                  className={`text-gray-700 font-bold flex justify-center size-max ${
-                    inputEnabled ? "opacity-100" : "opacity-50"
-                  }`}
-                  disabled={!inputEnabled}
-                >
-                  {isSubmitting && idLink == link.id ? (
-                    <FaSpinner className="animate-spin" />
-                  ) : (
-                    <FaRegSave
-                      // onClick={()=> setValues({
-                      //     title: "",
-                      //     url: ""
-                      //   })}
-                      className="cursor-pointer"
-                      title="save changes"
-                    />
-                  )}
-                </button>
-              </Form>
+          <div className="order-1 sm:order-2 flex items-center gap-2 ">
+            <Form method="POST">
+              <input type="hidden" name="formType" value="update" />
+              <input type="hidden" name="title" value={inputs.title} />
+              <input type="hidden" name="url" value={inputs.url} />
+              <input type="hidden" value={link.id} name="idCard" />
 
-              <Form
-                method="post"
-                id={"visibilityBtn" + link.id}
-                className="relative"
-                onClick={cardActive}
+              <button
+                type="submit"
+                onClick={() => setIdLink(link.id)}
+                className={`text-gray-700 font-bold flex justify-center size-max hover:scale-110 transition-all ${
+                  inputEnabled ? "opacity-100" : "opacity-50"
+                }`}
+                disabled={!inputEnabled}
               >
-                <input type="hidden" name="formType" value="update" />
-                <input
-                  type="checkbox"
-                  className="sr-only"
-                  name="isHidden"
-                  defaultChecked={linkActivated}
-                />
-                <div
-                  className={`block ${
-                    linkActivated ? `bg-green-400` : `bg-gray-600`
-                  } transition-colors w-14 h-8 rounded-full`}
-                ></div>
-                <div
-                  className={`dot absolute ${
-                    linkActivated ? `right-1` : `left-1`
-                  } transition-all top-1 bg-white w-6 h-6 rounded-full`}
-                ></div>
-              </Form>
-            </div>
-            <Form
-              method="delete"
-              className="lg:col-start-2 text-xl flex justify-center lg:p-5 p-2 text-gray-700 hover:bg-gray-500 hover:text-white rounded-full transition-colors size-max "
-            >
+                {isSubmitting && idLink == link.id ? (
+                  <FaSpinner className="animate-spin" />
+                ) : (
+                  <FaRegSave className="cursor-pointer" title="save changes" />
+                )}
+              </button>
+            </Form>
+
+            {!inputEnabled ? (
+              <span
+                onClick={() => toggleInput()}
+                className="opacity-70 hover:opacity-100 cursor-pointer hover:scale-110 transition-all"
+              >
+                <MdOutlineEdit title="Editar campos" />
+              </span>
+            ) : (
+              <span
+                onClick={() => toggleInput()}
+                className="opacity-50 hover:opacity-100 cursor-pointer hover:scale-110 transition-all"
+              >
+                <MdEditOff title="Dejar de editar" />
+              </span>
+            )}
+
+            <Form method="delete">
               <input type="hidden" name="link-id" value={link.id} />
-              <button onClick={() => setIdLink(link.id)}>
+              <button
+                className="hover:scale-110 transition-all"
+                onClick={() => setIdLink(link.id)}
+              >
                 {isSubmittingDelete && idLink == link.id ? (
                   <FaSpinner className="animate-spin" />
                 ) : (
@@ -192,9 +186,6 @@ function CardBackOffice({ link }: { link: UserLinkType }) {
           </div>
         </div>
       </div>
-      {/* );
-        })} */}
-      {/* </div> */}
     </>
   );
 }

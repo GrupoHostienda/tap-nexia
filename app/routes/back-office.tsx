@@ -1,4 +1,3 @@
-//import BackOfficeMenuDraftRonaldo from "@/components/BackOffice/BackOfficeMenuDraftRonaldo";
 import CardBackOffice from "@/components/BackOffice/CardBackOffice";
 import {
   ActionFunctionArgs,
@@ -6,11 +5,10 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useNavigation } from "@remix-run/react";
 import { sessionStorage } from "@/utils/session.server";
 
 import DashboarHeader from "@/components/DashboarHeader";
-import { validateUrl } from "@/utils/helpers";
 import HeadingMobile from "@/components/layout/HeadingMobile";
 import { BsLayoutWtf } from "react-icons/bs";
 import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
@@ -178,6 +176,11 @@ export default function LayoutBackOffice() {
   const { userLinks, user }: LoaderType = useLoaderData();
 
   const list = userLinks?.slice().reverse();
+
+  const navigation = useNavigation();
+
+  const isSubmitting = navigation.state === "loading";
+
   return (
     <div className=" w-full bg-red-500">
       <Outlet />
@@ -191,26 +194,28 @@ export default function LayoutBackOffice() {
           {/* back-office | col-01 */}
           <div className="colSpan-01 order-2 lg:order-1 //bg-blue-500">
             <div className=" max-w-[60rem] w-[100%] mx-auto h-screen pt-7 px-7 flex flex-col gap-2">
+              {/* heading */}
               <HeadingDesktop label="Back-Office">
                 <BsLayoutWtf />
               </HeadingDesktop>
 
-              {/* <BackOfficeMenuDraftRonaldo /> */}
-
-              {/******************************************* *******************************************/}
               {/* Boton add link */}
               <div className="w-full">
                 <Link
                   to="add"
-                  className="flex justify-center items-center bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
+                  className="flex justify-center items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white rounded-full w-full p-3"
                 >
                   <FaPlus />
-                  <p>Add Link</p>
+                  Add Link
+                  {isSubmitting &&
+                    navigation.location?.pathname === "/back-office/add" && (
+                      <div className="animate-spin h-5 w-5 border-l-2 border-white rounded-full "></div>
+                    )}
                 </Link>
-                <div className="flex justify-between pt-3">
+                <div className="flex flex-col sm:flex-row gap-2 justify-between pt-3">
                   <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
                     <RiLayoutTopLine />
-                    <p>Add Header</p>
+                    Add Header
                   </button>
                   <button className="flex gap-2 justify-center items-center p-3 bg-slate-300 hover:bg-slate-400 border rounded-full">
                     <FiArchive />
@@ -219,9 +224,9 @@ export default function LayoutBackOffice() {
                   </button>
                 </div>
               </div>
-              {/******************************************* *******************************************/}
 
-              <div className="flex flex-col gap-4 p-3 overflow-y-scroll h-screen hidden-scrollbar">
+              {/* links */}
+              <div className="flex flex-col gap-4 py-3 overflow-y-scroll h-screen hidden-scrollbar">
                 {list?.map((link, index: number) => {
                   return (
                     <div key={index}>

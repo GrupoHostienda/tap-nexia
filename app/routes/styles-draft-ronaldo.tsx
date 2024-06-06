@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
@@ -43,20 +43,22 @@ import HeadingDesktop from "@/components/layout/HeadingDesktop";
 import HeadingH2 from "@/components/layout/HeadingH2";
 import Buttons from "@/components/stylesPage/Buttons";
 import DashboarHeader from "@/components/DashboarHeader";
-import Preview from "@/components/PreviewDraft";
+import Preview from "@/components/Preview";
 import {
   SpecialButtonOne,
   SpecialButtonTwo,
 } from "@/components/stylesPage/SpecialButtons";
 import { motion } from "framer-motion";
 import { applyNewStyle } from "@/utils/helpers";
-import { getTokenIfConnected } from "@/services";
+import { getToken } from "@/services";
 import {
   BackgroundsSchema,
   LinksStylesAPISchema,
   UserLinksSchema,
   UserSchema,
 } from "@/schemas";
+import { IoShareSocial } from "react-icons/io5";
+import { TiSocialTwitter } from "react-icons/ti";
 
 //meta
 export function meta() {
@@ -73,7 +75,11 @@ export function meta() {
 
 //loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const authToken = await getTokenIfConnected(request); //redirecciona a /login si no estas autenticado
+  const authToken = await getToken(request);
+
+  if (!authToken) {
+    return redirect("/login");
+  }
 
   const base = process.env.API_BASE;
   const headers = {
@@ -120,9 +126,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const backgroundsDataVerified =
       BackgroundsSchema.safeParse(backgroundsData);
 
+    console.log(userData);
+
+    console.log(userDataVerified);
+    console.log(userLinksDataVerified);
+    console.log(linksDataVerified);
+    console.log(backgroundsDataVerified);
+
     /* si NO pasa la validacion de zod retorno un error*/
     if (
-      !userDataVerified.success ||
+      userDataVerified.success ||
       !userLinksDataVerified.success ||
       !linksDataVerified.success ||
       !backgroundsDataVerified.success
@@ -132,7 +145,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
 
     return json({
-      user: userDataVerified,
+      user: userData,
       links: linksDataVerified.data,
       backgrounds: backgroundsDataVerified.data,
       userLinks: userLinksDataVerified.data,
@@ -157,6 +170,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const color = formData.get("color") as string;
   const rounded = formData.get("rounded") as string;
   const shadow = formData.get("shadow") as string;
+  const background = formData.get("backgroundColor") as string;
+
+  console.log(formData);
+  console.log(color);
+  console.log(background);
 
   //delete
   if (request.method === "DELETE") {
@@ -182,6 +200,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const url = `${process.env.API_BASE}/user/link/update/${linkId} `;
 
+  const urlBackgrounds = `${process.env.API_BASE}/user/home-page/store`;
+  const urlSocialLinks = `${process.env.API_BASE}/user/social-media/store`;
+
   try {
     const responseLinks = await fetch(urlLinks, {
       method: "GET",
@@ -189,6 +210,19 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
+    });
+
+    const responseBackground = await fetch(urlBackgrounds, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({
+        background_id: 1,
+        bio: "bio",
+        style: "home page",
+      }),
     });
 
     const links = await responseLinks.json();
@@ -217,6 +251,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         style: `${newStyles}`,
       }),
     });
+    await responseBackground.json();
 
     await response.json();
 
@@ -247,6 +282,7 @@ export default function Styles() {
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
   const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
+  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
 
   //message from action
   const [message, setMessage] = useState("");
@@ -268,15 +304,15 @@ export default function Styles() {
     }
   }, [actionData]);
 
-  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
-
   const {
     color: colorState,
     outline: outlineState,
     shadow: shadowState,
+    background: backgroundState,
     setColor,
     setOutline,
     setShadow,
+    setBackground,
   }: ContextType = useOutletContext();
 
   return (
@@ -434,19 +470,27 @@ export default function Styles() {
               <div className=" bg-white p-4 rounded-xl ">
                 <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
                   {backgrounds.map((style, index) => {
-                    const bg = getSBackgroundClass(style.name);
+                    const bg = getSBackgroundClass(style.name) as string;
 
                     return (
-                      <div
-                        key={index}
-                        className=" flex flex-col items-center relative"
-                      >
-                        <div className=" absolute top-2 right-10 bg-white rounded-full text-green-600">
-                          <FaCircleCheck />
-                        </div>
+                      <div key={index} className=" flex flex-col items-center">
                         <div
-                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md`}
-                        ></div>
+                          onClick={() => setBackground(bg)}
+                          className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all relative`}
+                        >
+                          {/* ***************************** */}
+                          {((backgroundState && backgroundState === bg) ||
+                            (!backgroundState && "linear" === bg)) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 top-1 right-1 bg-white rounded-full text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          {/* ****************************** */}
+                        </div>
                         <p className=" pt-2 text-center">{style.name} Colour</p>
                       </div>
                     );
@@ -469,6 +513,60 @@ export default function Styles() {
                       </p>
                     </div>
                     <p className=" pt-2 text-center">Image</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div>
+              <HeadingH2 label="  Social Media">
+                <IoShareSocial />
+              </HeadingH2>
+              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4">
+                <h2>Agregar Enlace a redes sociales</h2>
+                <Form
+                  method="POST"
+                  className="grid grid-cols-[20%_60%_10%] gap-4"
+                >
+                  <div className="w-full">
+                    <select
+                      name="social-type"
+                      className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select"
+                    >
+                      <option value="facebook">Facebook</option>
+                      <option value="twitter">Twitter</option>
+                      <option value="instagram">Instagram</option>
+                      <option value="linkedin">LinkedIn</option>
+                      <option value="youtube">YouTube</option>
+                    </select>
+                  </div>
+                  <div className="w-full">
+                    <input
+                      className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
+                      type="text"
+                      name="media-link"
+                    />
+                  </div>
+                  <div className="">
+                    <button className="bg-blue-700 text-white rounded-md hover:bg-blue-500 p-2 w-full">
+                      Add Link
+                    </button>
+                  </div>
+                </Form>
+                {/* LISTA DE REDES SOCIALES */}
+                <h2>Lista de redes sociales</h2>
+                <div className="grid grid-cols-[5%_80%] gap-4 w-full">
+                  <div className="w-full h-full flex items-center justify-center text-4xl">
+                    {/* Espacio para icono de red social */}
+                    <TiSocialTwitter />
+                  </div>
+                  <div className="w-full flex p-3">
+                    {/* Espacio para los links y el boton de edicion */}
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Libero, praesentium placeat. Sunt esse explicabo optio illum
+                    itaque rerum, velit, repudiandae ipsam, accusamus corrupti
+                    id sapiente. Praesentium dicta aliquam impedit labore!
                   </div>
                 </div>
               </div>
@@ -516,6 +614,11 @@ export default function Styles() {
                 <input hidden name="color" defaultValue={colorState} />
                 <input hidden name="rounded" defaultValue={outlineState} />
                 <input hidden name="shadow" defaultValue={shadowState} />
+                <input
+                  hidden
+                  name="backgroundColor"
+                  defaultValue={backgroundState}
+                />
                 {isSubmittingStyle ? "Saving..." : "Save"}
               </button>
             </Form>

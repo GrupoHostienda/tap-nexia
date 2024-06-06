@@ -136,16 +136,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const rounded = (formData.get("rounded") as string) || "rounded-full";
   const shadow = (formData.get("shadow") as string) || "shadow-md";
 
-  console.log(color);
-  console.log(rounded);
-  console.log(shadow);
-
   if (title.trim() === "" || link.trim() === "") {
     return json({ error: "All fields are required." });
   }
 
   if (!validateUrl(link)) {
-    return json({ error: "Is not a valid URL." });
+    return json({ error: "Introduce a valid URL." });
   }
 
   /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
@@ -198,10 +194,6 @@ const Add = () => {
 
   const isSubmitting = navigation.state === "submitting";
 
-  const isRouting = navigation.location !== undefined;
-
-  const submitMethod = navigation.formMethod; //cuando el submit viene del onclick en los links esta const es undefined, si viene del crud de /styles será POST
-
   /* error message */
   const [message, setMessage] = useState("");
   useEffect(() => {
@@ -233,8 +225,11 @@ const Add = () => {
 
   return (
     <>
-      <div className=" fixed inset-0 bg-black/70 min-h-screen z-30"></div>
-      <div className=" absolute z-40 top-10 w-[90%] left-1/2 -translate-x-1/2 ">
+      <Link
+        to="/back-office"
+        className=" fixed inset-0 bg-black/70 min-h-screen z-30"
+      ></Link>
+      <div className=" absolute z-40 top-10 w-[90%] max-w-[60rem] left-1/2 -translate-x-1/2 ">
         {/* form */}
         <Form
           method="post"
@@ -243,13 +238,13 @@ const Add = () => {
           {/* title */}
           <div className="grid grid-cols-[20%_80%] sm:px-6">
             <label
-              className="bg-gray-600 text-white text-center rounded-tl-xl rounded-bl-xl p-2"
+              className=" bg-blue-700 text-white sm:text-xl rounded-tl-xl rounded-bl-xl flex items-center justify-center"
               htmlFor="title"
             >
-              Titulo
+              Title
             </label>
             <input
-              className="p-2 outline-none bg-gray-300 rounded-r-xl"
+              className="p-2 outline-none border rounded-r-xl"
               placeholder="My favorite song..."
               name="title"
               type="text"
@@ -260,13 +255,13 @@ const Add = () => {
           {/* link */}
           <div className="grid grid-cols-[20%_80%] sm:px-6">
             <label
-              className="bg-gray-600 text-white text-center rounded-tl-xl rounded-bl-xl p-2"
+              className=" bg-blue-700 text-white sm:text-xl rounded-tl-xl rounded-bl-xl flex items-center justify-center"
               htmlFor="link"
             >
               Link
             </label>
             <input
-              className="p-2 outline-none bg-gray-300 rounded-r-xl"
+              className="p-2 outline-none border rounded-r-xl"
               placeholder="https://www.youtube.com/watch?..."
               name="link"
               type="text"
@@ -435,9 +430,6 @@ const Add = () => {
               className="flex items-center gap-2 border border-gray-300 text-xl rounded-xl p-2 hover:scale-105 transition-all"
             >
               Go back
-              {isRouting && !submitMethod && (
-                <div className=" mx-auto animate-spin h-5 w-5 border-l-2 border-gray-600 rounded-full "></div>
-              )}
             </Link>
           </div>
         </Form>
