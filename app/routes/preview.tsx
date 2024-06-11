@@ -1,7 +1,6 @@
-import { useState } from "react";
-import data from "data.json";
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
+import { useLoaderData, useOutletContext } from "@remix-run/react";
 
 import { motion } from "framer-motion";
 
@@ -9,9 +8,12 @@ import LinksContainer from "@/components/ProfilePage/LinksContainer";
 import SocialsContainer from "@/components/SocialsContainer";
 import DashboarHeader from "@/components/DashboarHeader";
 import Sidebar from "@/components/SideBar";
-import { useLoaderData } from "@remix-run/react";
-import { PreviewProps, UserType } from "@/types";
+
+import { ContextType, UserLinkType, UserType } from "@/types";
+
 import { getToken } from "@/services";
+
+import { twMerge } from "tailwind-merge";
 
 /* function for meta data, for improving SEO */
 export function meta() {
@@ -27,7 +29,7 @@ export function meta() {
 }
 
 // loader para verificar sesión
-export const loader = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const authToken = await getToken(request);
 
   if (!authToken) {
@@ -35,11 +37,12 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
   }
 
   const base = process.env.API_BASE;
+
   const urls = {
     user: `${base}/user`,
     userLinks: `${base}/user/links`,
-    backgrounds: `${base}/backgrounds`,
   };
+
   const headers = {
     Authorization: `Bearer ${authToken}`,
   };
@@ -48,23 +51,24 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
     const responses = await Promise.all([
       fetch(urls.user, { headers }),
       fetch(urls.userLinks, { headers }),
-      fetch(urls.backgrounds, { headers }),
     ]);
 
-    if (!responses[0].ok || !responses[1].ok || !responses[2].ok) {
+    if (!responses[0].ok || !responses[1].ok) {
+      console.log("error");
       throw new Error("Failed to fetch data");
     }
 
-    const [userData, userLinksData, backgroundsData] = await Promise.all([
+    const [userData, userLinksData] = await Promise.all([
       responses[0].json(),
       responses[1].json(),
-      responses[2].json(),
     ]);
+
+    console.log(userData);
+    console.log(userLinksData);
 
     return json({
       user: userData,
       userLinks: userLinksData,
-      backgrounds: backgroundsData,
     });
   } catch (error) {
     return json({ error: error?.toString() });
@@ -72,23 +76,19 @@ export const loader = async ({ request }: ActionFunctionArgs) => {
 };
 
 type DataType = {
-  links: PreviewProps[];
-  userdata: UserType;
-  background: any;
+  userLinks: UserLinkType[];
+  user: UserType;
 };
 
 export default function Index() {
-  const [iFrameVisible, setIframeVisible] = useState(false);
-  const {
-    userLinks: links,
-    user: userdata,
-    backgrounds: backgrounds,
-  } = useLoaderData<DataType>();
+  const { userLinks: links, user: userdata } = useLoaderData<DataType>();
 
-  console.log(backgrounds);
+  const bgDB = userdata.home_page.style; //bg-preview
+
+  const { background }: ContextType = useOutletContext();
 
   return (
-    <div className=" bg-home min-h-screen">
+    <div className={twMerge("bg-slate-600 min-h-screen", bgDB, background)}>
       <DashboarHeader />
       <Sidebar title="Menu" />
       <div className=" pb-10 ">
@@ -104,7 +104,7 @@ export default function Index() {
                 }}
               >
                 <img
-                  src={data.avatar}
+                  src={userdata.cover}
                   alt="avatar"
                   className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
                 />
@@ -140,12 +140,7 @@ export default function Index() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.15 }}
           >
-            <LinksContainer
-              setIframeVisible={setIframeVisible}
-              iFrameVisible={iFrameVisible}
-              data={links}
-              user={userdata}
-            />
+            <LinksContainer data={links} />
           </motion.div>
 
           <motion.div

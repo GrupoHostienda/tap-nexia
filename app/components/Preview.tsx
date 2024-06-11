@@ -1,18 +1,12 @@
-import {
-  useLoaderData,
-  useNavigation,
-  useOutletContext,
-} from "@remix-run/react";
-
-import type { ContextType, UserLinkType, UserType } from "@/types";
+import { useNavigation, useOutletContext } from "@remix-run/react";
 
 import { useState } from "react";
 
 import DropDown from "./DropDown";
 
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FaUserEdit } from "react-icons/fa";
-import { motion } from "framer-motion";
+
+import type { ContextType, UserLinkType, UserType } from "@/types";
 
 import { twMerge } from "tailwind-merge";
 
@@ -20,59 +14,54 @@ import { twMerge } from "tailwind-merge";
 type PreviewProps = {
   data: UserLinkType[];
   user: UserType;
-  selectedLink: UserLinkType; //*************** */
-  setSelectedLinkId: React.Dispatch<number>; //********* */
-};
-
-//type *********************************
-type LoaderDataType = {
-  userLinks: UserLinkType[];
 };
 
 //component
-function Preview({
-  data,
-  user,
-  selectedLink, //flag of selected link |styles route
-  setSelectedLinkId, //for setting flag of selected link |styles route
-}: PreviewProps) {
-  const { userLinks }: LoaderDataType = useLoaderData();
-
+function Preview({ data, user }: PreviewProps) {
   const navigation = useNavigation();
 
-  const { color, outline, shadow, linkId, background }: ContextType =
-    useOutletContext();
+  const { linkId, background }: ContextType = useOutletContext();
 
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
 
   const [dropDown, setDropDown] = useState(0); //for showing dropdown
+
+  const bgDB = user.home_page.style; //bg-preview
+
   return (
     <div className="flex self-center bg-black rounded-2xl w-64 h-[28rem] p-3">
       <div
-        className={`w-full h-full ${background} rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar`}
+        className={twMerge(
+          `w-full h-full bg-gray-600 rounded-2xl p-3 flex flex-col gap-4 justify-start overflow-y-scroll hidden-scrollbar`,
+          bgDB,
+          background
+        )}
       >
         {/* profile picture */}
-        <div className="size-16 shrink-0 rounded-full bg-gray-700 self-center"></div>
+        <div className="shrink-0 rounded-full bg-gray-700 self-center overflow-hidden ">
+          <img
+            className="object-cover bg-center rounded-full size-16 "
+            src={user.cover}
+            alt="user"
+          />
+        </div>
 
         {/* email and username */}
         <div className="text-center">
-          <h1 className="font-bold">{user.email}</h1>
-          <p className="text-gray-500 text-sm">{user.username}</p>
+          <h1 className="font-bold text-gray-300">{user.email}</h1>
+          <p className="text-sm text-gray-300">{user.username}</p>
         </div>
 
         {/* Links*/}
         <div className="flex flex-col gap-3">
-          {data.map((dataLink, index) => {
-            const flag = dataLink.id === selectedLink?.id;
+          {[...data].reverse().map((dataLink, index) => {
             return (
               <div key={index}>
                 <div
                   className={twMerge(
                     "flex justify-between items-center px-4 py-2 whitespace-nowrap",
-                    dataLink.style?.class,
-                    flag && `${color} ${outline} ${shadow}`,
-                    flag && color === "bg-black" && "text-white"
+                    dataLink.style?.class
                   )}
                 >
                   {/* link text */}
@@ -81,36 +70,17 @@ function Preview({
                   ) : (
                     <p
                       className={twMerge(
-                        " w-full flex items-center justify-between gap-2",
-                        flag && color === "bg-black" && "text-white"
+                        " w-full flex items-center justify-between gap-2"
                       )}
-                      // className="w-full flex items-center justify-between gap-2"
                     >
                       {dataLink.title.substring(0, 16)}
                       {dataLink.title.length >= 20 && "..."}
-                      {flag && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className={twMerge(
-                            " text-black text-lg",
-                            flag && `${color}`,
-                            flag && color === "bg-black" && "text-white"
-                          )}
-                        >
-                          <FaUserEdit />
-                        </motion.span>
-                      )}
                     </p>
                   )}
 
                   {/* open dropdown button */}
                   <button
-                    className={twMerge(
-                      "cursor-pointer text-black",
-                      flag && `${color}`,
-                      flag && color === "bg-black" && "text-white"
-                    )}
+                    className={twMerge("cursor-pointer text-black")}
                     onClick={() => setDropDown(dataLink.id)}
                   >
                     <BsThreeDotsVertical />
@@ -122,8 +92,6 @@ function Preview({
                     setDropDown={setDropDown}
                     dropDown={dropDown}
                     dataLink={dataLink}
-                    setSelectedLinkId={setSelectedLinkId} //******************** */
-                    idPosition0={userLinks[0].id} //****************** */
                   />
                 )}
               </div>

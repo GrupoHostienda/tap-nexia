@@ -1,6 +1,9 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { json, redirect } from "@remix-run/node";
+
+import { sessionStorage } from "@/utils/session.server";
+
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
@@ -10,25 +13,35 @@ import {
   useOutletContext,
 } from "@remix-run/react";
 
-import { sessionStorage } from "@/utils/session.server";
-
 import { useEffect, useState } from "react";
 
 import { getSBackgroundClass } from "@/utils/stylesPage";
+
+import { getToken } from "@/services";
 
 import { IoMdLock } from "react-icons/io";
 import { HiPaintBrush } from "react-icons/hi2";
 import { PiSelectionBackground } from "react-icons/pi";
 import { FaCircleCheck } from "react-icons/fa6";
+import { IoShareSocial } from "react-icons/io5";
+import { TiSocialTwitter } from "react-icons/ti";
+
+import {
+  BackgroundsSchema,
+  LinksStylesAPISchema,
+  UserLinksSchema,
+  UserSchema,
+} from "@/schemas";
 
 import type {
   BackgroundType,
   ContextType,
   LinkStylesType,
-  PreviewProps,
   UserLinkType,
   UserType,
 } from "@/types";
+
+import { motion } from "framer-motion";
 
 import TwoColGridLayoutDratf from "@/components/layout/TwoColGridLayoutDratf";
 import HeadingMobile from "@/components/layout/HeadingMobile";
@@ -36,17 +49,6 @@ import HeadingDesktop from "@/components/layout/HeadingDesktop";
 import HeadingH2 from "@/components/layout/HeadingH2";
 import DashboarHeader from "@/components/DashboarHeader";
 import Preview from "@/components/Preview";
-import { motion } from "framer-motion";
-import { applyNewStyle } from "@/utils/helpers";
-import { getToken } from "@/services";
-import {
-  BackgroundsSchema,
-  LinksStylesAPISchema,
-  UserLinksSchema,
-  UserSchema,
-} from "@/schemas";
-import { IoShareSocial } from "react-icons/io5";
-import { TiSocialTwitter } from "react-icons/ti";
 
 //meta
 export function meta() {
@@ -114,8 +116,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     const backgroundsDataVerified =
       BackgroundsSchema.safeParse(backgroundsData);
 
-    console.log(userData);
-
     console.log(userDataVerified);
     console.log(userLinksDataVerified);
     console.log(linksDataVerified);
@@ -123,7 +123,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     /* si NO pasa la validacion de zod retorno un error*/
     if (
-      userDataVerified.success ||
+      !userDataVerified.success ||
       !userLinksDataVerified.success ||
       !linksDataVerified.success ||
       !backgroundsDataVerified.success
@@ -133,7 +133,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
 
     return json({
-      user: userData,
+      user: userDataVerified.data,
       links: linksDataVerified.data,
       backgrounds: backgroundsDataVerified.data,
       userLinks: userLinksDataVerified.data,
@@ -154,15 +154,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData();
 
-  const linkId = formData.get("link-id") as string;
-  const color = formData.get("color") as string;
-  const rounded = formData.get("rounded") as string;
-  const shadow = formData.get("shadow") as string;
-  const background = formData.get("backgroundColor") as string;
-
-  console.log(formData);
-  console.log(color);
-  console.log(background);
+  const linkId = formData.get("link-id") as string; //delete
+  const backgroundId = formData.get("backgroundId") as string;
+  const backgroundStyle = formData.get("backgroundStyle") as string;
+  const bgId = Number(backgroundId);
 
   //delete
   if (request.method === "DELETE") {
@@ -175,6 +170,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           Authorization: `Bearer ${authToken}`,
         },
       });
+
+      if (!response.ok) {
+        console.log("error at delete data");
+        throw new Error("Failed to delete data"); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+      }
+
       await response.json();
       return json({ message: "Succeed to delete item" });
     } catch (error) {
@@ -183,72 +184,32 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
   }
 
-  /* START | Fetch de datos */
-  const urlLinks = `${process.env.API_BASE}/user/links `;
-
-  const url = `${process.env.API_BASE}/user/link/update/${linkId} `;
-
-  const urlBackgrounds = `${process.env.API_BASE}/user/home-page/store`;
-  const urlSocialLinks = `${process.env.API_BASE}/user/social-media/store`;
-
+  //edit bg
+  const urlBackground = `${process.env.API_BASE}/user/home-page/store`;
   try {
-    const responseLinks = await fetch(urlLinks, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
-
-    const responseBackground = await fetch(urlBackgrounds, {
+    const responseBackground = await fetch(urlBackground, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        background_id: 1,
+        background_id: bgId,
         bio: "bio",
-        style: "home page",
+        style: `${backgroundStyle}`,
       }),
     });
 
-    const links = await responseLinks.json();
-
-    const link = links?.filter(
-      (link: PreviewProps) => link.id === Number(linkId)
-    );
-
-    const newStyles = applyNewStyle(
-      link[0].style.class,
-      color,
-      rounded,
-      shadow
-    );
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({
-        link_type_id: 1,
-        title: `${link[0]?.title}`,
-        url: `${link[0]?.url}`,
-        style: `${newStyles}`,
-      }),
-    });
+    if (!responseBackground.ok) {
+      console.log("error at edit background");
+      throw new Error("Failed to edit data"); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
+    }
     await responseBackground.json();
-
-    await response.json();
-
     return json({ message: "Succeed to save data" });
   } catch (error) {
     console.log(error);
     return json({ error: "Failed to save data, try again later." });
   }
-  /* END | Fetch de datos */
 };
 
 //type
@@ -262,14 +223,22 @@ type LoaderDataType = {
 //component
 export default function Styles() {
   const { user, backgrounds, userLinks }: LoaderDataType = useLoaderData();
+
+  const {
+    background: backgroundState,
+    setBackground,
+    bgToDBId,
+    setBgToDBId,
+  }: ContextType = useOutletContext();
+
   const actionData = useActionData<typeof action>();
+
   const navigation = useNavigation();
 
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
-  const [selectedLinkId, setSelectedLinkId] = useState(userLinks[0]?.id); //1st link is default
-  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
+  const bgDB = user.home_page.background.name; //bg-preview
 
   //message from action
   const [message, setMessage] = useState("");
@@ -291,14 +260,6 @@ export default function Styles() {
     }
   }, [actionData]);
 
-  const {
-    color: colorState,
-    outline: outlineState,
-    shadow: shadowState,
-    background: backgroundState,
-    setBackground,
-  }: ContextType = useOutletContext();
-
   return (
     <div className="pageLayout bg-slate-200">
       <DashboarHeader />
@@ -318,13 +279,13 @@ export default function Styles() {
               <HeadingH2 label="  Social Media">
                 <IoShareSocial />
               </HeadingH2>
-              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4">
+              <div className=" bg-white p-4 rounded-xl flex flex-col gap-4 w-full">
                 <h2>Agregar Enlace a redes sociales</h2>
                 <Form
                   method="POST"
-                  className="grid grid-cols-[20%_60%_10%] gap-4"
+                  className="flex sm:items-center flex-col sm:flex-row gap-4"
                 >
-                  <div className="w-full">
+                  <div className="w-full sm:max-w-36">
                     <select
                       name="social-type"
                       className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select"
@@ -336,27 +297,22 @@ export default function Styles() {
                       <option value="youtube">YouTube</option>
                     </select>
                   </div>
-                  <div className="w-full">
+                  <div className="w-full flex-1">
                     <input
                       className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
                       type="text"
                       name="media-link"
                     />
                   </div>
-                  <div className="">
-                    <button className="bg-blue-700 text-white rounded-md hover:bg-blue-500 p-2 w-full">
-                      Add Link
-                    </button>
-                  </div>
+                  <button className="bg-blue-700 text-white text-nowrap rounded-md hover:bg-blue-500 p-2 ">
+                    Add Link
+                  </button>
                 </Form>
-                {/* LISTA DE REDES SOCIALES */}
-                <h2>Lista de redes sociales</h2>
-                <div className="grid grid-cols-[5%_80%] gap-4 w-full">
-                  <div className="w-full h-full flex items-center justify-center text-4xl">
-                    {/* Espacio para icono de red social */}
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+                  <div className=" h-full flex items-center justify-center text-4xl">
                     <TiSocialTwitter />
                   </div>
-                  <div className="w-full flex p-3">
+                  <div className="">
                     {/* Espacio para los links y el boton de edicion */}
                     Lorem ipsum dolor sit amet consectetur adipisicing elit.
                     Libero, praesentium placeat. Sunt esse explicabo optio illum
@@ -376,15 +332,24 @@ export default function Styles() {
                   {backgrounds.map((style, index) => {
                     const bg = getSBackgroundClass(style.name) as string;
 
+                    if (!backgroundState && bgDB === style.name) {
+                      setBackground(bg);
+                      setBgToDBId(style.id);
+                    }
+
                     return (
                       <div key={index} className=" flex flex-col items-center">
                         <div
-                          onClick={() => setBackground(bg)}
+                          onClick={() => {
+                            console.log(style.id);
+                            console.log(bg);
+                            setBackground(bg);
+                            setBgToDBId(style.id);
+                          }}
                           className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all relative`}
                         >
-                          {/* ***************************** */}
                           {((backgroundState && backgroundState === bg) ||
-                            (!backgroundState && "linear" === bg)) && (
+                            (!backgroundState && bgDB === style.name)) && (
                             <motion.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
@@ -393,7 +358,6 @@ export default function Styles() {
                               <FaCircleCheck />
                             </motion.div>
                           )}
-                          {/* ****************************** */}
                         </div>
                         <p className=" pt-2 text-center">{style.name} Colour</p>
                       </div>
@@ -443,32 +407,16 @@ export default function Styles() {
               )}
             </div>
 
-            <Preview
-              data={userLinks}
-              user={user}
-              selectedLink={selectedLink[0]}
-              setSelectedLinkId={setSelectedLinkId}
-              idPosition0={userLinks[0]?.id}
-            />
+            <Preview data={userLinks} user={user} />
+
             {/* save button */}
             <Form method="post">
+              <input hidden name="backgroundId" value={bgToDBId as number} />
+              <input hidden name="backgroundStyle" value={backgroundState} />
               <button
                 disabled={isSubmittingStyle}
                 className=" bg-gray-300 lg:bg-white w-64 rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all"
               >
-                <input
-                  type="hidden"
-                  name="link-id"
-                  defaultValue={selectedLinkId}
-                />
-                <input hidden name="color" defaultValue={colorState} />
-                <input hidden name="rounded" defaultValue={outlineState} />
-                <input hidden name="shadow" defaultValue={shadowState} />
-                <input
-                  hidden
-                  name="backgroundColor"
-                  defaultValue={backgroundState}
-                />
                 {isSubmittingStyle ? "Saving..." : "Save"}
               </button>
             </Form>

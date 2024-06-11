@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Links,
   Meta,
@@ -8,6 +8,7 @@ import {
   isRouteErrorResponse,
   useRouteError,
   Link,
+  useNavigation,
 } from "@remix-run/react";
 import "./styles/index.css";
 import { motion } from "framer-motion";
@@ -49,11 +50,21 @@ export default function App() {
   const [color, setColor] = useState("");
   const [outline, setOutline] = useState("");
   const [shadow, setShadow] = useState("");
-  const [background, setBackground] = useState(
-    "bg-gradient-to-b from-blue-300 to-blue-500"
-  );
+
+  const [background, setBackground] = useState(""); //bg-preview
+  const [bgToDBId, setBgToDBId] = useState<number | null>(null); //bg-preview
+
+  const navigation = useNavigation();
 
   const [linkId, setLinkId] = useState(0); //for showing user deleting message
+
+  //bg-preview
+  useEffect(() => {
+    if (navigation.formMethod !== "POST") {
+      setBackground("");
+      setBgToDBId(null);
+    }
+  }, [navigation.location?.pathname, navigation.formMethod]);
 
   return (
     <Outlet
@@ -68,6 +79,8 @@ export default function App() {
         setLinkId, // delete | DropDrown component
         background,
         setBackground,
+        bgToDBId, // bg | Preview component
+        setBgToDBId,
       }}
     />
   );

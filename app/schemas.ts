@@ -23,7 +23,7 @@ export const BackgroundSchema = z.object({
 });
 export const BackgroundsSchema = z.array(BackgroundSchema);
 
-export const UserSchema = z.object({
+/* export const UserSchema = z.object({
   id: z.number(),
   username: z.string(),
   email: z.string(),
@@ -32,6 +32,26 @@ export const UserSchema = z.object({
   created_at: z.string(),
   updated_at: z.string(),
   home_page: z.string().nullable(),
+});
+ */
+export const UserSchema = z.object({
+  id: z.number(),
+  username: z.string(),
+  email: z.string(),
+  role: z.string(),
+  cover: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  home_page: z.object({
+    bio: z.string(),
+    style: z.string(),
+    background: z.object({
+      id: z.number(),
+      name: z.string(),
+      plan: z.string(),
+      image: z.string().nullable(),
+    }),
+  }),
 });
 
 export const UserLinkSchema = z.object({

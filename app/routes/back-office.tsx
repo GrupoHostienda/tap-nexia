@@ -22,6 +22,7 @@ import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
+//import { useEffect } from "react";
 
 //meta
 export function meta() {
@@ -80,7 +81,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     /* si NO pasa la validacion de zod retorno un error*/
     if (
-      userDataVerified.success ||
+      !userDataVerified.success ||
       !userLinksDataVerified.success ||
       !linksDataVerified.success
     ) {
@@ -91,7 +92,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return json({
       links: linksDataVerified.data,
       userLinks: userLinksDataVerified.data,
-      user: userData,
+      user: userDataVerified.data,
     });
   } catch (error) {
     console.log(error?.toString());
@@ -182,7 +183,7 @@ export default function LayoutBackOffice() {
   const isSubmitting = navigation.state === "loading";
 
   return (
-    <div className=" w-full bg-red-500">
+    <>
       <Outlet />
       <div className="pageLayout bg-slate-200">
         <DashboarHeader />
@@ -248,6 +249,6 @@ export default function LayoutBackOffice() {
           </div>
         </TwoColGridLayoutDratf>
       </div>
-    </div>
+    </>
   );
 }

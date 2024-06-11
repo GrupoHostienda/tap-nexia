@@ -102,7 +102,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
     /* si NO pasa la validacion de zod retorno un error*/
     if (
-      userDataVerified.success ||
+      !userDataVerified.success ||
       !userLinksDataVerified.success ||
       !linksDataVerified.success
     ) {
@@ -113,7 +113,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return json({
       links: linksDataVerified.data,
       userLinks: userLinksDataVerified.data,
-      user: userData,
+      user: userDataVerified.data,
     });
   } catch (error) {
     console.log(error?.toString());

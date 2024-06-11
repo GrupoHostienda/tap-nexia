@@ -41,4 +41,6 @@ export type ContextType = {
   //idPosition0: number; //edit | styles route
   background: string;
   setBackground: React.Dispatch<React.SetStateAction<string>>;
+  bgToDBId: number | null;
+  setBgToDBId: React.Dispatch<React.SetStateAction<number | null>>;
 };

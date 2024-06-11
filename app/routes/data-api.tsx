@@ -5,7 +5,7 @@ import { sessionStorage } from "@/utils/session.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const urlParams = new URL(request.url).searchParams;
-  const type = urlParams.get("type") || "links"; // default a "links" si no se especifica
+  const type = urlParams.get("type") || "user"; // default a "user" si no se especifica
 
   const session = await sessionStorage.getSession(
     request.headers.get("Cookie")
@@ -35,7 +35,7 @@ function ApiData() {
   const fetcher = useFetcher();
 
   //console.log(data);
-  //console.log(fetcher);
+  //console.log(fetcher.data);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     fetcher.load(`/data-api?type=${e.target.value}`);
@@ -48,7 +48,7 @@ function ApiData() {
       </h1>
       <select
         className=" bg-gray-300 px-4 py-1 rounded-md"
-        defaultValue="links"
+        defaultValue="user"
         onChange={handleChange}
       >
         <option value="backgrounds">Backgrounds</option>

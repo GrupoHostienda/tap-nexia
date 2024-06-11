@@ -14,7 +14,7 @@ export const validateUrl = (url: string) => {
   }
 };
 
-export function applyNewStyle(
+/* export function applyNewStyle(
   defaultStyle: string,
   color: string,
   rounded: string,
@@ -44,3 +44,4 @@ export function applyNewStyle(
 
   return updatedString;
 }
+ */

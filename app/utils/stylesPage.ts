@@ -34,7 +34,7 @@ export function getSpecialButtonClass(style: string) {
 export function getSBackgroundClass(style: string) {
   switch (style) {
     case "Linear":
-      return " bg-gray-300";
+      return " bg-gray-600";
     case "Gradient":
       return " bg-home";
   }
