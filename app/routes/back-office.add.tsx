@@ -13,7 +13,6 @@ import {
   useActionData,
   useLoaderData,
   useNavigation,
-  useOutletContext,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
@@ -23,7 +22,7 @@ import { sessionStorage } from "@/utils/session.server";
 
 import { LinksStylesAPISchema, UserLinksSchema, UserSchema } from "@/schemas";
 
-import { LinkStylesType, UserType, UserLinkType, ContextType } from "@/types";
+import { LinkStylesType, UserType, UserLinkType } from "@/types";
 
 import HeadingH2 from "../components/layout/HeadingH2";
 import Buttons from "../components/stylesPage/Buttons";
@@ -130,11 +129,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const authToken = session.get("authToken");
 
   const formData = await request.formData();
+
   const title = formData.get("title") as string;
   const link = formData.get("link") as string;
-  const color = (formData.get("color") as string) || "bg-white";
-  const rounded = (formData.get("rounded") as string) || "rounded-full";
-  const shadow = (formData.get("shadow") as string) || "shadow-md";
+
+  const color = formData.get("color") as string;
+  const rounded = formData.get("rounded") as string;
+  const shadow = formData.get("shadow") as string;
 
   if (title.trim() === "" || link.trim() === "") {
     return json({ error: "All fields are required." });
@@ -180,19 +181,55 @@ type ActionType = {
   error: string;
 };
 
+import {
+  FaHome,
+  FaLink,
+  FaEnvelope,
+  FaPhone,
+  FaInfoCircle,
+  FaBook,
+  FaCalendar,
+  FaCamera,
+  FaShoppingCart,
+  FaGlobe,
+} from "react-icons/fa";
+
 //component
 const Add = () => {
   const { userLinks, links }: LoaderType = useLoaderData();
 
   const action = useActionData<ActionType>();
 
-  const [selectedLinkId] = useState(userLinks[0]?.id); //1st link is default
+  const [selectedLinkId] = useState(userLinks[0]?.id); //1st link is default /* ****************** */
 
-  const selectedLink = userLinks.filter((link) => link?.id === selectedLinkId);
+  const selectedLink = userLinks.filter(
+    (link) => link?.id === selectedLinkId
+  ); /* ****************** */
 
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
+
+  const [colorState, setColor] = useState("bg-white");
+  const [outlineState, setOutline] = useState("rounded-full");
+  const [shadowState, setShadow] = useState("shadow-md");
+
+  const [linkType, setLinkType] = useState("1"); //para el select de linkTypes
+  const [iconType, setIconType] = useState(""); //para el select de icons
+  const [style, setStyle] = useState(""); //testing styles en iconButtons --> quitar luego
+
+  const icons = [
+    { id: "home", name: "Home" },
+    { id: "link", name: "Links" },
+    { id: "envelope", name: "Email" },
+    { id: "phone", name: "Phone" },
+    { id: "info-circle", name: "Info" },
+    { id: "book", name: "Book" },
+    { id: "calendar", name: "Calendar" },
+    { id: "camera", name: "Camera" },
+    { id: "shopping-cart", name: "Shop" },
+    { id: "globe", name: "Website" },
+  ];
 
   /* error message */
   const [message, setMessage] = useState("");
@@ -205,23 +242,6 @@ const Add = () => {
       return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
     }
   }, [action]);
-
-  /*   const {
-    color: colorState,
-    outline: outlineState,
-    shadow: shadowState,
-    setColor,
-    setOutline,
-    setShadow,
-  }: ContextType = useOutletContext(); */
-
-  const [colorState, setColor] = useState("");
-  const [outlineState, setOutline] = useState("");
-  const [shadowState, setShadow] = useState("");
-
-  console.log(colorState);
-  console.log(outlineState);
-  console.log(shadowState);
 
   return (
     <>
@@ -282,130 +302,287 @@ const Add = () => {
               <BsFillMenuButtonWideFill />
             </HeadingH2>
 
-            <div className=" bg-white pb-6 sm:px-6 rounded-xl flex flex-col gap-10 ">
-              {/* colors */}
-              <Buttons label="Fill">
-                {COLORS.map((color) => {
-                  return (
-                    <div
-                      onClick={() => setColor(color)}
-                      key={color}
-                      className="relative cursor-pointer hover:scale-105 transition-all"
-                    >
-                      {((colorState && colorState === color) ||
-                        (!colorState &&
-                          selectedLink[0]?.style.class.includes(color))) && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className=" absolute -top-2 -right-2 bg-white rounded-full text-green-600"
-                        >
-                          <FaCircleCheck />
-                        </motion.div>
-                      )}
+            {/* select type */}
+            <select
+              value={linkType}
+              onChange={(e) => {
+                setLinkType(e.target.value);
+              }}
+              className=" border p-2 rounded-md sm:mx-6 my-2 cursor-pointer"
+            >
+              {links.map((link) => {
+                return (
+                  <option key={link.id} value={link.id}>
+                    {link.name}
+                  </option>
+                );
+              })}
+            </select>
 
-                      <div
-                        className={`border border-gray-400 h-10 ${color}`}
-                      ></div>
-                    </div>
-                  );
-                })}
-              </Buttons>
+            {/* Select para íconos */}
+            {linkType === "2" && (
+              <select
+                value={iconType}
+                onChange={(e) => setIconType(e.target.value)}
+                className="border p-2 rounded-md sm:mx-6 my-2 cursor-pointer"
+              >
+                <option value="" disabled>
+                  Select Icon
+                </option>
 
-              {/* outline */}
-              <Buttons label="Outline">
-                {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
-                {[...links[0].schemas[1].options]
-                  .reverse()
-                  .map((style, index) => {
-                    const roundedClass = getRoundedClass(style) as string;
+                {icons.map((icon) => (
+                  <option key={icon.id} value={icon.id}>
+                    {icon.name}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Input para estilos */}
+            {linkType === "2" && (
+              <input
+                type="text"
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                placeholder="Enter styles (e.g., text-red-500)"
+                className="border p-2 rounded-md sm:mx-6 my-2"
+              />
+            )}
+
+            {/* Mostrar ícono seleccionado */}
+            {linkType === "2" && (
+              <div className={`mt-4 ${style}`}>
+                {iconType === "home" && <FaHome />}
+                {iconType === "link" && <FaLink />}
+                {iconType === "envelope" && <FaEnvelope />}
+                {iconType === "phone" && <FaPhone />}
+                {iconType === "info-circle" && <FaInfoCircle />}
+                {iconType === "book" && <FaBook />}
+                {iconType === "calendar" && <FaCalendar />}
+                {iconType === "camera" && <FaCamera />}
+                {iconType === "shopping-cart" && <FaShoppingCart />}
+                {iconType === "globe" && <FaGlobe />}
+              </div>
+            )}
+
+            {linkType === "1" && (
+              <div className=" pb-6 sm:px-6 flex flex-col gap-10 ">
+                {/* colors */}
+                <Buttons label="Fill">
+                  {COLORS.map((color) => {
                     return (
                       <div
-                        key={index}
-                        onClick={() => setOutline(roundedClass!)}
+                        onClick={() => setColor(color)}
+                        key={color}
                         className="relative cursor-pointer hover:scale-105 transition-all"
                       >
-                        {((outlineState && outlineState === roundedClass) ||
-                          (!outlineState &&
-                            selectedLink[0]?.style.class.includes(
-                              roundedClass
-                            ))) && (
+                        {((colorState && colorState === color) ||
+                          (!colorState &&
+                            selectedLink[0]?.style.class.includes(color))) && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className=" absolute -top-2 -right-2 bg-white text-green-600"
+                            className=" absolute -top-2 -right-2 bg-white rounded-full text-green-600"
                           >
                             <FaCircleCheck />
                           </motion.div>
                         )}
+
                         <div
-                          className={` border border-gray-400 h-10 ${roundedClass}`}
-                        />
+                          className={`border border-gray-400 h-10 ${color}`}
+                        ></div>
                       </div>
                     );
                   })}
-              </Buttons>
+                </Buttons>
 
-              {/* shadow */}
-              <Buttons label="Shadow">
-                {links[0].schemas[2].options.map(
-                  (style: string, index: number) => {
-                    const shadowClass = getShadowClass(style) as string;
-
-                    return (
-                      <div
-                        key={index}
-                        onClick={() => setShadow(shadowClass!)}
-                        className="relative cursor-pointer hover:scale-105 transition-all"
-                      >
-                        {((shadowState && shadowState === shadowClass) ||
-                          (!shadowState &&
-                            selectedLink[0]?.style.class.includes(
-                              shadowClass
-                            ))) && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className=" absolute z-10 -top-2 -right-2 bg-white text-green-600"
-                          >
-                            <FaCircleCheck />
-                          </motion.div>
-                        )}
-                        <div className=" relative z-0 h-10">
+                {/* outline */}
+                <Buttons label="Outline">
+                  {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
+                  {[...links[0].schemas[1].options]
+                    .reverse()
+                    .map((style, index) => {
+                      const roundedClass = getRoundedClass(style) as string;
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => setOutline(roundedClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((outlineState && outlineState === roundedClass) ||
+                            (!outlineState &&
+                              selectedLink[0]?.style.class.includes(
+                                roundedClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
                           <div
-                            className={` border border-gray-400 relative bg-white h-full ${shadowClass}`}
+                            className={` border border-gray-400 h-10 ${roundedClass}`}
                           />
                         </div>
-                      </div>
-                    );
-                  }
-                )}
-              </Buttons>
+                      );
+                    })}
+                </Buttons>
 
-              {/* special */}
-              <Buttons label="Special" mustUpgrade={true}>
-                {links[0].schemas[3].options.map(
-                  (style: string, index: number) => {
-                    const specialButtonClass = getSpecialButtonClass(style);
-                    return (
-                      <div
-                        key={index}
-                        className={`h-10 ${specialButtonClass}`}
-                      ></div>
-                    );
-                  }
-                )}
-                <div className="  h-10 bg-black rounded-full"></div>
-                <SpecialButtonOne />
-                <SpecialButtonTwo />
-              </Buttons>
-            </div>
+                {/* shadow */}
+                <Buttons label="Shadow">
+                  {links[0].schemas[2].options.map(
+                    (style: string, index: number) => {
+                      const shadowClass = getShadowClass(style) as string;
+
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => setShadow(shadowClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((shadowState && shadowState === shadowClass) ||
+                            (!shadowState &&
+                              selectedLink[0]?.style.class.includes(
+                                shadowClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          <div className=" relative z-0 h-10">
+                            <div
+                              className={` border border-gray-400 relative bg-white h-full ${shadowClass}`}
+                            />
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
+                </Buttons>
+
+                {/* special */}
+                <Buttons label="Special" mustUpgrade={true}>
+                  {links[0].schemas[3].options.map(
+                    (style: string, index: number) => {
+                      const specialButtonClass = getSpecialButtonClass(style);
+                      return (
+                        <div
+                          key={index}
+                          className={`h-10 ${specialButtonClass}`}
+                        ></div>
+                      );
+                    }
+                  )}
+                  <div className="  h-10 bg-black rounded-full"></div>
+                  <SpecialButtonOne />
+                  <SpecialButtonTwo />
+                </Buttons>
+              </div>
+            )}
+
+            {linkType === "2" && (
+              <div className="pb-6 sm:px-6 flex flex-col gap-10">
+                {/* left | right */}
+                <Buttons label=" Icon">
+                  <div className=" border p-2 flex items-center justify-start gap-2 cursor-pointer hover:scale-105 transition-all //bg-slate-300">
+                    <img
+                      className=" w-10 h-10 object-cover rounded-full"
+                      src="https://admin.tap.nexia.io/profile_covers/6655a3d5dd814_1716888533.jpeg"
+                      alt="img"
+                    />
+                    <span>Text</span>
+                  </div>
+                  <div className=" border p-2 flex items-center justify-between gap-2 cursor-pointer hover:scale-105 transition-all //bg-slate-300">
+                    <span>Text</span>
+                    <img
+                      className=" w-10 h-10 object-cover rounded-full"
+                      src="https://admin.tap.nexia.io/profile_covers/6655a3d5dd814_1716888533.jpeg"
+                      alt="img"
+                    />
+                  </div>
+                </Buttons>
+                {/* outline */}
+                <Buttons label="Outline">
+                  {/* se hace un copia del array que viene de la DB y se le aplica un reverse a la copia */}
+                  {[...links[0].schemas[1].options]
+                    .reverse()
+                    .map((style, index) => {
+                      const roundedClass = getRoundedClass(style) as string;
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => setOutline(roundedClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((outlineState && outlineState === roundedClass) ||
+                            (!outlineState &&
+                              selectedLink[0]?.style.class.includes(
+                                roundedClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          <div
+                            className={` border border-gray-400 h-10 ${roundedClass}`}
+                          />
+                        </div>
+                      );
+                    })}
+                </Buttons>
+                {/* shadow */}
+                <Buttons label="Shadow">
+                  {links[0].schemas[2].options.map(
+                    (style: string, index: number) => {
+                      const shadowClass = getShadowClass(style) as string;
+
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => setShadow(shadowClass!)}
+                          className="relative cursor-pointer hover:scale-105 transition-all"
+                        >
+                          {((shadowState && shadowState === shadowClass) ||
+                            (!shadowState &&
+                              selectedLink[0]?.style.class.includes(
+                                shadowClass
+                              ))) && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className=" absolute z-10 -top-2 -right-2 bg-white text-green-600"
+                            >
+                              <FaCircleCheck />
+                            </motion.div>
+                          )}
+                          <div className=" relative z-0 h-10">
+                            <div
+                              className={` border border-gray-400 relative bg-white h-full ${shadowClass}`}
+                            />
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
+                </Buttons>
+              </div>
+            )}
           </div>
 
           {/* inputs that goes to the action */}
-          <input hidden name="color" defaultValue={colorState} />
-          <input hidden name="rounded" defaultValue={outlineState} />
-          <input hidden name="shadow" defaultValue={shadowState} />
+          <input hidden name="color" value={colorState} readOnly />
+          <input hidden name="rounded" value={outlineState} readOnly />
+          <input hidden name="shadow" value={shadowState} readOnly />
 
           {/* error message */}
           {message && (

@@ -83,7 +83,7 @@ type DataType = {
 export default function Index() {
   const { userLinks: links, user: userdata } = useLoaderData<DataType>();
 
-  const bgDB = userdata.home_page.style; //bg-preview
+  const bgDB = userdata.home_page?.style; //bg-preview
 
   const { background }: ContextType = useOutletContext();
 
@@ -104,7 +104,9 @@ export default function Index() {
                 }}
               >
                 <img
-                  src={userdata.cover}
+                  src={
+                    userdata.cover ? `${userdata.cover}` : "/avatar-user.png"
+                  }
                   alt="avatar"
                   className=" bg-slate-100 rounded-[50%] w-24 h-24 object-cover mx-auto border-2 border-solid border-slate-200 "
                 />

@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
   BackgroundSchema,
-  LinksStylesAPISchema,
+  LinkStylesAPISchema,
   UserLinkSchema,
   UserSchema,
 } from "./schemas";
 
-export type LinkStylesType = z.infer<typeof LinksStylesAPISchema>;
+export type LinkStylesType = z.infer<typeof LinkStylesAPISchema>;
 
 export type BackgroundType = z.infer<typeof BackgroundSchema>;
 

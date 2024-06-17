@@ -238,7 +238,7 @@ export default function Styles() {
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
-  const bgDB = user.home_page.background.name; //bg-preview
+  const bgDB = user.home_page?.background.name || "bg-slate-600"; //bg-preview
 
   //message from action
   const [message, setMessage] = useState("");
@@ -331,7 +331,6 @@ export default function Styles() {
                 <div className=" grid grid-cols-1  sm:grid-cols-3 gap-4 ">
                   {backgrounds.map((style, index) => {
                     const bg = getSBackgroundClass(style.name) as string;
-
                     if (!backgroundState && bgDB === style.name) {
                       setBackground(bg);
                       setBgToDBId(style.id);
@@ -341,15 +340,16 @@ export default function Styles() {
                       <div key={index} className=" flex flex-col items-center">
                         <div
                           onClick={() => {
-                            console.log(style.id);
-                            console.log(bg);
                             setBackground(bg);
                             setBgToDBId(style.id);
                           }}
                           className={`h-[23rem] w-[14rem]  //xl:h-[30rem] //xl:w-[20rem] ${bg} rounded-md cursor-pointer hover:scale-105 transition-all relative`}
                         >
                           {((backgroundState && backgroundState === bg) ||
-                            (!backgroundState && bgDB === style.name)) && (
+                            (!backgroundState && bgDB === style.name) ||
+                            (!user.home_page &&
+                              style.id === 1 &&
+                              !backgroundState)) && (
                             <motion.div
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}

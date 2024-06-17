@@ -47,9 +47,9 @@ export function Layout({ children }: LayoutProps) {
 
 //app
 export default function App() {
-  const [color, setColor] = useState("");
+  /*  const [color, setColor] = useState("");
   const [outline, setOutline] = useState("");
-  const [shadow, setShadow] = useState("");
+  const [shadow, setShadow] = useState(""); */
 
   const [background, setBackground] = useState(""); //bg-preview
   const [bgToDBId, setBgToDBId] = useState<number | null>(null); //bg-preview
@@ -69,12 +69,12 @@ export default function App() {
   return (
     <Outlet
       context={{
-        color,
+        /*     color,
         setColor,
         outline,
         setOutline,
         shadow,
-        setShadow,
+        setShadow, */
         linkId,
         setLinkId, // delete | DropDrown component
         background,
