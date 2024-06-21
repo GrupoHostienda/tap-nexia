@@ -26,6 +26,7 @@ import { PiSelectionBackground } from "react-icons/pi";
 import { FaCircleCheck } from "react-icons/fa6";
 import { IoShareSocial } from "react-icons/io5";
 import { TiSocialTwitter } from "react-icons/ti";
+import { CiEraser } from "react-icons/ci";
 
 import {
   BackgroundsSchema,
@@ -374,8 +375,8 @@ export default function Styles() {
                     </select>
                   </div>
                   {/*                   <FaCircleCheck className=" h-4 w-4 //absolute top-0 z-50 bg-white text-green-500 rounded-full " />*/}{" "}
-                  {/* input */}
-                  <div className="w-full flex-1">
+                  <div className="w-full flex-1 relative">
+                    {/* input */}
                     <input
                       className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
                       type="text"
@@ -384,7 +385,27 @@ export default function Styles() {
                       value={socialInput}
                       onChange={handleInputChange}
                     />
+                    {/* eraser icon */}
+                    <div
+                      className=" group absolute top-1/2 -translate-y-1/2 text-xl right-2 text-red-500 cursor-pointer hover:scale-105 transition-all"
+                      onClick={() => {
+                        setSocialInput("");
+                        const updatedLinksState = socialLinksState?.map(
+                          (link) =>
+                            link.type === selectedSocial
+                              ? { ...link, url: "" }
+                              : link
+                        );
+                        setSocialLinksState(updatedLinksState);
+                      }}
+                    >
+                      <CiEraser />
+                      <div className="absolute bottom-full mb-1 hidden text-xs text-nowrap text-white bg-gray-600 rounded p-1 group-hover:block transition-all">
+                        Erase URL
+                      </div>
+                    </div>
 
+                    {/* inputs para el action */}
                     {socialLinksState?.map((link) => (
                       <input
                         key={link.type}
@@ -402,7 +423,7 @@ export default function Styles() {
                     disabled={isSubmittingFetcher}
                     className="bg-blue-700 text-white text-nowrap rounded-md hover:bg-blue-500 p-2 "
                   >
-                    {!isSubmittingFetcher ? " Add Social" : "Adding..."}
+                    {!isSubmittingFetcher ? " Save Social" : "Saving..."}
                   </button>
                 </fetcher.Form>
 

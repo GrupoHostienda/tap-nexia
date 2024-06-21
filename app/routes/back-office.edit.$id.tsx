@@ -47,11 +47,11 @@ import { validateUrl } from "@/utils/helpers";
 export function meta() {
   return [
     {
-      title: "Back Office - edit",
+      title: "Back Office - Edit",
     },
     {
       name: "description",
-      content: "Back Office - edit",
+      content: "Back Office - Edit",
     },
   ];
 }
