@@ -12,7 +12,6 @@ import {
   Link,
   useActionData,
   useLoaderData,
-  useNavigate,
   useNavigation,
   useParams,
 } from "@remix-run/react";
@@ -609,7 +608,7 @@ const Add = () => {
               type="submit"
               className="bg-blue-700 text-white text-xl rounded-xl p-2 hover:scale-105 transition-all"
             >
-              {!isSubmitting ? "Add link" : "Adding link..."}
+              {!isSubmitting ? "Edit link" : "Editing link..."}
             </button>
             {/* go back button */}
             <Link
