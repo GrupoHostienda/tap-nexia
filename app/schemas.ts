@@ -43,6 +43,12 @@ export const UserSchema = z.object({
       }),
     })
     .nullable(),
+  social_media: z.array(
+    z.object({
+      type: z.string(),
+      url: z.string(),
+    })
+  ),
 });
 
 export const UserLinkSchema = z.object({

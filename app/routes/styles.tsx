@@ -8,6 +8,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
   useActionData,
+  useFetcher,
   useLoaderData,
   useNavigation,
   useOutletContext,
@@ -220,6 +221,12 @@ type LoaderDataType = {
   userLinks: UserLinkType[];
 };
 
+//type
+type FetcherData = {
+  message?: string;
+  error?: string;
+};
+
 //component
 export default function Styles() {
   const { user, backgrounds, userLinks }: LoaderDataType = useLoaderData();
@@ -238,7 +245,11 @@ export default function Styles() {
   const isSubmittingStyle =
     navigation.state === "submitting" && navigation.formMethod === "POST";
 
-  const bgDB = user.home_page?.background.name || "bg-slate-600"; //bg-preview
+  const bgDB = user?.home_page?.background.name; //bg-preview
+
+  const fetcher = useFetcher<FetcherData>();
+
+  const isSubmittingFetcher = fetcher.state !== "idle"; //for adding links
 
   //message from action
   const [message, setMessage] = useState("");
@@ -260,6 +271,66 @@ export default function Styles() {
     }
   }, [actionData]);
 
+  //message from addLinkAction
+  const [addLinkMessage, setAddLinkMessage] = useState("");
+  useEffect(() => {
+    if (fetcher.data && fetcher.data.message) {
+      setAddLinkMessage(fetcher.data.message);
+      const timer = setTimeout(() => {
+        setAddLinkMessage(""); // Limpia el mensaje de error después de 4 segundos
+      }, 4000);
+
+      return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
+    } else if (fetcher.data && fetcher.data.error) {
+      setAddLinkMessage(fetcher.data.error);
+      const timer = setTimeout(() => {
+        setAddLinkMessage(""); // Limpia el mensaje de error después de 4 segundos
+      }, 4000);
+
+      return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
+    }
+  }, [fetcher.data]);
+
+  const selectOptions = [
+    { type: "Facebook", value: "Facebook" },
+    { type: "Twitter", value: "Twitter" },
+    { type: "Instagram", value: "Instagram" },
+    { type: "Linkedin", value: "Linkedin" },
+    { type: "Youtube", value: "Youtube" },
+  ];
+  const initialSocialLinksDB = selectOptions.map((option) => {
+    const existingLink = user?.social_media?.find(
+      (link) => link.type === option.type
+    );
+    return existingLink ? existingLink : { type: option.type, url: "" };
+  });
+  const [socialLinksState, setSocialLinksState] =
+    useState(initialSocialLinksDB);
+  const [selectedSocial, setSelectedSocial] = useState(
+    initialSocialLinksDB[0].type
+  ); // select add-link
+  const [socialInput, setSocialInput] = useState(initialSocialLinksDB[0].url); //controlled add-link input
+  useEffect(() => {
+    const selectedLink = socialLinksState.find(
+      (link) => link.type === selectedSocial
+    );
+    if (selectedLink) {
+      setSocialInput(selectedLink.url);
+    } else {
+      setSocialInput("");
+    }
+  }, [selectedSocial, socialLinksState]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setSocialInput(newValue);
+
+    const updatedLinksState = socialLinksState?.map((link) =>
+      link.type === selectedSocial ? { ...link, url: newValue } : link
+    );
+    setSocialLinksState(updatedLinksState);
+  };
+  console.log(socialLinksState);
+  console.log(socialInput);
   return (
     <div className="pageLayout bg-slate-200">
       <DashboarHeader />
@@ -281,33 +352,74 @@ export default function Styles() {
               </HeadingH2>
               <div className=" bg-white p-4 rounded-xl flex flex-col gap-4 w-full">
                 <h2>Agregar Enlace a redes sociales</h2>
-                <Form
+
+                <fetcher.Form
                   method="POST"
+                  action="/add-link"
                   className="flex sm:items-center flex-col sm:flex-row gap-4"
                 >
+                  {/* select */}
                   <div className="w-full sm:max-w-36">
                     <select
                       name="social-type"
-                      className="bg-gray-500 text-white p-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select"
+                      className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 w-full custom-select cursor-pointer"
+                      value={selectedSocial}
+                      onChange={(e) => setSelectedSocial(e.target.value)}
                     >
-                      <option value="facebook">Facebook</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="instagram">Instagram</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="youtube">YouTube</option>
+                      {selectOptions.map((opc) => (
+                        <option key={opc.type} value={opc.value}>
+                          {opc.type}
+                        </option>
+                      ))}
                     </select>
                   </div>
+                  {/*                   <FaCircleCheck className=" h-4 w-4 //absolute top-0 z-50 bg-white text-green-500 rounded-full " />*/}{" "}
+                  {/* input */}
                   <div className="w-full flex-1">
                     <input
                       className="w-full h-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-gray-200 rounded-md p-2"
                       type="text"
-                      name="media-link"
+                      name="social-link"
+                      placeholder={`https://www.${selectedSocial}.com/username...`}
+                      value={socialInput}
+                      onChange={handleInputChange}
                     />
+
+                    {socialLinksState?.map((link) => (
+                      <input
+                        key={link.type}
+                        hidden
+                        name={`social-links-${link.type}`}
+                        value={JSON.stringify({
+                          type: link.type,
+                          url: link.url,
+                        })}
+                        readOnly
+                      />
+                    ))}
                   </div>
-                  <button className="bg-blue-700 text-white text-nowrap rounded-md hover:bg-blue-500 p-2 ">
-                    Add Link
+                  <button
+                    disabled={isSubmittingFetcher}
+                    className="bg-blue-700 text-white text-nowrap rounded-md hover:bg-blue-500 p-2 "
+                  >
+                    {!isSubmittingFetcher ? " Add Social" : "Adding..."}
                   </button>
-                </Form>
+                </fetcher.Form>
+
+                {/* fetcher messages*/}
+                <div>
+                  {fetcher.data && fetcher.data.error && addLinkMessage && (
+                    <p className=" //bg-red-500 //w-64 //text-center text-red-500 //px-4 //py-2 //rounded-full">
+                      {addLinkMessage}
+                    </p>
+                  )}
+                  {fetcher.data && fetcher.data.message && addLinkMessage && (
+                    <p className=" //bg-green-500 //w-64 //text-center text-green-500 //px-4 //py-2 //rounded-full">
+                      {addLinkMessage}
+                    </p>
+                  )}
+                </div>
+
                 <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
                   <div className=" h-full flex items-center justify-center text-4xl">
                     <TiSocialTwitter />
@@ -411,8 +523,18 @@ export default function Styles() {
 
             {/* save button */}
             <Form method="post">
-              <input hidden name="backgroundId" value={bgToDBId as number} />
-              <input hidden name="backgroundStyle" value={backgroundState} />
+              <input
+                hidden
+                name="backgroundId"
+                value={bgToDBId ? bgToDBId : ""}
+                readOnly
+              />
+              <input
+                hidden
+                name="backgroundStyle"
+                value={backgroundState}
+                readOnly
+              />
               <button
                 disabled={isSubmittingStyle}
                 className=" bg-gray-300 lg:bg-white w-64 rounded-full px-4 py-1 text-lg font-semibold hover:scale-105 transition-all"

@@ -35,16 +35,16 @@ const DropDown = ({ setDropDown, dropDown, dataLink }: DropDownProps) => {
 
           {/* option bottoms*/}
           <div className=" absolute z-10 top-3 -left-0 min-h-44 py-2 w-52 bg-white bg-opacity-60 backdrop-blur-[0.5rem] px-2 flex flex-col justify-center gap-2 rounded-lg //*:shadow-sm //*:shadow-gray-600/[0.5] text-gray-600 *:bg-gray-200 *:px-4 *:py-1 *:rounded-full *:font-semibold">
-            <button
+            <Link
+              to={`/back-office/edit/${dropDown}`}
               onClick={() => {
                 setDropDown(0);
-                ////////////////////////
               }}
               className="flex justify-between items-center hover:scale-105 transition-all cursor-pointer"
             >
               <span>Edit Style</span>
               <CiEdit size={25} />
-            </button>
+            </Link>
             <Link
               to={dataLink.url}
               target="_blank"

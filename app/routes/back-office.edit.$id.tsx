@@ -12,7 +12,9 @@ import {
   Link,
   useActionData,
   useLoaderData,
+  useNavigate,
   useNavigation,
+  useParams,
 } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
@@ -46,11 +48,11 @@ import { validateUrl } from "@/utils/helpers";
 export function meta() {
   return [
     {
-      title: "Back Office - Add",
+      title: "Back Office - edit",
     },
     {
       name: "description",
-      content: "Back Office - Add",
+      content: "Back Office - edit",
     },
   ];
 }
@@ -106,7 +108,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       console.log("error at validation");
       throw new Error("Failed to fetch data 😢 "); //se mete por aca, pero no me renderiza este mensaje, renderiza otro
     }
-
     return json({
       links: linksDataVerified.data,
       userLinks: userLinksDataVerified.data,
@@ -120,12 +121,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 //action
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const action = async ({ params, request }: ActionFunctionArgs) => {
   const authToken = await getToken(request);
 
   if (!authToken) {
     return redirect("/login");
   }
+  const { id } = params;
 
   const formData = await request.formData();
 
@@ -146,19 +148,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   /* ******************************************* MEJORAR MANEJO DE ERRORES ********************************************/
   try {
-    const response = await fetch(`${process.env.API_BASE}/user/link/store`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify({
-        link_type_id: 1,
-        title: title,
-        url: link,
-        style: `${color} ${rounded} ${shadow}`,
-      }),
-    });
+    const response = await fetch(
+      `${process.env.API_BASE}/user/link/update/${id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          link_type_id: 1,
+          title: title,
+          url: link,
+          style: `${color} ${rounded} ${shadow}`,
+        }),
+      }
+    );
 
     if (!response.ok) {
       return json({ error: "Failed to save data " });
@@ -195,23 +200,25 @@ import {
 
 //component
 const Add = () => {
+  const { id } = useParams(); // id del link a editar
+
   const { userLinks, links }: LoaderType = useLoaderData();
 
   const action = useActionData<ActionType>();
 
-  const [selectedLinkId] = useState(userLinks[0]?.id); //1st link is default /* ****************** */
-
-  const selectedLink = userLinks.filter(
-    (link) => link?.id === selectedLinkId
-  ); /* ****************** */
+  const editingLink = userLinks.filter((link) => link?.id === Number(id)); //link a editar
+  const editingLinkStyle = editingLink[0].style.class.split(" ");
 
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
 
-  const [colorState, setColor] = useState("bg-white");
-  const [outlineState, setOutline] = useState("rounded-full");
-  const [shadowState, setShadow] = useState("shadow-md");
+  const [colorState, setColor] = useState(editingLinkStyle[0]);
+  const [outlineState, setOutline] = useState(editingLinkStyle[1]);
+  const [shadowState, setShadow] = useState(editingLinkStyle[2]);
+
+  const [titleInput, setTitleInput] = useState(editingLink[0]?.title);
+  const [linkInput, setLinkInput] = useState(editingLink[0]?.url);
 
   const [linkType, setLinkType] = useState("1"); //para el select de linkTypes
   const [iconType, setIconType] = useState(""); //para el select de icons
@@ -268,6 +275,8 @@ const Add = () => {
               name="title"
               type="text"
               id="title"
+              value={titleInput}
+              onChange={(e) => setTitleInput(e.target.value)}
             />
           </div>
 
@@ -285,6 +294,8 @@ const Add = () => {
               name="link"
               type="text"
               id="link"
+              value={linkInput}
+              onChange={(e) => setLinkInput(e.target.value)}
             />
           </div>
 
@@ -377,7 +388,7 @@ const Add = () => {
                       >
                         {((colorState && colorState === color) ||
                           (!colorState &&
-                            selectedLink[0]?.style.class.includes(color))) && (
+                            editingLink[0]?.style.class.includes(color))) && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
@@ -410,7 +421,7 @@ const Add = () => {
                         >
                           {((outlineState && outlineState === roundedClass) ||
                             (!outlineState &&
-                              selectedLink[0]?.style.class.includes(
+                              editingLink[0]?.style.class.includes(
                                 roundedClass
                               ))) && (
                             <motion.div
@@ -443,7 +454,7 @@ const Add = () => {
                         >
                           {((shadowState && shadowState === shadowClass) ||
                             (!shadowState &&
-                              selectedLink[0]?.style.class.includes(
+                              editingLink[0]?.style.class.includes(
                                 shadowClass
                               ))) && (
                             <motion.div
@@ -521,7 +532,7 @@ const Add = () => {
                         >
                           {((outlineState && outlineState === roundedClass) ||
                             (!outlineState &&
-                              selectedLink[0]?.style.class.includes(
+                              editingLink[0]?.style.class.includes(
                                 roundedClass
                               ))) && (
                             <motion.div
@@ -553,7 +564,7 @@ const Add = () => {
                         >
                           {((shadowState && shadowState === shadowClass) ||
                             (!shadowState &&
-                              selectedLink[0]?.style.class.includes(
+                              editingLink[0]?.style.class.includes(
                                 shadowClass
                               ))) && (
                             <motion.div

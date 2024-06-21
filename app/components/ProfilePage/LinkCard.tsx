@@ -7,9 +7,14 @@ type LinkCardProps = {
 const LinkCard = ({ label, url, style }: LinkCardProps) => {
   return (
     <li
-      className={`relative text-center px-4 py-2 hover:scale-[1.03] transition-all duration-200 cursor-pointer ${style}`}
+      className={`relative text-center hover:scale-[1.03] transition-all duration-200 cursor-pointer `}
     >
-      <a target="_blank" href={url} rel="noreferrer" className="w-full">
+      <a
+        target="_blank"
+        href={url}
+        rel="noreferrer"
+        className={` ${style} w-full block px-4 py-2  `}
+      >
         {label}
       </a>
     </li>

@@ -1,43 +1,50 @@
-import {
-  FaXTwitter,
-  FaFacebook,
-  FaInstagram,
-  FaSpotify,
-} from "react-icons/fa6";
+import { FaXTwitter, FaFacebook, FaInstagram } from "react-icons/fa6";
 import SocialItem from "./SocialItem";
-import data from "data.json";
+import { FaLinkedin, FaYoutube } from "react-icons/fa";
+import { useLoaderData } from "@remix-run/react";
+import { UserType } from "@/types";
 
-const { socials } = data;
+type DataType = {
+  user: UserType;
+};
 
 const SocialsContainer = () => {
+  const { user } = useLoaderData<DataType>();
   return (
-    <ul className=" flex justify-center gap-2 text-white text-2xl">
-      {socials.map((social, index) => {
-        if (social.title.toLowerCase() === "x") {
+    <ul className=" flex justify-center gap-2 text-white ">
+      {user.social_media.map((social, index) => {
+        if (social.type.toLowerCase() === "twitter") {
           return (
             <SocialItem key={index} social={social}>
               <FaXTwitter />
             </SocialItem>
           );
         }
-        if (social.title.toLowerCase() === "facebook") {
+        if (social.type.toLowerCase() === "facebook") {
           return (
             <SocialItem key={index} social={social}>
               <FaFacebook />
             </SocialItem>
           );
         }
-        if (social.title.toLowerCase() === "instagram") {
+        if (social.type.toLowerCase() === "instagram") {
           return (
             <SocialItem key={index} social={social}>
               <FaInstagram />
             </SocialItem>
           );
         }
-        if (social.title.toLowerCase() === "spotify") {
+        if (social.type.toLowerCase() === "linkedin") {
           return (
             <SocialItem key={index} social={social}>
-              <FaSpotify />
+              <FaLinkedin />
+            </SocialItem>
+          );
+        }
+        if (social.type.toLowerCase() === "youtube") {
+          return (
+            <SocialItem key={index} social={social}>
+              <FaYoutube />
             </SocialItem>
           );
         }

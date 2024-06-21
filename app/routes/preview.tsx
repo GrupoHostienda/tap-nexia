@@ -63,9 +63,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       responses[1].json(),
     ]);
 
-    console.log(userData);
-    console.log(userLinksData);
-
     return json({
       user: userData,
       userLinks: userLinksData,
@@ -91,8 +88,8 @@ export default function Index() {
     <div className={twMerge("bg-slate-600 min-h-screen", bgDB, background)}>
       <DashboarHeader />
       <Sidebar title="Menu" />
-      <div className=" pb-10 ">
-        <div className="flex flex-col gap-10 pt-20 max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="  min-h-screen">
+        <div className="flex flex-col min-h-screen pb-10 gap-10 pt-20 max-w-3xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-center flex-col gap-2">
             <div className=" relative ">
               <motion.div
@@ -141,6 +138,7 @@ export default function Index() {
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.15 }}
+            className=" flex-1"
           >
             <LinksContainer data={links} />
           </motion.div>

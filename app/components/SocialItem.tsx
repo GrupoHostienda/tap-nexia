@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 type SocialItemProps = {
   social: {
-    title: string;
+    type: string;
     url: string;
   };
   children: ReactNode;
@@ -11,7 +11,9 @@ type SocialItemProps = {
 const SocialItem = ({ social, children }: SocialItemProps) => {
   return (
     <li className=" hover:scale-125 transition-all cursor-pointer">
-      <a href={social.url}>{children}</a>
+      <a target="_blank" rel="noreferrer" href={social.url}>
+        {children}
+      </a>
     </li>
   );
 };

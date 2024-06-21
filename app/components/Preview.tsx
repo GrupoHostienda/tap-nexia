@@ -10,6 +10,9 @@ import type { ContextType, UserLinkType, UserType } from "@/types";
 
 import { twMerge } from "tailwind-merge";
 
+import SocialsContainer from "./SocialsContainer";
+import LinksContainer from "./ProfilePage/LinksContainer";
+
 //type
 type PreviewProps = {
   data: UserLinkType[];
@@ -54,7 +57,7 @@ function Preview({ data, user }: PreviewProps) {
         </div>
 
         {/* Links*/}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 flex-1">
           {data ? (
             [...data].reverse().map((dataLink, index) => {
               return (
@@ -106,6 +109,15 @@ function Preview({ data, user }: PreviewProps) {
               Add a link
             </Link>
           )}
+        </div>
+
+        {/*   <div className=" flex-1">
+          <LinksContainer data={data} />
+        </div> */}
+
+        {/* socials */}
+        <div className=" text-white  text-xl text-center capitalize flex //flex-col justify-center gap-2 //mb-14">
+          <SocialsContainer />
         </div>
       </div>
     </div>
