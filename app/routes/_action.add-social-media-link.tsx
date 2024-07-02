@@ -3,7 +3,7 @@ import { validateUrl } from "@/utils/helpers";
 import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 
 /******************** action ********************/
-/************* used "/in styles" *************/
+/************* used "/in stylesPage/SocialMedia" *************/
 export const action = async ({ request }: ActionFunctionArgs) => {
   const authToken = await getToken(request);
 

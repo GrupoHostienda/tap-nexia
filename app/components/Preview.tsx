@@ -11,7 +11,7 @@ import type { ContextType, UserLinkType, UserType } from "@/types";
 import { twMerge } from "tailwind-merge";
 
 import SocialsContainer from "./SocialsContainer";
-import LinksContainer from "./ProfilePage/LinksContainer";
+//import LinksContainer from "./ProfilePage/LinksContainer";
 
 //type
 type PreviewProps = {
@@ -24,6 +24,8 @@ function Preview({ data, user }: PreviewProps) {
   const navigation = useNavigation();
 
   const { linkId, background }: ContextType = useOutletContext();
+
+  const dataVisible = data?.filter((d) => d.isHidden === 0);
 
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
@@ -50,16 +52,16 @@ function Preview({ data, user }: PreviewProps) {
           />
         </div>
 
-        {/* email and username */}
+        {/* email and bio */}
         <div className="text-center">
           <h1 className="font-bold text-gray-300">{user.email}</h1>
-          <p className="text-sm text-gray-300">{user.username}</p>
+          <p className="text-sm text-gray-300">{user.home_page?.bio}</p>
         </div>
 
         {/* Links*/}
         <div className="flex flex-col gap-3 flex-1">
           {data ? (
-            [...data].reverse().map((dataLink, index) => {
+            dataVisible.reverse().map((dataLink, index) => {
               return (
                 <div key={index}>
                   <div
@@ -111,7 +113,7 @@ function Preview({ data, user }: PreviewProps) {
           )}
         </div>
 
-        {/*   <div className=" flex-1">
+        {/*  <div className=" flex-1">
           <LinksContainer data={data} />
         </div> */}
 

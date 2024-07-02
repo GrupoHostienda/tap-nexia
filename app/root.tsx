@@ -10,9 +10,15 @@ import {
   Link,
   useNavigation,
 } from "@remix-run/react";
-import "./styles/index.css";
+import stylesheet from "./styles/index.css?url";
 import { motion } from "framer-motion";
 import TwoColGridLayout from "./components/TwoColGridLayout";
+import { LinksFunction } from "@remix-run/node";
+
+//css
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
 
 //type
 type LayoutProps = {
@@ -45,12 +51,21 @@ export function Layout({ children }: LayoutProps) {
   );
 }
 
+//meta
+export function meta() {
+  return [
+    {
+      title: "Hostienda | Landing",
+    },
+    {
+      name: "description",
+      content: "Landing page",
+    },
+  ];
+}
+
 //app
 export default function App() {
-  /*  const [color, setColor] = useState("");
-  const [outline, setOutline] = useState("");
-  const [shadow, setShadow] = useState(""); */
-
   const [background, setBackground] = useState(""); //bg-preview
   const [bgToDBId, setBgToDBId] = useState<number | null>(null); //bg-preview
 
@@ -69,12 +84,6 @@ export default function App() {
   return (
     <Outlet
       context={{
-        /*     color,
-        setColor,
-        outline,
-        setOutline,
-        shadow,
-        setShadow, */
         linkId,
         setLinkId, // delete | DropDrown component
         background,
@@ -84,19 +93,6 @@ export default function App() {
       }}
     />
   );
-}
-
-//Error SEO
-export function meta() {
-  return [
-    {
-      title: "Hostienda | Error",
-    },
-    {
-      name: "description",
-      content: "There was an error",
-    },
-  ];
 }
 
 //error UI

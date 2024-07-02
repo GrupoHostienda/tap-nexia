@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { TbMenu } from "react-icons/tb";
@@ -8,23 +7,29 @@ import { CiImageOn, CiStar, CiCalendar, CiLock } from "react-icons/ci";
 import { ImStatsBars2 } from "react-icons/im";
 import { MdOutlineEdit, MdEditOff } from "react-icons/md";
 import { FaRegSave, FaSpinner } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form, useNavigation, useSubmit } from "@remix-run/react";
 import { UserLinkType } from "@/types";
 
 //component
-const CardBackOffice = ({ link }: { link: UserLinkType }) => {
+function CardBackOffice({ link }: { link: UserLinkType }) {
   const navigation = useNavigation();
+
+  const ref = useRef<HTMLInputElement>(null); //para el checkbox
 
   const isSubmittingDelete =
     !(navigation.state === "idle") && navigation.formMethod === "DELETE";
   const isSubmitting =
     !(navigation.state === "idle") && navigation.formMethod === "POST";
-  const [idLink, setIdLink] = useState<number>(0);
+  const [idLink, setIdLink] = useState<number>();
 
   const [linkActivated, setLinkActivated] = useState(link.isHidden == 0);
 
+  //para el checkbox
   const submit = useSubmit();
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    submit(event.currentTarget.form);
+  };
 
   const [inputEnabled, setInputEnabled] = useState(false);
   const toggleInput = () => {
@@ -48,6 +53,13 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
     });
   };
 
+  //ref button type button and input type checkbox
+  const handleCheckboxRef = () => {
+    if (ref.current) {
+      ref.current.click();
+    }
+  };
+
   useEffect(() => {
     // Este efecto se ejecutará cuando las propiedades del enlace cambien
     setValues({
@@ -56,12 +68,6 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
     });
     setInputEnabled(false); // Deshabilita los inputs después de la actualización
   }, [link]);
-
-  useEffect(() => {
-    if (navigation.state === "idle") {
-      setIdLink(0);
-    }
-  }, [navigation]);
 
   return (
     <>
@@ -77,7 +83,7 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
               name="title"
               onChange={handleInputs}
               className={` ${
-                inputEnabled && "border"
+                inputEnabled && "border bg-white"
               } w-full bg-transparent outline-none p-2 rounded-md`}
               disabled={!inputEnabled}
             />
@@ -88,7 +94,7 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
               onChange={handleInputs}
               className={` ${
                 inputEnabled && "border"
-              } w-full bg-transparent outline-none p-2 rounded-md`}
+              } w-full //bg-transparent outline-none p-2 rounded-md`}
               name="url"
               value={inputs.url || link.url}
               disabled={!inputEnabled}
@@ -115,41 +121,37 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
             id={"visibilityBtn" + link.id}
             className="order-2 sm:order-1 cursor-pointer"
           >
+            {/* checkbox - hidden */}
             <input
-              type="number"
-              className="hidden"
+              type="checkbox"
+              // className="hidden"
+              //  ref={ref}
+              checked={link.isHidden === 0}
               name="isHidden"
-              value={linkActivated ? 0 : 1}
+              onChange={handleChange}
             />
             <input type="hidden" name="title" value={inputs.title} />
             <input type="hidden" name="url" value={inputs.url} />
-            <input type="hidden" name="style" value={link.style?.class} />
+            <input type="hidden" name="style" value={link.style.class} />
             <input type="hidden" value={link.id} name="idCard" />
 
             {/* submmit button */}
             <button
               className="relative"
-              onClick={(e) => {
-                setLinkActivated((prev) => !prev);
-                setIdLink(link.id);
-                submit(e.currentTarget.form);
-              }}
+              onClick={() => setLinkActivated((prev) => !prev)}
             >
-              {/*   {isSubmitting &&
-                idLink == link.id &&
-                navigation.formMethod === "POST" && (
-                  <div className=" absolute top-[6px] -left-7 z-10  animate-spin h-5 w-5 border-l-2 border-gray-600 rounded-full"></div>
-                )} */}
               <div
+                onClick={handleCheckboxRef}
                 className={`block ${
-                  !link.isHidden
+                  linkActivated
                     ? `bg-green-400 transition-all`
                     : `bg-gray-600 transition-all`
                 } w-14 h-8 rounded-full`}
               ></div>
               <div
+                onClick={handleCheckboxRef}
                 className={`//dot absolute ${
-                  !link.isHidden
+                  linkActivated
                     ? `right-1 transition-all`
                     : `left-1 transition-all`
                 } top-1 bg-white w-6 h-6 rounded-full`}
@@ -163,7 +165,6 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
               <input type="hidden" name="title" value={inputs.title} />
               <input type="hidden" name="url" value={inputs.url} />
               <input type="hidden" value={link.id} name="idCard" />
-              <input type="hidden" name="style" value={link.style?.class} />
 
               <button
                 type="submit"
@@ -215,6 +216,6 @@ const CardBackOffice = ({ link }: { link: UserLinkType }) => {
       </div>
     </>
   );
-};
+}
 
 export default CardBackOffice;

@@ -6,7 +6,6 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useNavigation } from "@remix-run/react";
-import { sessionStorage } from "@/utils/session.server";
 
 import DashboarHeader from "@/components/DashboarHeader";
 import HeadingMobile from "@/components/layout/HeadingMobile";
@@ -22,7 +21,6 @@ import { FaPlus } from "react-icons/fa";
 import { FiArchive } from "react-icons/fi";
 import { RiLayoutTopLine } from "react-icons/ri";
 import { IoIosArrowForward } from "react-icons/io";
-//import { useEffect } from "react";
 
 //meta
 export function meta() {
@@ -103,23 +101,20 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 //action
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const authToken = session.get("authToken");
+  const authToken = await getToken(request);
+
+  if (!authToken) {
+    return redirect("/login");
+  }
+
   if (request.method === "POST") {
     const formData = await request.formData();
-    // const formType = formData.get("formType");
     const title = formData.get("title") as string;
     const link = formData.get("url") as string;
+    const style = formData.get("style") as string;
     const idLink = formData.get("idCard") as string;
+    const isHidden = formData.get("isHidden") as string;
 
-    const linkVisibleStr = formData.get("isHidden") as string;
-    const linkVisible = parseInt(linkVisibleStr, 10);
-
-    console.log("ejecutando update");
-    console.log(title);
-    console.log(linkVisible);
     try {
       const response = await fetch(
         `${process.env.API_BASE}/user/link/update/${idLink}`,
@@ -133,7 +128,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             link_type_id: 1,
             title: title,
             url: link,
-            isHidden: linkVisible,
+            style: style,
+            isHidden: isHidden,
           }),
         }
       );
@@ -141,6 +137,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         throw new Error("Failed to fetch data");
       }
       console.log(response.status);
+      console.log(response);
       const data = await response.json();
       console.log(data);
       return json({ data });
@@ -240,7 +237,7 @@ export default function LayoutBackOffice() {
           </div>
 
           {/* preview | col-02 */}
-          <div className="colSpan-02 order-1 lg:order-2 //bg-red-500">
+          <div className="colSpan-02 order-1 lg:order-2 //bg-blue-500">
             <div className="sticky top-20 flex flex-col gap-4 items-center  bg-white lg:bg-transparent my-8 mx-6 lg:mx-0 rounded-xl lg:rounded-none py-4  lg:py-0 ">
               <div className=" lg:h-10"></div>
 

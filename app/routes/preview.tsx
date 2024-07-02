@@ -82,6 +82,8 @@ export default function Index() {
 
   const bgDB = userdata.home_page?.style; //bg-preview
 
+  const linksVisible = links.filter((d) => d.isHidden === 0);
+
   const { background }: ContextType = useOutletContext();
 
   return (
@@ -129,8 +131,10 @@ export default function Index() {
               animate={{ y: 0, opacity: 1 }}
               className=" text-center capitalize text-slate-200"
             >
-              <h2 className="  text-3xl font-bold">{userdata.username}</h2>
-              <p className=" text-lg ">{userdata.role}</p>
+              <h2 className="  text-3xl font-bold lowercase">
+                {userdata.email}
+              </h2>
+              <p className=" text-lg ">{userdata.home_page?.bio}</p>
             </motion.div>
           </div>
 
@@ -140,7 +144,7 @@ export default function Index() {
             transition={{ delay: 0.15 }}
             className=" flex-1"
           >
-            <LinksContainer data={links} />
+            <LinksContainer data={linksVisible} />
           </motion.div>
 
           <motion.div

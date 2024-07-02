@@ -59,12 +59,18 @@ const DashboarHeader = () => {
           to="/back-office"
           onClick={() => setPathname("/back-office")}
         >
-          <MdOutlineDashboard /> Back Office
+          <MdOutlineDashboard />
+
           {pathname === "/back-office" &&
-            submitMethod === undefined &&
-            isRouting && (
+          submitMethod === undefined &&
+          isRouting ? (
+            <>
+              <span>Back Offi...</span>{" "}
               <div className=" animate-spin h-5 w-5 border-l-2 border-gray-600 rounded-full"></div>
-            )}
+            </>
+          ) : (
+            <span>Back Office</span>
+          )}
         </Link>
       </li>
       <li>
